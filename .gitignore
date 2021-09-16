@@ -1,0 +1,7 @@
+# ignore ide files
+.devcontainer
+.vscode
+
+# ignore packages
+vendor
+node_modules
