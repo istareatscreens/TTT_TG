@@ -11,5 +11,5 @@
       "downlevelIteration": true,
     },
     "exclude": ["node_modules"],
-    "include": ["src/js", "src/js/index.js"]
+    "include": ["src/js", "src/js/index.ts"]
   }

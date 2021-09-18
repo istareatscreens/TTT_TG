@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 
 module.exports = {
-  entry: "./src/js/index.js",
+  entry: "./src/js/index.ts",
   output: {
     filename: "[name].js",
   },
