@@ -5,3 +5,6 @@
 # ignore packages
 vendor
 node_modules
+
+# ignore build folder
+client/public
