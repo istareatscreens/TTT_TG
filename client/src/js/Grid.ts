@@ -5,10 +5,10 @@ export default class Grid {
   private context: CanvasRenderingContext2D;
   private color: string;
 
-  constructor(
+  public constructor(
     context: CanvasRenderingContext2D,
     lineStroke: number,
-    dimensions: { width: number; height: number },
+    dimensions: Dimensions,
     color: string = "black"
   ) {
     this.dimensions = dimensions;
@@ -18,7 +18,7 @@ export default class Grid {
   }
 
   public draw(): void {
-    const { width, height } = this.dimensions;
+    const [width, height] = this.dimensions;
     this.createLine(width / 3, 0, this.lineStroke, height);
     this.createLine((width * 2) / 3, 0, this.lineStroke, height);
     this.createLine(0, height / 3, width, this.lineStroke);
@@ -38,7 +38,7 @@ export default class Grid {
 
   // prettier-ignore
   public isInsideGrid(x: number, y: number): boolean {
-    const { width, height } = this.dimensions;
+    const [ width, height ] = this.dimensions;
     return (
       (x > width / 3 && x < width / 3 + this.lineStroke && y > 0 && y < height) ||
       (x > width*2 / 3 && x < width*2 / 3 + this.lineStroke && y > 0 && y < height) ||
