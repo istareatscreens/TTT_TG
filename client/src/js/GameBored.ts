@@ -1,7 +1,8 @@
 import Grid from "./Grid";
-import QuadrantMark, { Mark } from "./QuadrantMark";
+import Quadrant, { Mark } from "./Quadrant";
 import { Coordinates, Dimensions } from "./types";
 
+//debug function
 function dec2bin(dec: number) {
   return (dec >>> 0).toString(2);
 }
@@ -12,7 +13,7 @@ export default class GameBored {
   private dimensions: Dimensions;
   private lineStroke: number;
   private quadrantDimensions: Dimensions;
-  private marks: Array<QuadrantMark>;
+  private quadrants: Array<Quadrant>;
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -25,16 +26,16 @@ export default class GameBored {
     this.grid = new Grid(context, lineStroke, dimensions);
     const [width, height] = dimensions;
     this.quadrantDimensions = [width / 3, height / 3];
-    this.marks = [];
+    this.quadrants = [];
   }
 
-  public draw(state: number): void {
+  public draw(state: number = 0): void {
+    this.context.clearRect(0, 0, ...this.dimensions);
     this.grid.draw();
-    this.update(state);
+    this.drawMarks(state);
   }
 
-  public update(state: number): void {
-    console.log(dec2bin(state));
+  private drawMarks(state: number): void {
     /* 
       each two bits represents a quadrant
       00 === empty
@@ -65,18 +66,36 @@ export default class GameBored {
       ((yPosition % 3) * height) / 3 + lineStrokeAdjustment(yPosition),
     ];
 
-    const quadrantMark = new QuadrantMark(
+    const quadrantMark = new Quadrant(
       this.context,
       {
         coordinates: quadrantCoordinates,
         dimensions: this.quadrantDimensions,
         mark: mark,
+        quadrant: yPosition * 3 + xPosition,
       },
       this.lineStroke
     );
 
     quadrantMark.draw();
 
-    this.marks.push(quadrantMark);
+    this.quadrants.push(quadrantMark);
+  }
+
+  public isValidMove(coordinates: Coordinates) {
+    return (
+      (!this.grid.isInsideGrid(...coordinates) &&
+        this.findQuadrant(coordinates)?.isEmpty()) ??
+      false
+    );
+  }
+  private findQuadrant(coordinates: Coordinates): Quadrant | undefined {
+    return this.quadrants.find((quadrant) =>
+      quadrant.isInQuadrant(...coordinates)
+    );
+  }
+
+  public getQuadrantNumber(coordinates: Coordinates): number | undefined {
+    return this.findQuadrant(coordinates)?.getNumber();
   }
 }

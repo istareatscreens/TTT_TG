@@ -38,13 +38,12 @@ export default class Grid {
 
   // prettier-ignore
   public isInsideGrid(x: number, y: number): boolean {
-    const [ width, height ] = this.dimensions;
+    const [width, height] = this.dimensions;
     return (
       (x > width / 3 && x < width / 3 + this.lineStroke && y > 0 && y < height) ||
-      (x > width*2 / 3 && x < width*2 / 3 + this.lineStroke && y > 0 && y < height) ||
-      (x > 0 && x < width  && y > height/3 && y < height/3 + this.lineStroke) ||
-      (x > 0 && x < width  && y > height*2/3 && y < height*2/3 + this.lineStroke)
+      (x > width * 2 / 3 && x < width * 2 / 3 + this.lineStroke && y > 0 && y < height) ||
+      (x > 0 && x < width  && y > height / 3 && y < height / 3 + this.lineStroke) ||
+      (x > 0 && x < width  && y > height * 2 / 3 && y < height * 2 / 3 + this.lineStroke)
     );
-
   }
 }

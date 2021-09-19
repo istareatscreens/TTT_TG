@@ -10,9 +10,10 @@ interface MarkProperties {
   coordinates: Coordinates;
   dimensions: Dimensions;
   mark: Mark;
+  quadrant: number;
 }
 
-export default class QuadrantMark {
+export default class Quadrant {
   private context: CanvasRenderingContext2D;
   private properties: MarkProperties;
   private lineStroke: number;
@@ -39,11 +40,13 @@ export default class QuadrantMark {
         this.drawX();
         break;
       case O:
+        this.drawO();
         break;
-      case Empty: //do nothing
+      case Empty:
+        //do nothing
         break;
       default:
-        console.log(this.properties.mark);
+        console.log("Invalid input");
     }
   }
 
@@ -71,5 +74,40 @@ export default class QuadrantMark {
     this.context.closePath();
   }
 
-  private drawO(): void {}
+  private drawO(): void {
+    const [x, y] = this.properties.coordinates;
+    const [width, height] = this.properties.dimensions;
+    this.context.strokeStyle = this.color;
+    this.context.lineWidth = this.lineStroke;
+    this.context.beginPath();
+    this.context.arc(
+      x + width / 2,
+      y + height / 2,
+      width / 2 - this.edgeBuffer,
+      0,
+      2 * Math.PI
+    );
+    this.context.stroke();
+  }
+
+  public isInQuadrant(xCoordinate: number, yCoordinate: number): boolean {
+    const [x, y] = this.properties.coordinates;
+    const [width, height] = this.properties.dimensions;
+    return (
+      xCoordinate > x &&
+      xCoordinate < x + width &&
+      yCoordinate > y &&
+      yCoordinate < y + height
+    );
+  }
+
+  public isEmpty(): boolean {
+    return !(
+      Mark.X === this.properties.mark || this.properties.mark === Mark.O
+    );
+  }
+
+  public getNumber(): number {
+    return this.properties.quadrant;
+  }
 }

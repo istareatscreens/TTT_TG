@@ -1,4 +1,4 @@
-import Bored from "./Bored";
+import Game from "./Game";
 import { Dimensions } from "./types";
 
 const canvas = document.getElementById("ttt-canvas") as HTMLCanvasElement;
@@ -10,10 +10,8 @@ window.addEventListener("resize", () => {
 const init = () => {
   const dimensions: Dimensions = [window.innerHeight, window.innerWidth];
   setCanvasDimensions(...dimensions);
-
-  const bored = new Bored(context, dimensions, 10);
-  bored.draw(0);
-  bored.update(87381);
+  const game = new Game(context, dimensions);
+  game.start();
 };
 
 const setCanvasDimensions = (height: number, width: number) => {
