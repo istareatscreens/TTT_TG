@@ -3,15 +3,15 @@
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
-use MyApp\Chat;
+use GameClient\Client;
 
 require __DIR__.'/vendor/autoload.php';
-require_once "Chat.php";
+require_once "Client.php";
 
     $server = IoServer::factory(
         new HttpServer(
             new WsServer(
-                new Chat()
+                new Client()
             )
         ),
         8080

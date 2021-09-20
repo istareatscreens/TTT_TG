@@ -1,10 +1,12 @@
 <?php
-namespace MyApp;
+namespace GameClient;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+require_once "Game.php";
 
-class Chat implements MessageComponentInterface {
+class Client implements MessageComponentInterface {
     protected $clients;
+    protected $games;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
@@ -13,15 +15,18 @@ class Chat implements MessageComponentInterface {
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-
+         
         echo "New connection! ({$conn->resourceId})\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+        //template code
         $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
+        $msg = json_decode($msg);
+        $GUID = com_create_guid();
+        
         foreach ($this->clients as $client) {
             if ($from !== $client) {
                 // The sender is not the receiver, send to each client connected
