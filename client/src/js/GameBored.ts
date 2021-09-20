@@ -55,15 +55,11 @@ export default class GameBored {
     yPosition: number,
     mark: Mark // value must be < 3
   ): void {
-    console.log(dec2bin(mark));
-
     const [width, height] = this.dimensions;
-    const lineStrokeAdjustment = (coordinate: number): number =>
-      coordinate % 3 === 0 ? 0 : this.lineStroke;
 
     const quadrantCoordinates: Coordinates = [
-      ((xPosition % 3) * width) / 3 + lineStrokeAdjustment(xPosition),
-      ((yPosition % 3) * height) / 3 + lineStrokeAdjustment(yPosition),
+      ((xPosition % 3) * width) / 3,
+      ((yPosition % 3) * height) / 3,
     ];
 
     const quadrantMark = new Quadrant(
@@ -82,7 +78,7 @@ export default class GameBored {
     this.quadrants.push(quadrantMark);
   }
 
-  public isValidMove(coordinates: Coordinates) {
+  public isValidMove(coordinates: Coordinates): boolean {
     return (
       (!this.grid.isInsideGrid(...coordinates) &&
         this.findQuadrant(coordinates)?.isEmpty()) ??
@@ -90,8 +86,10 @@ export default class GameBored {
     );
   }
   private findQuadrant(coordinates: Coordinates): Quadrant | undefined {
-    return this.quadrants.find((quadrant) =>
-      quadrant.isInQuadrant(...coordinates)
+    return this.quadrants.find(
+      (quadrant) =>
+        !this.grid.isInsideGrid(...coordinates) &&
+        quadrant.isInQuadrant(...coordinates)
     );
   }
 

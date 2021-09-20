@@ -83,7 +83,7 @@ export default class Quadrant {
     this.context.arc(
       x + width / 2,
       y + height / 2,
-      width / 2 - this.edgeBuffer,
+      Math.min(width, height) / 2 - this.edgeBuffer,
       0,
       2 * Math.PI
     );

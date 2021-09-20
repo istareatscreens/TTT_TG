@@ -13,7 +13,7 @@ export default class Grid {
   ) {
     this.dimensions = dimensions;
     this.context = context;
-    this.lineStroke = lineStroke;
+    this.lineStroke = lineStroke / 2;
     this.color = color;
   }
 
