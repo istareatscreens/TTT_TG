@@ -11,17 +11,23 @@ class Game {
     private $movesLeft;
     private $winner;
 
-    public function __construct($id, ){
+    public function __construct($id, $client1, $client2){
         $this->id = $id; 
         $this->state = 0;
         $this->movesLeft = 9;
         $this->playersMove = 1; //player 1 moves first
         $this->clients = array();
+        $this->registerClient($client1);
+        $this->registerClient($client2);
         $this->winner = NULL;
     }
 
     public function getId(){
         return $this->id;
+    }
+
+    public function getPlayers(){
+        return array($this->clients[0][0], $this->clients[1][0]);
     }
 
     public function registerClient($client): bool{
@@ -44,9 +50,9 @@ class Game {
     private function getMark($client): int{
         $mark = -1;
         if($client === $this->clients[0][0]){
-            $mark === $this->clients[1][0];
-        }else if($client === $this->clients[0][0]){
-            $mark === $this->clients[1][0];
+            $mark === $this->clients[0][1];
+        }else if($client === $this->clients[1][0]){
+            $mark === $this->clients[1][1];
         }
         return $mark;
     }
@@ -56,7 +62,7 @@ class Game {
     }
 
     public function getWinner(){
-        return $this->winner;
+        return (is_null($this->winner))? 0 : $this->getMark($this->winner);
     }
 
     private function setWinner($client): void{
