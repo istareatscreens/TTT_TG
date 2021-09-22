@@ -1,16 +1,11 @@
-import { Coordinates, Dimensions } from "./types";
-
-export enum Mark {
-  Empty,
-  X,
-  O,
-}
+import { Mark } from "../../common/enums";
+import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
 
 interface MarkProperties {
   coordinates: Coordinates;
   dimensions: Dimensions;
   mark: Mark;
-  quadrant: number;
+  quadrant: QuadrantNumber;
 }
 
 export default class Quadrant {
@@ -107,7 +102,7 @@ export default class Quadrant {
     );
   }
 
-  public getNumber(): number {
+  public getNumber(): QuadrantNumber {
     return this.properties.quadrant;
   }
 }

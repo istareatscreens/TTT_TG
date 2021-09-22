@@ -1,12 +1,14 @@
-import GameBored from "./GameBored";
-import { Dimensions } from "./types";
+import GameBored from "./bored/GameBored";
+import { Coordinates, Dimensions, QuadrantNumber } from "../types";
+import { Mark } from "../common/enums";
 
-export default class Game {
+export default class TicTacToe {
   private context: CanvasRenderingContext2D;
   private dimensions: Dimensions;
   private bored: GameBored;
   private state: number;
   private lineStroke: number;
+  private winner: Mark;
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -17,6 +19,14 @@ export default class Game {
     this.setDimensions(dimensions);
     this.bored = new GameBored(context, dimensions, this.lineStroke);
     this.state = 0;
+    this.winner = Mark.Empty;
+  }
+
+  public setWinner(winner: Mark): void {
+    this.winner = winner;
+  }
+  public getWinner(): Mark {
+    return this.winner;
   }
 
   public setDimensions(dimensions: Dimensions) {
@@ -27,9 +37,12 @@ export default class Game {
     this.context.clearRect(0, 0, ...this.dimensions);
   }
 
-  public interact(event: MouseEvent): void {
-    const { offsetX, offsetY } = event;
-    console.log(this.bored.getQuadrantNumber([offsetX, offsetY]));
+  public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
+    if (this.bored.isValidMove(coordinates)) {
+      console.log(this.bored.getQuadrantNumber(coordinates));
+      return this.bored.getQuadrantNumber(coordinates);
+    }
+    return -1;
   }
 
   public setState(state: number): void {

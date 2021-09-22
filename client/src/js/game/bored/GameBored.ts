@@ -1,6 +1,7 @@
 import Grid from "./Grid";
-import Quadrant, { Mark } from "./Quadrant";
-import { Coordinates, Dimensions } from "./types";
+import Quadrant from "./Quadrant";
+import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
+import { Mark } from "../../common/enums";
 
 //debug function
 function dec2bin(dec: number) {
@@ -68,7 +69,7 @@ export default class GameBored {
         coordinates: quadrantCoordinates,
         dimensions: this.quadrantDimensions,
         mark: mark,
-        quadrant: yPosition * 3 + xPosition,
+        quadrant: (yPosition * 3 + xPosition) as QuadrantNumber,
       },
       this.lineStroke
     );
@@ -85,6 +86,7 @@ export default class GameBored {
       false
     );
   }
+
   private findQuadrant(coordinates: Coordinates): Quadrant | undefined {
     return this.quadrants.find(
       (quadrant) =>
@@ -93,7 +95,7 @@ export default class GameBored {
     );
   }
 
-  public getQuadrantNumber(coordinates: Coordinates): number | undefined {
-    return this.findQuadrant(coordinates)?.getNumber();
+  public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
+    return this.findQuadrant(coordinates)?.getNumber() ?? -1;
   }
 }

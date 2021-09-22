@@ -1,4 +1,4 @@
-import { Dimensions } from "./types";
+import { Dimensions } from "../../types";
 export default class Grid {
   private dimensions: Dimensions;
   private lineStroke: number;
