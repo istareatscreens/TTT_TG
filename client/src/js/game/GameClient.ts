@@ -43,8 +43,12 @@ export default class GameClient implements ISubscriber {
     this.resizeController.add(this);
   }
 
-  public getSubscriberId() {
+  public getSubscriberId(): string {
     return this.subscriberId.getId();
+  }
+
+  public getSubscriberElement(): HTMLElement {
+    return this.canvas;
   }
 
   public redraw(dimensions: Dimensions) {
@@ -60,7 +64,7 @@ export default class GameClient implements ISubscriber {
   }
 
   public update(): void {
-    if (this.gameController.hasCoordinates()) {
+    if (this.gameController.hasCoordinates(this)) {
       this.makeMove();
     } else if (this.resizeController.hasDimensions()) {
       this.resizeGame();
@@ -122,6 +126,10 @@ export default class GameClient implements ISubscriber {
     this.game.setState(state);
   }
 
+  private getElement(): HTMLElement {
+    return this.canvas;
+  }
+
   private resizeGame(): void {
     const dimensions = this.resizeController.getDimensions();
     this.canvas.width = dimensions[0];
@@ -131,7 +139,7 @@ export default class GameClient implements ISubscriber {
   }
 
   private makeMove(): void {
-    const coordinates = this.gameController.getCoordinates();
+    const coordinates = this.gameController.getCoordinates(this);
     const quadrant = this.game.getQuadrantNumber(coordinates);
     console.log("quadrant: " + quadrant);
     if (!this.connected) {

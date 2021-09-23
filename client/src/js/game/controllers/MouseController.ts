@@ -2,47 +2,67 @@ import ISubscriber from "../../common/interfaces/ISubscriber";
 import { Coordinates } from "../../types";
 import Controller from "./Controller";
 
-export default class MouseController implements Controller {
-  private coordinates: Coordinates[];
-  private canvas: HTMLCanvasElement;
-  private subscribers: Map<string, ISubscriber>;
+type ElementData = [element: HTMLElement, isBound: boolean];
 
-  public constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-    this.coordinates = [];
+export default class MouseController implements Controller {
+  private coordinates: Map<string, Coordinates[]>;
+  private subscribers: Map<string, ISubscriber>;
+  private elements: Map<string, ElementData>;
+
+  public constructor() {
+    this.coordinates = new Map<string, Coordinates[]>();
+    this.elements = new Map<string, ElementData>();
     this.subscribers = new Map<string, ISubscriber>();
   }
 
   public add(subscriber: ISubscriber): void {
-    this.subscribers = this.subscribers.set(
-      subscriber.getSubscriberId(),
-      subscriber
-    );
+    const id = subscriber.getSubscriberId();
+    this.elements.set(id, [subscriber.getSubscriberElement(), false]);
+    this.coordinates.set(id, []);
+    this.subscribers.set(id, subscriber);
   }
 
   public remove(subscriber: ISubscriber): void {
-    this.subscribers.delete(subscriber.getSubscriberId());
+    const id = subscriber.getSubscriberId();
+    this.subscribers.delete(id);
+    const [element] = this.elements.get(id);
+    element.removeEventListener("click", this.setCoordinates.bind(this, id));
+    this.elements.delete(id);
+    this.coordinates.delete(id);
   }
 
   public notify(): void {
-    this.subscribers.forEach((subscriber) => subscriber.update());
+    this.subscribers.forEach((subscriber) => {
+      if (this.coordinates.get(subscriber.getSubscriberId()).length !== 0) {
+        subscriber.update();
+      }
+    });
   }
 
   public connect(): void {
-    this.canvas.removeEventListener("click", this.setCoordinates.bind(this));
-    this.canvas.addEventListener("click", this.setCoordinates.bind(this));
+    this.elements.forEach((elementData, id) => {
+      const [element, isAttached] = elementData;
+      if (isAttached) {
+        return;
+      }
+      element.removeEventListener("click", this.setCoordinates.bind(this, id));
+      element.addEventListener("click", this.setCoordinates.bind(this, id));
+    });
   }
 
-  public hasCoordinates(): boolean {
-    return this.coordinates.length !== 0;
+  public hasCoordinates(subscriber: ISubscriber): boolean {
+    return (
+      this.coordinates.size !== 0 &&
+      this.coordinates.get(subscriber.getSubscriberId()).length !== 0
+    );
   }
 
-  private setCoordinates(e: MouseEvent) {
-    this.coordinates.push([e.offsetX, e.offsetY]);
+  private setCoordinates(id: string, e: MouseEvent) {
+    this.coordinates.get(id).push([e.offsetX, e.offsetY]);
     this.notify();
   }
 
-  public getCoordinates(): Coordinates {
-    return this.coordinates.shift();
+  public getCoordinates(subscriber: ISubscriber): Coordinates {
+    return this.coordinates.get(subscriber.getSubscriberId()).shift();
   }
 }

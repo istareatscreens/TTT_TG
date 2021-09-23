@@ -21,7 +21,7 @@ const init = () => {
   const game = new TicTacToe(context, dimensions);
   //game.draw();
   const resizeController = new WindowController(window);
-  const mouseController = new MouseController(canvas);
+  const mouseController = new MouseController();
   const client = new GameClient(
     server,
     game,
