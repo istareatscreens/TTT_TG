@@ -4,10 +4,10 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 require_once "Game.php";
 
-class Client implements MessageComponentInterface {
-    protected $clients;
+class SocketClient implements MessageComponentInterface {
     protected $games;
     protected $lobby;
+    protected $clients;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
@@ -140,6 +140,14 @@ class Client implements MessageComponentInterface {
         $client1->send($data);
         $client2->send($data);
 
+    }
+
+    private function sendMessageOut($status, $gameId, $playerId, $winner){
+        $data = array();
+        $data["status"] = "inGame";
+        $data["gameId"] = $gameId;
+        $data["winner"] = 0;
+    
     }
 
     public function onClose(ConnectionInterface $conn) {

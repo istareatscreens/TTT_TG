@@ -8,3 +8,6 @@ node_modules
 
 # ignore build folder
 client/public
+
+# secrets
+.env

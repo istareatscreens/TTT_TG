@@ -1,23 +1,38 @@
-version: '3'
+version: "3"
 services:
-    reverse-proxy:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        ports:
-            - "8000:80"
-        restart: always
-        depends_on:
-            - socket-server
-    socket-server:
-        restart: always
-        build:
-            context: ./server
-            dockerfile: Dockerfile
-        ports:
-            - "8080:8080"
-    composer:
-        image: "composer"
-        volumes:
-            - "./server:/app"
-        command: install
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    restart: always
+    depends_on:
+      - socket-server
+      - db
+  socket-server:
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+  composer:
+    image: "composer"
+    volumes:
+      - "./server:/app"
+    command: install
+  db:
+    container_name: db
+    image: mysql:latest
+    restart: always
+    volumes:
+      - ./server/db/script/dbCreate.sql:/docker-entrypoint-initdb.d/dbCreate.sql
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
