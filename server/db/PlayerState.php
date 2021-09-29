@@ -1,39 +1,79 @@
 <?php
 
-namespace db;
+namespace Db;
 
-class PlayerState{
+class PlayerState
+{
 
     private $db;
 
-    public function __construct(Database $db){
+    public function __construct(Database $db)
+    {
         $this->db = $db;
     }
 
-
-    public function registerPlayer(table\PlayerInfo $player): void{
-        $query = "INSERT INTO player_info(token, client_hash) ".
-                    "VALUES(:token, :client_hash)";
+    public function savePlayer(string $playerId, string $hash): void
+    {
+        $query = "INSERT INTO tttdb.player (token, client_hash) VALUES (UUID_TO_BIN(:token), :client_hash)";
         $this->db->query(
             $query,
-            $player->getExecuteParams()
+            array(
+                "token" => $playerId,
+                "client_hash" => $hash
+            )
         );
     }
 
-    public function getPlayerInfo(string $token){
-        $query = "SELECT * FROM player_info WHERE token = UUID_TO_BIN(:token)";
+    public function playerExistsByToken(string $token): bool
+    {
+        $result = $this->getPlayerDataFromToken($token);
+        return !is_null($result) && $result;
+    }
+
+    public function playerExistsByHash(string $hash)
+    {
+        $result = $this->getPlayerDataFromHash($hash);
+        return !is_null($result) && $result;
+    }
+
+    public function getPlayerDataFromHash(string $hash)
+    {
+        $query = "SELECT * FROM player WHERE client_hash = :client_hash";
         return $this->db->select(
             $query,
-            ["token"=>$token]
+            ["client_hash" => $hash]
         );
     }
 
-    public function getPlayer(table\PlayerInfo $player){
+    public function getPlayerDataFromToken(string $token)
+    {
+        $query = "SELECT * FROM player WHERE token = UUID_TO_BIN(:token)";
+        return $this->db->select(
+            $query,
+            ["token" => $token]
+        );
+    }
+
+    public function getPlayer(int $player_id)
+    {
         $query = "SELECT * FROM player WHERE player_id = :player_id";
         return $this->db->select(
             $query,
-            $player->getExecuteParams()
+            ["player_id" => $player_id]
         );
     }
 
+    public function updateClientHash(string $token, string $hash = "")
+    {
+        $query = "UPDATE player " .
+            "SET client_hash=:client_hash " .
+            "WHERE token=UUID_TO_BIN(:token)";
+        $this->db->query(
+            $query,
+            [
+                "token" => $token,
+                "clientHash" => ($hash === "") ? \PDO::PARAM_NULL : $hash
+            ]
+        );
+    }
 }

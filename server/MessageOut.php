@@ -1,18 +1,21 @@
 <?php
 
-namespace GameClient;
+namespace Game;
 
-class MessageOut{
+class MessageOut
+{
 
     public $gameId;
     public $playerId;
 
-    public function __construct($gameId, $playerId){
+    public function __construct($playerId, $gameId = "")
+    {
         $this->gameId = $gameId;
         $this->playerId = $playerId;
     }
 
-    public function createMessage(string $status, int $state=0, int $winner=0): string | false{
+    public function createMessage(string $status, int $state = 0, int $winner = 0): string | false
+    {
         $data = array();
         $data["status"] = $status;
         $data["playerId"] = $this->playerId;
@@ -21,5 +24,4 @@ class MessageOut{
         $data["winner"] = $winner;
         return json_encode($data);
     }
-
 }

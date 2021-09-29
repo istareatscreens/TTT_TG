@@ -4,7 +4,7 @@ author: jchook
 source: https://github.com/jchook/uuid-v4/blob/master/lib/Uuid.php
 */
 
-namespace Jchook;
+namespace Library;
 
 /**
  * UUID v4 Generator
@@ -44,7 +44,8 @@ class Uuid
 		return substr(self::$buf, $idx, $n);
 	}
 
-    public static function is_uuid(string $uuid): bool{
-        return !(!is_string($uuid) || (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 1));
-    }
+	public static function isUuid(string $uuid): bool
+	{
+		return is_string($uuid) && (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 0);
+	}
 }

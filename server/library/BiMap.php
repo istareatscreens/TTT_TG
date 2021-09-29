@@ -1,4 +1,6 @@
 <?php
+
+namespace Library;
 // author: Psyrus, source: https://stackoverflow.com/questions/15794858/php-bi-directional-map
 class BiMap
 {
@@ -12,48 +14,36 @@ class BiMap
 
     public function getKey($v)
     {
-        if($this->hasValue($v))
-        {
+        if ($this->hasValue($v)) {
             return $this->VtoK[$v];
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     public function getAllKeys()
     {
-        if($this->KtoV)
-        {
+        if ($this->KtoV) {
             return array_keys($this->KtoV);
-        }
-        else
-        {
+        } else {
             return $this->KtoV;
         }
     }
 
     public function getValue($k)
     {
-        if($this->hasKey($k))
-        {
+        if ($this->hasKey($k)) {
             return $this->KtoV[$k];
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     public function getAllValues()
     {
-        if($this->VtoK)
-        {
+        if ($this->VtoK) {
             return array_keys($this->VtoK);
-        }
-        else
-        {
+        } else {
             return $this->VtoK;
         }
     }
@@ -70,12 +60,10 @@ class BiMap
 
     public function put($k, $v)
     {
-        if($this->hasKey($k))
-        {
+        if ($this->hasKey($k)) {
             $this->removeKey($k);
         }
-        if($this->hasValue($v))
-        {
+        if ($this->hasValue($v)) {
             $this->removeValue($v);
         }
         $this->KtoV[$k] = $v;
@@ -84,40 +72,32 @@ class BiMap
 
     public function putAll($array)
     {
-        foreach($array as $k => $v)
-        {
+        foreach ($array as $k => $v) {
             $this->put($k, $v);
         }
     }
 
     public function removeKey($k)
     {
-        if($this->hasKey($k))
-        {
+        if ($this->hasKey($k)) {
             unset($this->VtoK[$this->KtoV[$k]]);
             $v = $this->KtoV[$k];
             unset($this->KtoV[$k]);
             return $v;
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     public function removeValue($v)
     {
-        if($this->hasValue($v))
-        {
+        if ($this->hasValue($v)) {
             unset($this->KtoV[$this->VtoK[$v]]);
             $k = $this->VtoK[$v];
             unset($this->VtoK[$v]);
             return $k;
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
-
 }
