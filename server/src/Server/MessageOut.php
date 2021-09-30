@@ -14,13 +14,14 @@ class MessageOut
         $this->playerId = $playerId;
     }
 
-    public function createMessage(string $status, int $state = 0, int $winner = 0): string | false
+    public function createMessage(string $status, int $mark = 0, int $state = 0, int $winner = 0): string | false
     {
         $data = array();
         $data["status"] = $status;
         $data["playerId"] = $this->playerId;
         $data["gameId"] = $this->gameId;
         $data["state"] = $state;
+        $data["mark"] = $mark;
         $data["winner"] = $winner;
         return json_encode($data);
     }

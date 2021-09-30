@@ -33,7 +33,7 @@ class PlayerState
     public function playerExistsByHash(string $hash)
     {
         $result = $this->getPlayerDataFromHash($hash);
-        return !is_null($result) && $result;
+        return !is_null($result) && $result && $result;
     }
 
     public function getPlayerDataFromHash(string $hash)
@@ -47,16 +47,18 @@ class PlayerState
 
     public function getPlayerDataFromToken(string $token)
     {
-        $query = "SELECT * FROM player WHERE token = UUID_TO_BIN(:token)";
+        $query = "SELECT player_id, BIN_TO_UUID(token), client_hash FROM player " .
+            "WHERE token = UUID_TO_BIN(:token)";
         return $this->db->select(
             $query,
             ["token" => $token]
         );
     }
 
-    public function getPlayer(int $player_id)
+    public function getPlayerFromPlayer_Id(string $player_id)
     {
-        $query = "SELECT * FROM player WHERE player_id = :player_id";
+        $query = "SELECT player_id, BIN_TO_UUID(token), client_hash FROM player " .
+            "WHERE player_id = :player_id";
         return $this->db->select(
             $query,
             ["player_id" => $player_id]
@@ -66,13 +68,13 @@ class PlayerState
     public function updateClientHash(string $token, string $hash = "")
     {
         $query = "UPDATE player " .
-            "SET client_hash=:client_hash " .
-            "WHERE token=UUID_TO_BIN(:token)";
+            "SET client_hash = :client_hash " .
+            "WHERE token = UUID_TO_BIN(:token)";
         $this->db->query(
             $query,
             [
                 "token" => $token,
-                "clientHash" => ($hash === "") ? \PDO::PARAM_NULL : $hash
+                "client_hash" => ($hash === "") ? \PDO::PARAM_NULL : $hash
             ]
         );
     }

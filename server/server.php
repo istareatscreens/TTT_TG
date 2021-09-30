@@ -10,7 +10,6 @@ use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 
 require __DIR__ . '/vendor/autoload.php';
-//require_once realpath("vender/autoload.php");
 
 $db = new Database();
 $server = IoServer::factory(

@@ -11,7 +11,6 @@ use Ratchet\ConnectionInterface;
 class ClientHandler
 {
     private $clients;
-    private $game;
     private PlayerState $db;
     private BiMap $clientBiMap; //key uuid, value hash
 
@@ -38,7 +37,17 @@ class ClientHandler
 
     public function getClientByPlayerId($playerId): ConnectionInterface
     {
-        return $this->clinets[$this->clientBiMap->getValue($playerId)];
+        return $this->clients[$this->clientBiMap->getValue($playerId)];
+    }
+
+    public function removeClient($hash): void
+    {
+        if ($hash !== "" && $this->clientBiMap->hasValue($hash)) {
+            $key = $this->clientBiMap->getKey($hash);
+            $this->clientBiMap->put($key, "");
+            unset($this->clients);
+            $this->db->updateClientHash($key);
+        }
     }
 
     public function clientIsConnected($playerId): bool
@@ -84,7 +93,6 @@ class ClientHandler
     {
         $hash = $this->getClientHash($client);
         if ($hash === "") {
-            echo "here 0";
             return false;
         }
 
@@ -93,19 +101,16 @@ class ClientHandler
         if identifier is not equal to supplied return false
         */
         if ($this->clientBiMap->hasValue($hash)) {
-            echo "here 1";
             return $playerId === $this->clientBiMap->getKey($hash);
         }
 
         //check if uuid is valid if not register
         if (!Uuid::isUuid($playerId)) {
-            echo "here";
             return $this->registerUser($client);
         }
 
         //check if new client
         if ($this->db->playerExistsByToken($playerId)) {
-            echo "here3";
             $this->updateHash($playerId, $hash);
             return true;
         }

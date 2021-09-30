@@ -71,6 +71,7 @@ class MessageHandler
     /*
         status: inLobby | inGame | gameOver
         state: 
+        mark:
         gameId: 
         winner: 0 | 1 | 2
     */
@@ -138,13 +139,15 @@ class MessageHandler
         $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
         $playerId2 = $this->clientHandler->getPlayerIdByClient($client2);
 
-        $this->games[$gameId] = new Game($gameId, $playerId1, $playerId2);
-        $this->gameState->createGame($gameId, $playerId1, $playerId2);
+        if ($game = Game::init($gameId, $playerId1, $playerId2)) {
+            $this->games[$gameId] = $game;
+            $this->gameState->createGame($gameId, $playerId1, $playerId2);
 
-        $message = new MessageOut($playerId1, $gameId);
-        $client1->send($message->createMessage("inGame"));
+            $message = new MessageOut($playerId1, $gameId);
+            $client1->send($message->createMessage("inGame"));
 
-        $message = new MessageOut($playerId2, $gameId);
-        $client2->send($message->createMessage("inGame"));
+            $message = new MessageOut($playerId2, $gameId);
+            $client2->send($message->createMessage("inGame"));
+        }
     }
 }

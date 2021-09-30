@@ -5,72 +5,66 @@ namespace Test;
 
 use Game\Db\Database;
 use Game\Db\PlayerState;
+use Game\Db\GameState;
 use Game\Library\Uuid;
 use Game\Server\ClientHandler;
+use Game\Server\MessageOut;
 use Game\Test\Mock\ClientMock;
 use PHPUnit\Framework\TestCase;
 
 require_once "Mock/ClientMock.php";
 
-class ClientHandlerTest extends TestCase
+class MessageHandler extends TestCase
 {
     protected function setUp(): void
     {
         $this->db = new Database();
         $this->db->resetDb();
-        $this->clientHandler = new ClientHandler($this->db);
+
         $this->playerState = new PlayerState($this->db);
+        $this->gameState = new GameState($this->db);
+        $this->clientHandler = new ClientHandler($this->db);
+        $this->messageHandler = new MessageHandler($this->clientHandler, $this->db);
+
+        $this->client1 = new ClientMock();
+        $this->playerId1 = "ad27d471-9448-46c8-8142-eadbac1f6706";
+        $this->playerState->savePlayer($this->playerId1, $this->client1->resourceId);
+        $this->client2 = new ClientMock();
+        $this->playerId2 = "22349f33-7af2-4aa8-9f66-804a7630b3ea";
+        $this->playerState->savePlayer($this->playerId2, $this->client2->resourceId);
+        $this->client3 = new ClientMock();
+        $this->playerId3 = "4df0cbda-df38-4ebd-9ed4-f1e9043ad699";
+        $this->playerState->savePlayer($this->playerId3, $this->client3->resourceId);
     }
+
 
     protected function tearDown(): void
     {
         $this->db->resetDb();
     }
 
-    /** @test */
-    public function validateClient_no_hash()
-    {
-        // No hash
-        $client = new ClientMock();
-        $client->resourceId = "";
-        $result = $this->clientHandler->validateClient($client, "");
-        $this->assertFalse($result);
+    private function makeMessageIn(
+        string $status,
+        string $gameId,
+        int $state,
+        string $winner
+    ) {
+        return [
+            "status" => $status,
+            "gameId" => $gameId,
+            "state" => $state,
+            "winner" => $winner
+        ];
     }
 
     /** @test */
-    public function validateClient_no_playerId()
+    public function messageHandler_join_lobby()
     {
-        //register client (no playerId)
-        $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
-        $result = $this->clientHandler->validateClient($client1, "");
-        $this->assertTrue($result);
+        $this->msg = new MessageOut($this->playerId1);
 
-        //valid player correct hash
-        $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
-        $playerId1 = "ad27d471-9448-46c8-8142-eadbac1f6706";
-        $this->playerState->savePlayer($playerId1, $client1->resourceId);
-        $result = $this->clientHandler->validateClient($client1, $playerId1);
-        $this->assertTrue($result);
-
-        //valid hash changed playerId
-        $playerId2 = "22349f33-7af2-4aa8-9f66-804a7630b3ea";
-        $result = $this->clientHandler->validateClient($client1, $playerId2);
-        $this->assertFalse($result);
-
-        //different hash valid playerId
-        $client1 = new ClientMock();
-        $result = $this->clientHandler->validateClient($client1, $playerId1);
-        $this->assertTrue($result);
-
-        //invalid hash invalid playerId (proper uuid)
-        $client1 = new ClientMock();
-        $result = $this->clientHandler->validateClient($client1, $playerId2);
-        $this->assertFalse($result);
+        //$this->messageHandler($this->cleint1,);
     }
 
-    /** @test */
     public function test_getters()
     {
         //valid player correct hash

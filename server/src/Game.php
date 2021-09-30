@@ -5,76 +5,68 @@ namespace Game;
 class Game
 {
 
-    private $state;
-    private $id;
-    private $clients;
+    private int $state;
+    private string $id;
+    private array $players;
     private int $playersMove;
     private int $movesLeft;
     private int $winner;
 
-    public function __construct($id, $client1, $client2)
+    private function __construct($id)
     {
         $this->id = $id;
         $this->state = 0;
         $this->movesLeft = 9;
         $this->playersMove = 1; //player 1 moves first
-        $this->clients = array();
-        $this->registerClient($client1);
-        $this->registerClient($client2);
         $this->winner = 0;
+        $this->players = array();
     }
 
-    public function getId()
+    public static function init($id, $playerId1, $playerId2): bool | Game
+    {
+        $game = new Game($id);
+        if ($game->registerPlayers($playerId1, $playerId2)) {
+            return $game;
+        } else {
+            return false;
+        }
+    }
+
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function isPlayer($playerId)
+    public function isPlayer($playerId): bool
     {
-        return $playerId === $this->clients[0][0] || $playerId === $this->clients[1][0];
+        return key_exists($playerId, $this->players);
     }
 
-    public function getPlayers()
+    public function getPlayers(): array
     {
-        return array($this->clients[0][0], $this->clients[1][0]);
+        return array_keys($this->players);
     }
 
-    public function registerClient($client): bool
+    private function registerPlayers(string $playerId1, string $playerId2): bool
     {
-        if (count($this->clients) > 2 && $client !== $this->clients[0]) {
-            return false;
-        } elseif (count($this->clients) == 0) {
-            array_push($this->clients, array($client, random_int(1, 2)));
-            return true;
-        } else {
-            array_push($this->clients, array($client, $this->clients[0][1] == 1 ? 2 : 1));
-            return true;
-        }
-        return false;
+
+        $this->players[$playerId1] = random_int(1, 2);
+        $this->players[$playerId2] = ($this->players[$playerId1] == 1) ? 2 : 1;
+
+        return $playerId1 !== $playerId2;
     }
 
-    public function gameReady(): bool
+    public function getMark(string $playerId): int
     {
-        return count($this->clients) === 2;
+        return $this->players[$playerId];
     }
 
-    private function getMark($client): int
+    private function validQuadrant(int $quadrant): bool
     {
-        $mark = -1;
-        if ($client === $this->clients[0][0]) {
-            $mark === $this->clients[0][1];
-        } else if ($client === $this->clients[1][0]) {
-            $mark === $this->clients[1][1];
-        }
-        return $mark;
+        return $quadrant > -1 && $quadrant < 9;
     }
 
-    private function validQuadrant($quadrant): bool
-    {
-        return $quadrant < 9;
-    }
-
-    public function getWinner()
+    public function getWinner(): int
     {
         return $this->winner;
     }
@@ -84,19 +76,18 @@ class Game
         $this->winner = $mark;
     }
 
-    public function makeMove($client, $quadrant): bool
+    public function makeMove(string $playerId, int $quadrant): bool
     {
         $moveComplete = false;
         if (
             $this->outOfMoves()
-            || !$this->gameReady()
             || !$this->validQuadrant($quadrant)
         ) {
             return false;
         }
 
-        $mark = $this->getMark($client);
-        if ($mark === -1 || $mark !== $this->playersMove) {
+        $mark = $this->getMark($playerId);
+        if ($mark !== $this->playersMove) {
             return false;
         }
 
@@ -105,19 +96,18 @@ class Game
             $this->changeState($quadrant, $mark);
             $gameWon = $this->wonGame($mark);
             $moveComplete = true;
+            if ($moveComplete && $gameWon) {
+                $this->setWinner($mark);
+                $this->setMovesLeft(0);
+            }
             $this->endTurn();
         };
 
-        if ($moveComplete && $gameWon) {
-            $this->setWinner($mark);
-            $this->setMovesLeft(0);
-        }
-
         return $moveComplete;
     }
-    private function setMovesLeft($moves)
+    private function setMovesLeft(int $moves): void
     {
-        $this->movesLeft;
+        $this->movesLeft = $moves;
     }
 
     public function gameOver(): bool
@@ -125,7 +115,7 @@ class Game
         return $this->outOfMoves() || $this->winner !== 0;
     }
 
-    public function getState()
+    public function getState(): int
     {
         return $this->state;
     }
@@ -135,13 +125,13 @@ class Game
         $this->playersMove = ($this->playersMove === 1) ? 2 : 1;
     }
 
-    private function changeState($quadrant, $mark): void
+    private function changeState(int $quadrant, int $mark): void
     {
         $mask = 1 << $quadrant * 2;
         $this->state = (($this->state & ~$mask) | ($mark << $quadrant * 2));
     }
 
-    private function wonGame($mark): bool
+    private function wonGame(int $mark): bool
     {
         $wonGame = false;
         $winningMasks = array(
@@ -161,7 +151,7 @@ class Game
         return $wonGame;
     }
 
-    private function containsThreeOfTheSameMarks($result, $mark): bool
+    private function containsThreeOfTheSameMarks(int $result, int $mark): bool
     {
         $counter = 0;
         for ($quadrant = 0; $quadrant < 9; $quadrant++) {
@@ -173,15 +163,15 @@ class Game
 
     public function outOfMoves(): bool
     {
-        return $this->movesLeft < 1;
+        return !($this->movesLeft > 0 && $this->movesLeft < 10);
     }
 
-    private function quadrantIsEmpty($quadrant, $state): bool
+    private function quadrantIsEmpty(int $quadrant, int $state): bool
     {
         return $this->getQuadrantMark($quadrant, $state) === 0;
     }
 
-    private function getQuadrantMark($quadrant, $state): int
+    private function getQuadrantMark(int $quadrant, int $state): int
     {
         $mask = 3 << $quadrant * 2;
         return ($mask & $state) >> $quadrant * 2;

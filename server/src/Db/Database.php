@@ -19,8 +19,7 @@ class Database
         try {
             $query = $this->db->prepare($sqlQuery);
             $query->execute($params);
-            $result = $query->fetch();
-            return $result;
+            return $query->fetch();
         } catch (\PDOException $e) {
             $this->handleError($e, $sqlQuery);
             return null;
@@ -52,9 +51,12 @@ class Database
 
     public function resetDb()
     {
-        $this->db->exec("DROP DATABASE tttdb");
-        $sql = file_get_contents('script/db.sql');
-        $this->db->exec($sql);
+        $this->db = connectToDatabase();
+        $truncate = "TRUNCATE TABLE ";
+        $this->db->exec("SET FOREIGN_KEY_CHECKS=0");
+        $this->db->exec($truncate . "player");
+        $this->db->exec($truncate . "game");
+        $this->db->exec("SET FOREIGN_KEY_CHECKS=1");
     }
 
 

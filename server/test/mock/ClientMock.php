@@ -1,6 +1,6 @@
 <?php
 
-namespace Game\Test;
+namespace Game\Test\Mock;
 
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;

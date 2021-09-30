@@ -31,7 +31,7 @@ services:
     image: mysql:latest
     restart: always
     volumes:
-      - ./server/db/script/dbCreate.sql:/docker-entrypoint-initdb.d/dbCreate.sql
+      - ./server/db/script/db.sql:/docker-entrypoint-initdb.d/db.sql
     env_file:
       - .env
     ports:
