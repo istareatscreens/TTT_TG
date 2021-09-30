@@ -2,6 +2,7 @@
 
 namespace Game\Server;
 
+use GameFactory;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 

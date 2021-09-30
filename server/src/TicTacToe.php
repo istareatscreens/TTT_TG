@@ -2,7 +2,11 @@
 
 namespace Game;
 
-class Game
+use Game\GameInterface;
+
+use function PHPUnit\Framework\throwException;
+
+class TicTacToe implements GameInterface
 {
 
     private int $state;
@@ -12,24 +16,27 @@ class Game
     private int $movesLeft;
     private int $winner;
 
-    private function __construct($id)
+    public function __construct()
     {
-        $this->id = $id;
         $this->state = 0;
         $this->movesLeft = 9;
         $this->playersMove = 1; //player 1 moves first
         $this->winner = 0;
-        $this->players = array();
     }
 
-    public static function init($id, $playerId1, $playerId2): bool | Game
+    public function createGame($id, string ...$playerIds): GameInterface
     {
-        $game = new Game($id);
-        if ($game->registerPlayers($playerId1, $playerId2)) {
-            return $game;
-        } else {
-            return false;
+        $newGame = clone $this;
+        echo "here";
+        $newGame->id = $id;
+        echo "here";
+        $newGame->players = array();
+        echo "here";
+        if (!$newGame->registerPlayers(...$playerIds)) {
+            throwException(new \Exception("Cannot register identical players to a game in TicTacToe"));
         }
+        echo "here";
+        return $newGame;
     }
 
     public function getId(): string
@@ -56,7 +63,7 @@ class Game
         return $playerId1 !== $playerId2;
     }
 
-    public function getMark(string $playerId): int
+    public function getPlayerNumber(string $playerId): int
     {
         return $this->players[$playerId];
     }
@@ -71,9 +78,9 @@ class Game
         return $this->winner;
     }
 
-    private function setWinner($mark): void
+    private function setWinner($playerNumber): void
     {
-        $this->winner = $mark;
+        $this->winner = $playerNumber;
     }
 
     public function makeMove(string $playerId, int $quadrant): bool
@@ -86,18 +93,18 @@ class Game
             return false;
         }
 
-        $mark = $this->getMark($playerId);
-        if ($mark !== $this->playersMove) {
+        $playerNumber = $this->getPlayerNumber($playerId);
+        if ($playerNumber !== $this->playersMove) {
             return false;
         }
 
         $gameWon = false;
         if (!$this->quadrantIsEmpty($quadrant, $this->state)) {
-            $this->changeState($quadrant, $mark);
-            $gameWon = $this->wonGame($mark);
+            $this->changeState($quadrant, $playerNumber);
+            $gameWon = $this->wonGame($playerNumber);
             $moveComplete = true;
             if ($moveComplete && $gameWon) {
-                $this->setWinner($mark);
+                $this->setWinner($playerNumber);
                 $this->setMovesLeft(0);
             }
             $this->endTurn();
@@ -125,13 +132,13 @@ class Game
         $this->playersMove = ($this->playersMove === 1) ? 2 : 1;
     }
 
-    private function changeState(int $quadrant, int $mark): void
+    private function changeState(int $quadrant, int $playerNumber): void
     {
         $mask = 1 << $quadrant * 2;
-        $this->state = (($this->state & ~$mask) | ($mark << $quadrant * 2));
+        $this->state = (($this->state & ~$mask) | ($playerNumber << $quadrant * 2));
     }
 
-    private function wonGame(int $mark): bool
+    private function wonGame(int $playerNumber): bool
     {
         $wonGame = false;
         $winningMasks = array(
@@ -146,22 +153,22 @@ class Game
         );
         foreach ($winningMasks as &$mask) {
             $result = $this->state & $mask;
-            $wonGame = $this->containsThreeOfTheSameMarks($result, $mark);
+            $wonGame = $this->containsThreeOfTheSameMarks($result, $playerNumber);
         }
         return $wonGame;
     }
 
-    private function containsThreeOfTheSameMarks(int $result, int $mark): bool
+    private function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
     {
         $counter = 0;
         for ($quadrant = 0; $quadrant < 9; $quadrant++) {
             $resultMark = $this->getQuadrantMark($quadrant, $result);
-            $counter += $mark === $resultMark ? 1 : 0;
+            $counter += $playerNumber === $resultMark ? 1 : 0;
         }
         return $counter === 3;
     }
 
-    public function outOfMoves(): bool
+    private function outOfMoves(): bool
     {
         return !($this->movesLeft > 0 && $this->movesLeft < 10);
     }

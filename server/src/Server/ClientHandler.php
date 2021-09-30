@@ -50,7 +50,7 @@ class ClientHandler
         }
     }
 
-    public function clientIsConnected($playerId): bool
+    public function playerIsConnected($playerId): bool
     {
         return $this->clientBiMap->getValue($playerId) !== "";
     }

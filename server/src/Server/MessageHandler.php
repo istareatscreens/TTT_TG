@@ -4,7 +4,8 @@ namespace Game\Server;
 
 use Game\Db\Database;
 use Game\Db\GameState;
-use Game\Game;
+use Game\GameFactory;
+use Game\TicTacToe;
 use Game\Library\Lobby;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
@@ -12,17 +13,20 @@ use Ratchet\ConnectionInterface;
 class MessageHandler
 {
 
-    private $clientHandler;
-    private $lobby;
-    private $db;
-    private $gameState;
+    private ClientHandler $clientHandler;
+    private array $games;
+    private array $lobbies;
+    private Database $db;
+    private GameState $gameState;
+    private GameFactory $gameFactory;
 
-    public function __construct(ClientHandler $clientHandler, Database $db)
+    public function __construct(ClientHandler $clientHandler, GameFactory $gameFactory, Database $db)
     {
         $this->clientHandler = $clientHandler;
         $this->db = $db;
-        $this->lobby = new Lobby();
+        $this->lobbies = array();
         $this->gameState = new GameState($db);
+        $this->gameFactory = $gameFactory;
     }
 
     public function addClient(ConnectionInterface $client)
@@ -51,14 +55,18 @@ class MessageHandler
     public function handleMessage($msg, $client): void
     {
         $playerId = $msg->playerId;
+        $gameType = $msg->game;
+        $type = $msg->type;
         if (!$this->registerClient($client, $playerId)) {
             return;
         }
 
-        switch ($msg->type) {
+        echo $msg->type;
+        switch ($type) {
             case "joinLobby":
-                $this->addToLobby($client);
-                $this->matchPlayer($client);
+                echo "here";
+                $this->addToLobby($gameType, $client);
+                $this->matchPlayer($gameType, $client);
                 break;
             case "makeMove":
                 $this->handleMove($msg, $client);
@@ -66,6 +74,16 @@ class MessageHandler
             case "joinGame":
                 break;
         }
+    }
+
+    private function affixNamespaceToGameType($gameType)
+    {
+        return "Game\\" . $gameType;
+    }
+
+    private function removeNamespaceFromGameType($gameType)
+    {
+        return substr($gameType, strlen("Game\\"));
     }
 
     /*
@@ -99,13 +117,13 @@ class MessageHandler
         $gameOver = $game->gameOver();
         $status = ($gameOver) ? "inGame" : "gameOver";
 
-        $message = new MessageOut($playerId1, $gameId);
+        $message = new MessageOut($playerId1, $gameId, $game->getPlayerNumber($playerId1));
         $client1->send($message->createMessage($status, $game->getState(), $winner));
 
-        if (!$this->clientHandler->clientIsConnected($playerId2)) {
+        if (!$this->clientHandler->playerIsConnected($playerId2)) {
             $client2 = $this->clientHandler->getClientByPlayerId($playerId2);
             $message = new MessageOut($playerId2, $gameId);
-            $client2->send($message->createMessage($status, $game->getState(), $winner));
+            $client2->send($message->createMessage($status, $game->getPlayerNumber($playerId2), $game->getState(), $winner));
         }
 
         if ($gameOver) {
@@ -114,40 +132,58 @@ class MessageHandler
         }
     }
 
-    private function addToLobby($client): void
+    private function addToLobby($gameType, $client): void
     {
         $hash = $this->clientHandler->getClientHash($client);
-        $this->lobby->queue($hash);
+        if (!key_exists($gameType, $this->lobbies)) {
+            $this->createLobby($gameType);
+        }
+        $lobby = &$this->lobbies[$gameType];
+        $lobby->queue($hash);
     }
 
-    private function matchPlayer($client): void
+    private function createLobby($gameType): void
     {
-        if (!$this->lobby->isEmpty() && $this->lobby->size() % 2 !== 0) {
-            $message = new MessageOut($this->clientHandler->getPlayerIdByClient($client));
-            $client->send($message->createMessage("inLobby"));
+        $this->lobbies[$gameType] = new Lobby();
+    }
+
+    private function matchPlayer(string $gameType, ConnectionInterface $client): void
+    {
+        $lobby = &$this->lobbies[$gameType];
+        if (!$lobby->isEmpty() && $lobby->size() % 2 !== 0) {
+            $this->notifyPlayerTheyAreInLobby($gameType, $client);
             return;
         }
-        $client1 = $this->clientHandler->getClientByHash($this->lobby->shift());
-        $client2 = $this->clientHandler->getClientByHash($this->lobby->shift());
-        $this->createGame($client1, $client2);
+        $client1 = $this->clientHandler->getClientByHash($lobby->shift());
+        $client2 = $this->clientHandler->getClientByHash($lobby->shift());
+        $this->createGame($gameType, $client1, $client2);
     }
 
-    private function createGame($client1, $client2): void
+    private function notifyPlayerTheyAreInLobby(string $gameType, ConnectionInterface $client)
+    {
+        $playerId = $this->clientHandler->getPlayerIdByClient($client);
+        $message = new MessageOut($gameType, $playerId);
+        $client->send($message->createMessage("inLobby"));
+    }
+
+    private function createGame($gameType, $client1, $client2): void
     {
         $gameId = Uuid::v4();
+        $gameClass = $this->affixNamespaceToGameType($gameType);
 
         $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
         $playerId2 = $this->clientHandler->getPlayerIdByClient($client2);
 
-        if ($game = Game::init($gameId, $playerId1, $playerId2)) {
+        if ($game = $this->gameFactory->createGame($gameClass, $gameId, $playerId1, $playerId2)) {
+
             $this->games[$gameId] = $game;
             $this->gameState->createGame($gameId, $playerId1, $playerId2);
 
-            $message = new MessageOut($playerId1, $gameId);
+            $message = new MessageOut($gameType, $playerId1, $gameId);
             $client1->send($message->createMessage("inGame"));
 
-            $message = new MessageOut($playerId2, $gameId);
+            $message = new MessageOut($gameType, $playerId2, $gameId);
             $client2->send($message->createMessage("inGame"));
-        }
+        };
     }
 }
