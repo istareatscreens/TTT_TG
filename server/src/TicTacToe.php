@@ -27,15 +27,12 @@ class TicTacToe implements GameInterface
     public function createGame($id, string ...$playerIds): GameInterface
     {
         $newGame = clone $this;
-        echo "here";
         $newGame->id = $id;
-        echo "here";
         $newGame->players = array();
-        echo "here";
         if (!$newGame->registerPlayers(...$playerIds)) {
-            throwException(new \Exception("Cannot register identical players to a game in TicTacToe"));
+            throw new \Exception("Cannot register identical players to a game in TicTacToe");
+            return false;
         }
-        echo "here";
         return $newGame;
     }
 
@@ -99,7 +96,7 @@ class TicTacToe implements GameInterface
         }
 
         $gameWon = false;
-        if (!$this->quadrantIsEmpty($quadrant, $this->state)) {
+        if ($this->quadrantIsEmpty($quadrant, $this->state)) {
             $this->changeState($quadrant, $playerNumber);
             $gameWon = $this->wonGame($playerNumber);
             $moveComplete = true;
@@ -129,6 +126,7 @@ class TicTacToe implements GameInterface
 
     private function endTurn(): void
     {
+        $this->movesLeft--;
         $this->playersMove = ($this->playersMove === 1) ? 2 : 1;
     }
 
@@ -140,7 +138,6 @@ class TicTacToe implements GameInterface
 
     private function wonGame(int $playerNumber): bool
     {
-        $wonGame = false;
         $winningMasks = array(
             0b110000110000110000,
             0b001100001100001100,
@@ -153,9 +150,11 @@ class TicTacToe implements GameInterface
         );
         foreach ($winningMasks as &$mask) {
             $result = $this->state & $mask;
-            $wonGame = $this->containsThreeOfTheSameMarks($result, $playerNumber);
+            if ($this->containsThreeOfTheSameMarks($result, $playerNumber)) {
+                return true;
+            }
         }
-        return $wonGame;
+        return false;
     }
 
     private function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
