@@ -7,7 +7,8 @@ use Game\Db\Database;
 use Game\Db\PlayerState;
 use Game\Library\Uuid;
 use Game\Server\ClientHandler;
-use Game\Test\Mock\ClientMock;
+use Game\TicTacToe;
+use Test\Mock\ClientMock;
 use PHPUnit\Framework\TestCase;
 
 require_once "Mock/ClientMock.php";
@@ -92,7 +93,7 @@ class ClientHandlerTest extends TestCase
     }
 
     /** @test */
-    public function test_removeClient()
+    public function test_removeClient_and_isConnected()
     {
         //valid player correct hash
         $client1 = new ClientMock();
@@ -101,6 +102,7 @@ class ClientHandlerTest extends TestCase
         $this->playerState->savePlayer($playerId1, $client1->resourceId);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
+        $this->assertTrue($this->clientHandler->playerIsConnected($playerId1));
 
         $result = $this->playerState->getPlayerDataFromToken($playerId1);
         $this->assertEquals($result->client_hash, $client1->resourceId);
@@ -108,5 +110,6 @@ class ClientHandlerTest extends TestCase
         $this->clientHandler->removeClient($client1->resourceId);
         $result = $this->playerState->getPlayerDataFromToken($playerId1);
         $this->assertEquals($result->client_hash, "0");
+        $this->assertFalse($this->clientHandler->playerIsConnected($playerId1));
     }
 }

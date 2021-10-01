@@ -14,8 +14,14 @@ class GameFactory
 
     public function &addGame(GameInterface $game)
     {
-        $this->games[$game::class] = $game;
+        $hash = $this->removeNamespaceFromType($game);
+        $this->games[$hash] = $game;
         return $this;
+    }
+
+    private function removeNamespaceFromType($gameType)
+    {
+        return substr(strrchr($gameType::class, '\\'), 1);
     }
 
     public function createGame(string $type, $id, ...$playerId): GameInterface | false

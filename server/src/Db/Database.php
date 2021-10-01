@@ -36,13 +36,12 @@ class Database
         }
     }
 
-    public function selectAll($sqlQuery, $params)
+    public function selectAll($sqlQuery, $params): array | NULL
     {
         try {
             $query = $this->db->prepare($sqlQuery);
             $query->execute($params);
-            $result = $query->fetch();
-            return $result;
+            return $query->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             $this->handleError($e, $sqlQuery);
             return null;

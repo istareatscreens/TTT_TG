@@ -12,18 +12,29 @@ class GameState
         $this->db = $db;
     }
 
-    public function createGame(string $gameId, string $playerId1, string $playerId2)
+    public function createGame(string $gameId, string $playerId1, string $playerId2): bool
     {
+        $query = "SELECT player_id FROM player WHERE token = UUID_TO_BIN(:player1) OR token = UUID_TO_BIN(:player2)";
+        $results = $this->db->selectAll($query, [
+            "player1" => $playerId1,
+            "player2" => $playerId2
+        ]);
+
+        if (is_null($results) || count($results) === 0) {
+            return false;
+        }
+
         $query = "INSERT INTO game(token, player1, player2) " .
             "VALUES(UUID_TO_BIN(:token), :player1, :player2)";
         $this->db->query(
             $query,
             [
                 "token" => $gameId,
-                "player1" => $playerId1,
-                "player2" => $playerId2
+                "player1" => isset($results[0]["player_id"]) ? $results[0]["player_id"] :  \PDO::PARAM_NULL,
+                "player2" => isset($results[1]["player_id"]) ? $results[1]["player_id"] :  \PDO::PARAM_NULL
             ]
         );
+        return true;
     }
 
     public function getGames(string $playerId)
@@ -48,7 +59,7 @@ class GameState
 
     public function deleteGame(string $gameId)
     {
-        $query = "DELETE FROM game WHERE token = UUID_TO_BIND(:token)";
+        $query = "DELETE FROM game WHERE token = UUID_TO_BIN(:token)";
         $this->db->query($query, ["token" => $gameId]);
     }
 }
