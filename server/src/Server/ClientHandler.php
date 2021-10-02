@@ -7,6 +7,7 @@ use Game\Db\PlayerState;
 use Game\Library\BiMap;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
+use React\Socket\ConnectorInterface;
 
 class ClientHandler
 {
@@ -40,13 +41,35 @@ class ClientHandler
         return $this->clients[$this->clientBiMap->getValue($playerId)];
     }
 
-    public function removeClient($hash): void
+    public function clientHasPlayerId(ConnectionInterface $client): bool
     {
-        if ($hash !== "" && $this->clientBiMap->hasValue($hash)) {
-            $key = $this->clientBiMap->getKey($hash);
-            $this->clientBiMap->put($key, "");
-            unset($this->clients);
-            $this->db->updateClientHash($key);
+        return $this->clientBiMap->hasValue($this->getClientByHash($client));
+    }
+
+    public function clientExists(ConnectionInterface $client): bool
+    {
+        $hash = $this->getClientHash($client);
+        return $this->hashExists($hash);
+    }
+
+    private function hashExists($hash): bool
+    {
+        return key_exists($hash, $this->clients) && $this->clientBiMap->hasValue($hash);
+    }
+
+    public function removeClient(ConnectionInterface $client): void
+    {
+        try {
+            $hash = $this->getClientHash($client);
+            if ($this->hashExists($hash)) {
+                $key = $this->clientBiMap->getKey($hash);
+                $this->clientBiMap->put($key, "");
+                unset($this->clients);
+                $this->db->updateClientHash($key);
+            }
+        } catch (\Exception $e) {
+            echo $e;
+            return;
         }
     }
 
@@ -58,6 +81,11 @@ class ClientHandler
     public function getClientByHash($hash): ConnectionInterface
     {
         return $this->clients[$hash];
+    }
+
+    public function deletePlayer($playerId): void
+    {
+        $this->db->deletePlayer($playerId);
     }
 
     public function getPlayerIdByClient(ConnectionInterface $client): string

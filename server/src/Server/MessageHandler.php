@@ -5,7 +5,6 @@ namespace Game\Server;
 use Game\Db\Database;
 use Game\Db\GameState;
 use Game\GameFactory;
-use Game\TicTacToe;
 use Game\Library\Lobby;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
@@ -38,6 +37,72 @@ class MessageHandler
         return $this->clientHandler->validateClient($client, $playerId);
     }
 
+    public function disconnectClient(ConnectionInterface $client): void
+    {
+        if (!$this->clientHandler->clientExists($client)) {
+            return;
+        }
+
+        // Handle case where player just joined and quit
+        if (!$this->clientHandler->clientHasPlayerId($client)) {
+            $this->clientHandler->removeClient($client);
+        }
+
+        // Handle case where player messaged the server
+        $this->removeFromLobbies($client);
+        $playerId = $this->clientHandler->getPlayerIdByClient($client);
+
+        $this->clientHandler->removeClient($client);
+        $this->handleGamesAfterDisconnect($playerId);
+    }
+
+    private function removeFromLobbies(ConnectionInterface $client): void
+    {
+        $hash = $this->clientHandler->getClientHash($client);
+        foreach ($this->lobbies as &$lobby) {
+            $lobby->remove($hash);
+        }
+    }
+
+    private function handleGamesAfterDisconnect($playerId): void
+    {
+        $games = $this->gameState->getAllGameIdsPlayerIdsAndClientHashesFromPlayerID($playerId);
+        if (is_null($games) || count($games) === 0) {
+            // TODO: probably dont do this here
+            $this->clientHandler->deletePlayer($playerId);
+            return;
+        }
+
+        $clientAndMessage = [];
+        foreach (array_keys($games) as $gameId) {
+            foreach ($games[$gameId] as $gameData) {
+                [$clientHash, $playerId2] = $gameData[0];
+                if ($playerId2 === $playerId) {
+                    continue;
+                }
+
+                // Delete game if all players left
+                if (is_null($clientHash)) {
+                    $this->deleteGame($gameId);
+                } else {
+                    //notify other user of player leaving 
+                    $state = $this->games[$gameId]->getState();
+                    $winner = $this->games[$gameId]->getWinner();
+                    $message = new MessageOut($playerId2, $gameId);
+                    $clientAndMessage += [
+                        $this->clientHandler->getClientByHash($clientHash),
+                        $message->createMessage("playerLeft", $playerId2, $state, $winner)
+                    ];
+                }
+            }
+        }
+
+        // notify players of disconnect
+        foreach ($clientAndMessage as [$client, $message]) {
+            $client->send($message);
+        }
+    }
+
     public function handleMessage($msg, $client): void
     {
         $playerId = $msg->playerId;
@@ -64,11 +129,6 @@ class MessageHandler
         }
     }
 
-    private function affixNamespaceToGameType($gameType)
-    {
-        return "Game\\" . $gameType;
-    }
-
     private function joinGame($gameId, $client)
     {
         if (!$this->gameExists($gameId)) {
@@ -82,6 +142,7 @@ class MessageHandler
         }
 
         $message = new MessageOut($playerId, $gameId);
+
         $client->send(
             $message->createMessage(
                 "inGame",
@@ -90,6 +151,24 @@ class MessageHandler
                 $game->getWinner()
             )
         );
+
+        // notify other player
+        $players = $game->getPlayers();
+        foreach ($players as $player) {
+            if ($playerId === $player) {
+                continue;
+            }
+            $client = $this->clientHandler->getClientByPlayerId($player);
+            $message = new MessageOut($player, $gameId);
+            $client->send(
+                $message->createMessage(
+                    "playerRejoin",
+                    $game->getPlayerNumber($playerId),
+                    $game->getState(),
+                    $game->getWinner()
+                )
+            );
+        }
     }
 
     private function gameExists($gameId)
@@ -132,9 +211,14 @@ class MessageHandler
         }
 
         if ($gameOver) {
-            $this->gameState->deleteGame($gameId);
-            unset($this->games[$gameId]);
+            $this->deleteGame($gameId);
         }
+    }
+
+    private function deleteGame($gameId): void
+    {
+        $this->gameState->deleteGame($gameId);
+        unset($this->games[$gameId]);
     }
 
     private function addToLobby($gameType, $client): void

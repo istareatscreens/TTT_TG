@@ -107,7 +107,7 @@ class ClientHandlerTest extends TestCase
         $result = $this->playerState->getPlayerDataFromToken($playerId1);
         $this->assertEquals($result->client_hash, $client1->resourceId);
 
-        $this->clientHandler->removeClient($client1->resourceId);
+        $this->clientHandler->removeClient($client1);
         $result = $this->playerState->getPlayerDataFromToken($playerId1);
         $this->assertEquals($result->client_hash, "0");
         $this->assertFalse($this->clientHandler->playerIsConnected($playerId1));

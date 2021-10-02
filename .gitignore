@@ -11,6 +11,10 @@ client/public
 
 # secrets
 .env
+*.txt
+*.env
 
 # test files
 .phpunit.result.cache
+*.bak
+*.bk

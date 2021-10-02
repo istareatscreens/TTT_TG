@@ -14,7 +14,7 @@ class PlayerState
 
     public function savePlayer(string $playerId, string $hash): void
     {
-        $query = "INSERT INTO tttdb.player (token, client_hash) VALUES (UUID_TO_BIN(:token), :client_hash)";
+        $query = "INSERT INTO player (player_token, client_hash) VALUES (UUID_TO_BIN(:token), :client_hash)";
         $this->db->query(
             $query,
             array(
@@ -24,9 +24,15 @@ class PlayerState
         );
     }
 
-    public function playerExistsByToken(string $token): bool
+    public function deletePlayer(string $playerId)
     {
-        $result = $this->getPlayerDataFromToken($token);
+        $query = "DELETE FROM game WHERE player_token = UUID_TO_BIN(:token)";
+        $this->db->query($query, ["token" => $playerId]);
+    }
+
+    public function playerExistsByToken(string $playerId): bool
+    {
+        $result = $this->getPlayerDataFromToken($playerId);
         return !is_null($result) && $result;
     }
 
@@ -45,19 +51,19 @@ class PlayerState
         );
     }
 
-    public function getPlayerDataFromToken(string $token)
+    public function getPlayerDataFromToken(string $playerId)
     {
-        $query = "SELECT player_id, BIN_TO_UUID(token), client_hash FROM player " .
-            "WHERE token = UUID_TO_BIN(:token)";
+        $query = "SELECT player_id, BIN_TO_UUID(player_token), client_hash FROM player " .
+            "WHERE player_token = UUID_TO_BIN(:token)";
         return $this->db->select(
             $query,
-            ["token" => $token]
+            ["token" => $playerId]
         );
     }
 
     public function getPlayerFromPlayer_Id(string $player_id)
     {
-        $query = "SELECT player_id, BIN_TO_UUID(token), client_hash FROM player " .
+        $query = "SELECT player_id, BIN_TO_UUID(player_token), client_hash FROM player " .
             "WHERE player_id = :player_id";
         return $this->db->select(
             $query,
@@ -65,15 +71,15 @@ class PlayerState
         );
     }
 
-    public function updateClientHash(string $token, string $hash = "")
+    public function updateClientHash(string $playerId, string $hash = "")
     {
         $query = "UPDATE player " .
             "SET client_hash = :client_hash " .
-            "WHERE token = UUID_TO_BIN(:token)";
+            "WHERE player_token = UUID_TO_BIN(:token)";
         $this->db->query(
             $query,
             [
-                "token" => $token,
+                "token" => $playerId,
                 "client_hash" => ($hash === "") ? \PDO::PARAM_NULL : $hash
             ]
         );

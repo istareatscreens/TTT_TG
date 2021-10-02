@@ -67,7 +67,9 @@ namespace Game\Library {
 
         public function remove($key)
         {
-            unset($this->queue[$key]);
+            if (key_exists($key, $this->queue)) {
+                unset($this->queue[$key]);
+            }
         }
 
         public function isEmpty(): bool
