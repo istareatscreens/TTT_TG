@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS tttdb.player (
   player_id INT UNSIGNED AUTO_INCREMENT NOT NULL, 
   player_token BINARY(16) NOT NULL, 
   client_hash VARCHAR(45),
+  date_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (player_id),
   INDEX(player_token),
   UNIQUE INDEX client_hash_UNIQUE (client_hash ASC) VISIBLE,
@@ -36,3 +37,11 @@ CREATE TABLE IF NOT EXISTS tttdb.game (
     ON UPDATE CASCADE
     )
 ENGINE = InnoDB;
+
+DROP EVENT IF EXISTS `remove_old_players`;
+CREATE EVENT `remove_old_players`  ON SCHEDULE EVERY 1 DAY 
+STARTS '2010-01-01 00:00:00' 
+DO 
+DELETE FROM `tttdb`.`players` where DATEDIFF(now(),`date_created`) > 1;
+
+ALTER EVENT `remove_old_players` ON  COMPLETION PRESERVE ENABLE;

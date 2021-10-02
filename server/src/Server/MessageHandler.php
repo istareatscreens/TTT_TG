@@ -68,8 +68,6 @@ class MessageHandler
     {
         $games = $this->gameState->getAllGameIdsPlayerIdsAndClientHashesFromPlayerID($playerId);
         if (is_null($games) || count($games) === 0) {
-            // TODO: probably dont do this here
-            $this->clientHandler->deletePlayer($playerId);
             return;
         }
 
