@@ -59,8 +59,8 @@ export default class GameBored {
     const [width, height] = this.dimensions;
 
     const quadrantCoordinates: Coordinates = [
-      ((xPosition % 3) * width) / 3,
-      ((yPosition % 3) * height) / 3,
+      ((2 - (xPosition % 3)) * width) / 3,
+      ((2 - (yPosition % 3)) * height) / 3,
     ];
 
     const quadrantMark = new Quadrant(
