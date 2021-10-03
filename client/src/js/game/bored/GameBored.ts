@@ -96,6 +96,6 @@ export default class GameBored {
   }
 
   public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
-    return this.findQuadrant(coordinates)?.getNumber() ?? -1;
+    return this.findQuadrant(coordinates)?.getNumber() ?? null;
   }
 }

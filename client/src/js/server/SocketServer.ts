@@ -1,12 +1,12 @@
 import ISubscriber from "../common/interfaces/ISubscriber";
-import { MessageIn, MessageOut } from "../types";
-import Server from "./Server";
+import { TTTMessageIn, TTTMessageOut } from "../game/message/TicTacToeMessage";
+import IServer from "./IServer";
 const url = "ws://localhost:8080";
 
-export default class SocketServer implements Server {
+export default class SocketServer implements IServer {
   private socket: WebSocket;
   private subscribers: Map<string, ISubscriber>;
-  private messagesIn: MessageIn[];
+  private messagesIn: TTTMessageIn[];
   private connected: boolean;
 
   constructor() {
@@ -15,7 +15,7 @@ export default class SocketServer implements Server {
     this.messagesIn = [];
   }
 
-  public getMessageIn(): MessageIn {
+  public getMessageIn(): TTTMessageIn {
     return this.messagesIn.shift();
   }
 
@@ -37,11 +37,11 @@ export default class SocketServer implements Server {
 
   private socketOnMessage(msg: MessageEvent): void {
     console.log("received " + msg.data);
-    this.setMessage(JSON.parse(msg.data) as MessageIn);
+    this.setMessage(JSON.parse(msg.data) as TTTMessageIn);
     this.notify();
   }
 
-  private setMessage(msg: MessageIn) {
+  private setMessage(msg: TTTMessageIn) {
     this.messagesIn.push(msg);
   }
 
@@ -61,7 +61,7 @@ export default class SocketServer implements Server {
     return this.connected;
   }
 
-  public send(message: MessageOut): void {
+  public send(message: TTTMessageOut): void {
     this.socket.send(JSON.stringify(message));
   }
 

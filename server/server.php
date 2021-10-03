@@ -14,6 +14,7 @@ use Ratchet\WebSocket\WsServer;
 require __DIR__ . '/vendor/autoload.php';
 
 $db = new Database();
+$db->resetDb();
 $gameFactory = new GameFactory();
 $gameFactory->addGame(new TicTacToe());
 $clientHandler = new ClientHandler($db);
@@ -29,5 +30,5 @@ $server = IoServer::factory(
     8080
 );
 
-echo "server listening on 8080";
+echo "server listening on 8080\n";
 $server->run();

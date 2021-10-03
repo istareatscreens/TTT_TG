@@ -1,10 +1,10 @@
 import IPublisher from "../common/interfaces/IPublisher";
-import { MessageOut, MessageIn } from "../types";
+import { TTTMessageIn, TTTMessageOut } from "../game/message/TicTacToeMessage";
 
 export default interface IServer extends IPublisher {
-  getMessageIn: () => MessageIn;
+  getMessageIn: () => TTTMessageIn;
   hasMessageIn: () => boolean;
   start: () => void;
   isConnected: () => boolean;
-  send: (msg: MessageOut) => void;
+  send: (msg: TTTMessageOut) => void;
 }

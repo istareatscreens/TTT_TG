@@ -73,6 +73,7 @@ class PlayerState
 
     public function updateClientHash(string $playerId, string $hash = "")
     {
+        echo "HEREIN UPDATE CLIENT: " . $playerId . " " . $hash;
         $query = "UPDATE player " .
             "SET client_hash = :client_hash " .
             "WHERE player_token = UUID_TO_BIN(:token)";
@@ -80,7 +81,7 @@ class PlayerState
             $query,
             [
                 "token" => $playerId,
-                "client_hash" => ($hash === "") ? \PDO::PARAM_NULL : $hash
+                "client_hash" => ($hash === "") ? NULL : $hash
             ]
         );
     }

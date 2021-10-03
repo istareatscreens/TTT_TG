@@ -7,22 +7,22 @@ use Game\Db\Database;
 use Game\Db\PlayerState;
 use Game\Db\GameState;
 use Game\GameFactory;
-use Game\Library\Uuid;
 use Game\Server\ClientHandler;
 use Game\Server\MessageOut;
 use Test\Mock\ClientMock;
 use Game\TicTacToe;
 use Game\Server\MessageHandler;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 require_once "Mock/ClientMock.php";
 
 class MessageHandlerTest extends TestCase
 {
 
-    private function removeNamespaceFromType($gameType)
+    private function removeNamespaceFromType($game)
     {
-        return substr(strrchr($gameType::class, '\\'), 1);
+        return (new ReflectionClass($game))->getShortName();
     }
 
     protected function setUp(): void
@@ -70,7 +70,7 @@ class MessageHandlerTest extends TestCase
 
     protected function tearDown(): void
     {
-        //$this->db->resetDb();
+        $this->db->resetDb();
     }
 
     private function makeMessageIn(

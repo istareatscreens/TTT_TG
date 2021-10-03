@@ -1,16 +1,16 @@
 import ISubscriber from "../common/interfaces/ISubscriber";
 import { UniqueId } from "../common/UniqueId";
-import Server from "../server/Server";
-import { Dimensions, GameStatus } from "../types";
+import IServer from "../server/IServer";
+import { Dimensions, GameResponse } from "../types";
 import Controller from "./controllers/Controller";
 import TicTacToe from "./TicTacToe";
 
 export default class GameClient implements ISubscriber {
-  private gameId: number;
-  private gameStatus: GameStatus;
-  private playerID: number;
+  private gameId: string;
+  private gameStatus: GameResponse;
+  private playerId: string;
   private canvas: HTMLCanvasElement;
-  private server: Server;
+  private server: IServer;
   private resizeController: Controller;
   private gameController: Controller;
   private subscriberId: UniqueId;
@@ -18,15 +18,15 @@ export default class GameClient implements ISubscriber {
   private connected: boolean;
 
   constructor(
-    server: Server,
+    server: IServer,
     game: TicTacToe,
     gameController: Controller,
     resizeController: Controller,
     canvas: HTMLCanvasElement
   ) {
-    this.gameId = -1;
+    this.gameId = "";
     this.gameStatus = "initial";
-    this.playerID = -1;
+    this.playerId = "";
     this.server = server;
     this.canvas = canvas;
     this.game = game;
@@ -71,7 +71,9 @@ export default class GameClient implements ISubscriber {
     } else if (this.server.hasMessageIn()) {
       this.handleMessage();
     } else if (this.server.isConnected()) {
-      this.handleConnection();
+      this.joinLobby();
+    } else if (this.server.isConnected()) {
+      this.reconnectToGame();
     } else if (!this.server.isConnected()) {
       this.handleDisconnection();
     }
@@ -85,12 +87,25 @@ export default class GameClient implements ISubscriber {
     return this.connected;
   }
 
-  private handleConnection(): void {
+  private joinLobby(): void {
+    this.connected = true;
+    this.server.send({
+      type: "joinLobby",
+      game: "TicTacToe",
+      gameId: this.gameId,
+      playerId: this.playerId,
+      position: null,
+    });
+  }
+
+  private reconnectToGame(): void {
     this.connected = true;
     this.server.send({
       type: "joinGame",
-      gameId: -1,
-      quadrant: -1,
+      game: "TicTacToe",
+      gameId: this.gameId,
+      playerId: this.playerId,
+      position: null,
     });
   }
 
@@ -102,6 +117,7 @@ export default class GameClient implements ISubscriber {
     const msg = this.server.getMessageIn();
     this.gameStatus = msg.status;
     this.gameId = msg.gameId;
+    this.playerId = msg.playerId;
     switch (this.gameStatus) {
       case "inLobby":
         break;
@@ -109,11 +125,15 @@ export default class GameClient implements ISubscriber {
         this.updateState(msg.state);
         this.game.setWinner(msg.winner);
         break;
-      case "Finished":
+      case "gameOver":
         this.updateState(msg.state);
         this.game.setWinner(msg.winner);
         break;
       case "initial":
+        break;
+      case "playerRejoin":
+        break;
+      case "playerLeft":
         break;
       default:
         console.log(
@@ -147,8 +167,10 @@ export default class GameClient implements ISubscriber {
     }
     this.server.send({
       type: "makeMove",
+      game: "TicTacToe",
       gameId: this.gameId,
-      quadrant: quadrant,
+      playerId: this.playerId,
+      position: quadrant,
     });
   }
 }

@@ -42,11 +42,12 @@ export default class TicTacToe {
       console.log(this.bored.getQuadrantNumber(coordinates));
       return this.bored.getQuadrantNumber(coordinates);
     }
-    return -1;
+    return null;
   }
 
   public setState(state: number): void {
     this.state = state;
+    this.draw();
   }
 
   public draw(): void {

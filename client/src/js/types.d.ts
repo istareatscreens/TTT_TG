@@ -2,15 +2,22 @@ import { Mark } from "./common/enums";
 
 export type Dimensions = [width: number, height: number];
 export type Coordinates = [x: number, y: number];
-export type GameStatus =
-  | "inLobby"
-  | "inGame"
-  | "Finished"
-  | "Failed"
-  | "initial";
+export type GameCommand = "makeMove" | "joinGame" | "joinLobby";
+
+export type GameName = "TicTacToe";
 
 export type PlayerOptions = "joinLobby" | "joinGame" | "makeMove";
-export type QuadrantNumber = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+export type GameResponse =
+  | "initial"
+  | "gameOver"
+  | "inGame"
+  | "inLobby"
+  | "playerRejoin"
+  | "playerLeft"
+  | "gameOver";
+
+export type QuadrantNumber = null | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export interface Game {}
 
@@ -20,10 +27,11 @@ export type GameProperties = [
   canvas: HTMLCanvasElement
 ];
 
+/*
 export interface MessageIn {
   status: GameStatus;
   state: number;
-  gameId: number;
+  gameId: string;
   winner: Mark;
 }
 
@@ -32,3 +40,4 @@ export interface MessageOut {
   gameId: number;
   quadrant: QuadrantNumber;
 }
+*/

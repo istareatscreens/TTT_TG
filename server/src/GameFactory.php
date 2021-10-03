@@ -2,6 +2,7 @@
 
 namespace Game;
 
+use Reflection;
 
 class GameFactory
 {
@@ -14,7 +15,7 @@ class GameFactory
 
     public function &addGame(GameInterface $game)
     {
-        $hash = $this->removeNamespaceFromType($game::class);
+        $hash = $this->removeNamespaceFromType($game);
         $this->games[$hash] = $game;
         return $this;
     }
@@ -29,16 +30,17 @@ class GameFactory
         return key_exists($gameName, $this->games);
     }
 
-    private function removeNamespaceFromType($gameType)
+    private function removeNamespaceFromType($game)
     {
-        return substr(strrchr($gameType, '\\'), 1);
+        return (new \ReflectionClass($game))->getShortName();
     }
 
     public function createGame(string $type, $id, ...$playerId): GameInterface | false
     {
-        $type = $this->removeNamespaceFromType($type);
         try {
-            return $this->games[$type]->createGame($id, ...$playerId);
+            return $this->isValidGame($type) ?
+                $this->games[$type]->createGame($id, ...$playerId) :
+                false;
         } catch (\Exception $e) {
             return false;
         }

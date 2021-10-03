@@ -17,7 +17,6 @@ const jsPath = "./src/js/**/*.*";
 const cssPath = "./src/css/**/*";
 const htmlPath = "./src/html/**/*";
 
-//WEB
 //Production
 function jsTaskProd() {
   return src([jsPath, "!node_modules"])

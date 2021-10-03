@@ -25,7 +25,9 @@ export default class Quadrant {
     this.lineStroke = lineStroke;
     this.properties = properties;
     this.color = color;
-    this.edgeBuffer = this.lineStroke * 5;
+
+    const [width, height] = this.properties.dimensions;
+    this.edgeBuffer = this.lineStroke * 3;
   }
 
   public draw(): void {
@@ -51,11 +53,11 @@ export default class Quadrant {
 
     this.drawLine(
       [x + this.edgeBuffer, y + this.edgeBuffer],
-      [width + x - this.edgeBuffer, height + y - this.edgeBuffer]
+      [width + x - this.edgeBuffer, Math.abs(height + y - this.edgeBuffer)]
     );
     this.drawLine(
       [x + width - this.edgeBuffer, y + this.edgeBuffer],
-      [x + this.edgeBuffer, y + height - this.edgeBuffer]
+      [x + this.edgeBuffer, Math.abs(y + height - this.edgeBuffer)]
     );
   }
 
@@ -78,7 +80,7 @@ export default class Quadrant {
     this.context.arc(
       x + width / 2,
       y + height / 2,
-      Math.min(width, height) / 2 - this.edgeBuffer,
+      Math.abs(Math.min(width, height) / 2 - this.edgeBuffer),
       0,
       2 * Math.PI
     );

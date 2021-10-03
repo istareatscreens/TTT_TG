@@ -52,7 +52,7 @@ class ClientHandler
         return $this->hashExists($hash);
     }
 
-    private function hashExists($hash): bool
+    public function hashExists($hash): bool
     {
         return key_exists($hash, $this->clients) && $this->clientBiMap->hasValue($hash);
     }
@@ -62,10 +62,10 @@ class ClientHandler
         try {
             $hash = $this->getClientHash($client);
             if ($this->hashExists($hash)) {
-                $key = $this->clientBiMap->getKey($hash);
-                $this->clientBiMap->put($key, "");
+                $playerId = $this->clientBiMap->getKey($hash);
+                $this->clientBiMap->put($playerId, "");
                 unset($this->clients[$hash]);
-                $this->db->updateClientHash($key);
+                $this->db->updateClientHash($playerId);
             }
         } catch (\Exception $e) {
             echo $e;
@@ -78,7 +78,7 @@ class ClientHandler
         return $this->clientBiMap->getValue($playerId) !== "";
     }
 
-    public function getClientByHash($hash): ConnectionInterface
+    public function getClientByHash($hash): ConnectionInterface | NULL
     {
         return $this->clients[$hash];
     }
@@ -97,7 +97,7 @@ class ClientHandler
     {
         $uuid = Uuid::v4();
         $hash = $this->getClientHash($client);
-        if ($hash === "") {
+        if (is_null($hash)) {
             return false;
         }
         $this->clientBiMap->put($uuid, $hash);
@@ -126,7 +126,7 @@ class ClientHandler
     public function validateClient(ConnectionInterface $client, string $playerId): bool
     {
         $hash = $this->getClientHash($client);
-        if ($hash === "") {
+        if (is_null($hash) || $hash === "") {
             return false;
         }
 

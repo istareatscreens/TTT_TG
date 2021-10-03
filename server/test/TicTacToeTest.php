@@ -34,7 +34,7 @@ class TicTacToeTest extends TestCase
         $gameFactory = new GameFactory();
         $gameFactory->addGame(new TicTacToe());
         $game = $gameFactory->createGame(
-            TicTacToe::class,
+            "TicTacToe",
             $this->gameId,
             $this->playerId1,
             $this->playerId2
@@ -61,7 +61,7 @@ class TicTacToeTest extends TestCase
         $gameFactory = new GameFactory();
         $gameFactory->addGame(new TicTacToe());
         $game = $gameFactory->createGame(
-            TicTacToe::class,
+            "TicTacToe",
             $this->gameId,
             $this->playerId1,
             $this->playerId1
@@ -76,7 +76,7 @@ class TicTacToeTest extends TestCase
         $gameFactory = new GameFactory();
         $gameFactory->addGame(new TicTacToe());
         $game = $gameFactory->createGame(
-            TicTacToe::class,
+            "TicTacToe",
             $this->gameId,
             $this->playerId1,
             $this->playerId2
@@ -124,7 +124,7 @@ class TicTacToeTest extends TestCase
         $gameFactory = new GameFactory();
         $gameFactory->addGame(new TicTacToe());
         $game = $gameFactory->createGame(
-            TicTacToe::class,
+            "TicTacToe",
             $this->gameId,
             $this->playerId1,
             $this->playerId2
