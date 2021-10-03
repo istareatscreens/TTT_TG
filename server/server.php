@@ -29,4 +29,5 @@ $server = IoServer::factory(
     8080
 );
 
+echo "server listening on 8080";
 $server->run();

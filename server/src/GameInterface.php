@@ -17,5 +17,6 @@ interface GameInterface
     public function getWinner();
     public function makeMove(string $playerId, int $position): bool;
     public function gameOver(): bool;
+    public function validPosition($position): bool;
     public function getState();
 }

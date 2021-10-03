@@ -65,7 +65,7 @@ class TicTacToe implements GameInterface
         return $this->players[$playerId];
     }
 
-    private function validQuadrant(int $quadrant): bool
+    public function validPosition($quadrant): bool
     {
         return $quadrant > -1 && $quadrant < 9;
     }
@@ -85,7 +85,7 @@ class TicTacToe implements GameInterface
         $moveComplete = false;
         if (
             $this->outOfMoves()
-            || !$this->validQuadrant($quadrant)
+            || !$this->validPosition($quadrant)
         ) {
             return false;
         }

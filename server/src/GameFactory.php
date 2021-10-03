@@ -19,6 +19,16 @@ class GameFactory
         return $this;
     }
 
+    public function isValidPositionInGame(string $gameName, $position): bool
+    {
+        return $this->games[$gameName]->validPosition($position);
+    }
+
+    public function isValidGame(string $gameName)
+    {
+        return key_exists($gameName, $this->games);
+    }
+
     private function removeNamespaceFromType($gameType)
     {
         return substr(strrchr($gameType, '\\'), 1);

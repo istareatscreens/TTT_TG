@@ -22,7 +22,7 @@ class ClientHandler
         $this->db = new PlayerState($db);
     }
 
-    public function addClient(ConnectionInterface $client)
+    public function addClient(ConnectionInterface $client): void
     {
         $this->clients[$this->getClientHash($client)] = ($client);
     }
@@ -43,7 +43,7 @@ class ClientHandler
 
     public function clientHasPlayerId(ConnectionInterface $client): bool
     {
-        return $this->clientBiMap->hasValue($this->getClientByHash($client));
+        return $this->clientBiMap->hasValue($this->getClientHash($client));
     }
 
     public function clientExists(ConnectionInterface $client): bool
@@ -64,7 +64,7 @@ class ClientHandler
             if ($this->hashExists($hash)) {
                 $key = $this->clientBiMap->getKey($hash);
                 $this->clientBiMap->put($key, "");
-                unset($this->clients);
+                unset($this->clients[$hash]);
                 $this->db->updateClientHash($key);
             }
         } catch (\Exception $e) {
@@ -105,14 +105,20 @@ class ClientHandler
         return true;
     }
 
-    private function updateHash(string $playerId, string $hash)
+    private function updateHash(ConnectionInterface $client, $playerId, $hash): void
     {
+
+        $oldHash = $this->clientBiMap->getValue($playerId);
+        if (key_exists($oldHash, $this->clients)) {
+            unset($this->clients[$oldHash]);
+        }
+        $this->clients[$hash] = $client;
         $this->clientBiMap->removeKey($playerId);
         $this->clientBiMap->put($playerId, $hash);
         $this->db->updateClientHash($playerId, $hash);
     }
 
-    private function saveUserToDb(string $playerId, string $hash)
+    private function saveUserToDb(string $playerId, string $hash): void
     {
         $this->db->savePlayer($playerId, $hash);
     }
@@ -139,7 +145,7 @@ class ClientHandler
 
         //check if new client
         if ($this->db->playerExistsByToken($playerId)) {
-            $this->updateHash($playerId, $hash);
+            $this->updateHash($client, $playerId, $hash);
             return true;
         }
 

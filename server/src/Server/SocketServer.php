@@ -21,30 +21,14 @@ class SocketServer implements MessageComponentInterface
         echo "New connection! ({$conn->resourceId})\n";
     }
 
-    /*
-        type: joinLobby | joinGame | makeMove
-        gameId: default == -1 | id
-        playerId: ""
-        quadrant: -1<value<9
-    */
-
-    /*
-        status: inLobby | inGame | failed
-        state: 
-        gameId: 
-        winner: 0 | 1 | 2
-    */
-
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         //template code
-        $numRecv = count($this->clients) - 1;
         echo sprintf(
-            'Connection %d sending message "%s" to %d other connection%s' . "\n",
+            'Recieved from %d message: "%s"' .
+                "\n",
             $from->resourceId,
             $msg,
-            $numRecv,
-            $numRecv == 1 ? '' : 's'
         );
         $msg = json_decode($msg);
         $this->messageHandler->handleMessage($msg, $from);

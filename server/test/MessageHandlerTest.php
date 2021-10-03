@@ -29,6 +29,7 @@ class MessageHandlerTest extends TestCase
     {
         $this->db = new Database();
         $this->db->resetDb();
+        $this->gameState = new GameState($this->db);
 
         $this->playerState = new PlayerState($this->db);
         $this->gameState = new GameState($this->db);
@@ -39,6 +40,7 @@ class MessageHandlerTest extends TestCase
         $this->gameName = $this->removeNamespaceFromType($this->mockGame);
         $this->state = 55;
         $this->mockGame->method("createGame")->willReturn($this->mockGame);
+        $this->mockGame->method("validPosition")->willReturn(true);
         $this->mockGame->method("getPlayerNumber")->willReturn(1);
         $this->mockGame->method("getState")->willReturn($this->state);
         $this->mockGame->method("getWinner")->willReturn(0);
@@ -68,7 +70,7 @@ class MessageHandlerTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->db->resetDb();
+        //$this->db->resetDb();
     }
 
     private function makeMessageIn(
@@ -76,7 +78,7 @@ class MessageHandlerTest extends TestCase
         string $gameType,
         string |int $gameId = -1,
         string |int $playerId = -1,
-        string |int $position = -1
+        string |int $position = NULL
     ) {
         return (object)[
             "type" => $type,
@@ -128,14 +130,67 @@ class MessageHandlerTest extends TestCase
         $this->messageHandler->handleMessage($msgIn, $client2);
         $msgOut2 = $msg2->createMessage("inGame", 1, 55);
         $this->assertEquals($msgOut2, $client2->getMessage());
+        $msgOut1 = $msg1->createMessage("playerRejoin", 1, 55);
+        $this->assertEquals($msgOut1, $client1->getMessage());
+
+        //leave game and change client
+        $this->messageHandler->disconnectClient($client2);
+        $msgOut1 = $msg1->createMessage("playerLeft", 1, 55);
+        $this->assertEquals($msgOut1, $client1->getMessage());
+        $client2 = new ClientMock();
+        $msgIn = $this->makeMessageIn("joinGame", $this->gameName, $this->gameId, $playerId2);
+        $this->messageHandler->handleMessage($msgIn, $client2);
+        $msgOut2 = $msg2->createMessage("inGame", 1, 55);
+        $this->assertEquals($msgOut2, $client2->getMessage());
+
 
         //game over
-        $msgIn = $this->makeMessageIn("makeMove", $this->gameName, $this->gameId, $playerId2, 2);
+        $msgIn = $this->makeMessageIn("makeMove", $this->gameName, $this->gameId, $playerId2, 0);
         $this->mockGame->method("gameOver")->willReturn(true);
         $this->messageHandler->handleMessage($msgIn, $client2);
         $msgOut2 = $msg2->createMessage("gameOver", 1, 55);
         $msgOut1 = $msg1->createMessage("gameOver", 1, 55);
         $this->assertEquals($msgOut1, $client1->getMessage());
         $this->assertEquals($msgOut2, $client2->getMessage());
+    }
+
+    public function start_game_both_players_leave()
+    {
+
+        //join loby
+        $client1 = new ClientMock();
+        $this->messageHandler->addClient($client1);
+        $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
+        $this->messageHandler->handleMessage($msgIn, $client1);
+        $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
+        $msg1 = new MessageOut($playerId1);
+        $msgOut1 = $msg1->createMessage("inLobby");
+        $this->assertEquals($msgOut1, $client1->getMessage());
+
+        // start game
+        $client2 = new ClientMock();
+        $this->messageHandler->addClient($client2);
+        $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
+        $this->messageHandler->handleMessage($msgIn, $client2);
+        $playerId2 = $this->clientHandler->getPlayerIdByClient($client2);
+        $msg2 = new MessageOut($playerId2, $this->gameId);
+        $msg1 = new MessageOut($playerId1, $this->gameId);
+        $msgOut2 = $msg2->createMessage("inGame", 1);
+        $this->assertEquals($msgOut2, $client2->getMessage());
+        $msgOut1 = $msg1->createMessage("inGame", 1);
+        $this->assertEquals($msgOut1, $client1->getMessage());
+
+        // check if game is deleted since all users left
+        $this->messageHandler->disconnectClient($client1);
+        $msgOut2 = $msg2->createMessage("playerLeft", 1, 55);
+        $this->assertEquals($msgOut2, $client1->getMessage());
+        $this->messageHandler->disconnectClient($client2);
+        $result = $this->gameState->getGame($this->gameId);
+        $this->assertTrue(count($result) === 0);
+
+        // should not allow move on game since it was deleted
+        $msgIn = $this->makeMessageIn("makeMove", $this->gameName, $this->gameId, $playerId1);
+        $this->messageHandler->handleMessage($client1, $msgOut1);
+        $this->assertNull($client1->getMessage());
     }
 }

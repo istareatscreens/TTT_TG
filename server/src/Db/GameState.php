@@ -37,6 +37,13 @@ class GameState
         return true;
     }
 
+    public function getGame($gameId)
+    {
+        $query = "SELECT * FROM game WHERE UUID_TO_BIN(:game_token) = game_token";
+        $result = $this->db->select($query, ["game_token" => $gameId]);
+        return $result;
+    }
+
     public function getGamesAndPlayers(string $playerId)
     {
         $query = "SELECT player_id FROM player WHERE player_token = UUID_TO_BIN(:token)";
@@ -73,20 +80,25 @@ class GameState
             . "game_player_union "
             . "INNER JOIN active_games "
             . "WHERE game_player_union.game_id = active_games.game_id "
-            . "AND UUID_TO_BIN(:player_token) != player_token";
-        $result = $this->db->selectAll(
+            . "AND player_token != UUID_TO_BIN(:player_token)";
+        $results = $this->db->selectAll(
             $query,
             ["player_token" => $playerId]
         );
 
-        $results = []; // [$game_token] => [player_id, client_hash]
-        foreach ($result as $row) {
-            if (!key_exists($row["game_token"], $results)) {
-                $row["game_token"] = [];
-            }
-            array_push($row["game_token"], [$row['player_token'], $row["client_hash"]]);
+        if (count($results) === 0) {
+            return NULL;
         }
-        return $results;
+
+        $games = []; // [$game_token] => [player_id, client_hash]
+        foreach ($results as $result) {
+            $gameId = $result["BIN_TO_UUID(game_token)"];
+            if (!key_exists($gameId, $games)) {
+                $games[$gameId] = [];
+            }
+            array_push($games[$gameId], [$result["BIN_TO_UUID(player_token)"], $result["client_hash"]]);
+        }
+        return $games;
     }
 
     public function getPlayers(string $gameId)

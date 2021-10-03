@@ -5,9 +5,7 @@ namespace Test;
 
 use Game\Db\Database;
 use Game\Db\PlayerState;
-use Game\Library\Uuid;
 use Game\Server\ClientHandler;
-use Game\TicTacToe;
 use Test\Mock\ClientMock;
 use PHPUnit\Framework\TestCase;
 
