@@ -1,0 +1,12 @@
+@mixin absolute-axis-xy($top: 50%, $left: 50%) {
+  position: absolute;
+  left: $left;
+  top: $top;
+  transform: translate(-50%, -50%);
+}
+
+@mixin debug-border {
+  border-color: red;
+  border-style: solid;
+  border-width: 1px;
+}

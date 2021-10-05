@@ -9,6 +9,7 @@ export default class TicTacToe {
   private state: number;
   private lineStroke: number;
   private winner: Mark;
+  private turn: Mark;
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -19,7 +20,12 @@ export default class TicTacToe {
     this.setDimensions(dimensions);
     this.bored = new GameBored(context, dimensions, this.lineStroke);
     this.state = 0;
+    this.turn = Mark.X;
     this.winner = Mark.Empty;
+  }
+
+  public getTurn(): Mark {
+    return this.turn;
   }
 
   public setWinner(winner: Mark): void {
@@ -46,6 +52,9 @@ export default class TicTacToe {
   }
 
   public setState(state: number): void {
+    if (state !== this.state) {
+      this.turn = Mark.X === this.turn ? Mark.X : Mark.O;
+    }
     this.state = state;
     this.draw();
   }

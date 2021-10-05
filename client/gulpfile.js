@@ -46,14 +46,22 @@ function copyHtml() {
 function cssTask() {
   return src([cssPath + ".scss", cssPath + ".css"])
     .pipe(sourcemaps.init())
-    .pipe(sass({ includePaths: ["./node_modules"] }).on("error", sass.logError))
-    .pipe(concat("style.css"))
-    .pipe(postcss([autoprefixer(), cssnano()])) //not all plugins work with postcss only the ones mentioned in their documentation
-    .pipe(sourcemaps.write("."))
+    .pipe(webpack(require("./webpack.dev.js")))
     .pipe(browserSync.stream())
     .pipe(dest(output));
 }
 
+//function cssTask() {
+//  return src([cssPath + ".scss", cssPath + ".css"])
+//    .pipe(sourcemaps.init())
+//    .pipe(sass({ includePaths: ["./node_modules"] }).on("error", sass.logError))
+//    .pipe(concat("style.css"))
+//    .pipe(postcss([autoprefixer(), cssnano()])) //not all plugins work with postcss only the ones mentioned in their documentation
+//    .pipe(sourcemaps.write("."))
+//    .pipe(browserSync.stream())
+//    .pipe(dest(output));
+//}
+//
 function watchTask() {
   browserSync.init({
     server: {

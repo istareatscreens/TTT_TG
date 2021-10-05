@@ -93,7 +93,7 @@ class MessageHandler
                 }
 
                 // Delete game if all players left
-                if (is_null($clientHash) || $this->clientHandler->hashExists($clientHash)) {
+                if (is_null($clientHash)) {
                     $this->deleteGame($gameId);
                 } else {
                     //notify other user of player leaving 

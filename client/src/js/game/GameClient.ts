@@ -3,7 +3,20 @@ import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
 import { Dimensions, GameResponse } from "../types";
 import Controller from "./controllers/Controller";
+import { TTTMessageIn } from "./message/TicTacToeMessage";
 import TicTacToe from "./TicTacToe";
+
+interface Controllers {
+  resizeController: Controller;
+  gameController: Controller;
+}
+
+interface FrontEndCallbacks {
+  setWinner?: (input: any) => void;
+  setTurn?: (input: any) => void;
+  setPlayerNumber?: (input: any) => void;
+  setGameStatus?: (input: any) => void;
+}
 
 export default class GameClient implements ISubscriber {
   private gameId: string;
@@ -11,18 +24,18 @@ export default class GameClient implements ISubscriber {
   private playerId: string;
   private canvas: HTMLCanvasElement;
   private server: IServer;
-  private resizeController: Controller;
-  private gameController: Controller;
+  private controllers: Controllers;
   private subscriberId: UniqueId;
   private game: TicTacToe;
   private connected: boolean;
+  private frontEndCallbacks: FrontEndCallbacks;
 
   constructor(
     server: IServer,
     game: TicTacToe,
-    gameController: Controller,
-    resizeController: Controller,
-    canvas: HTMLCanvasElement
+    controllers: Controllers,
+    canvas: HTMLCanvasElement,
+    frontEndCallBacks: FrontEndCallbacks
   ) {
     this.gameId = "";
     this.gameStatus = "initial";
@@ -30,8 +43,8 @@ export default class GameClient implements ISubscriber {
     this.server = server;
     this.canvas = canvas;
     this.game = game;
-    this.gameController = gameController;
-    this.resizeController = resizeController;
+    this.controllers = controllers;
+    this.frontEndCallbacks = frontEndCallBacks;
     this.subscriberId = new UniqueId();
     this.connected = false;
     this.subscribe();
@@ -39,8 +52,8 @@ export default class GameClient implements ISubscriber {
 
   private subscribe(): void {
     this.server.add(this);
-    this.gameController.add(this);
-    this.resizeController.add(this);
+    this.controllers.gameController.add(this);
+    this.controllers.resizeController.add(this);
   }
 
   public getSubscriberId(): string {
@@ -57,16 +70,16 @@ export default class GameClient implements ISubscriber {
   }
 
   public start() {
-    this.resizeController.connect();
-    this.gameController.connect();
+    this.controllers.resizeController.connect();
+    this.controllers.gameController.connect();
     this.game.draw();
     this.server.start();
   }
 
   public update(): void {
-    if (this.gameController.hasCoordinates(this)) {
+    if (this.controllers.gameController.hasCoordinates(this)) {
       this.makeMove();
-    } else if (this.resizeController.hasDimensions()) {
+    } else if (this.controllers.resizeController.hasDimensions()) {
       this.resizeGame();
     } else if (this.server.hasMessageIn()) {
       this.handleMessage();
@@ -77,14 +90,6 @@ export default class GameClient implements ISubscriber {
     } else if (!this.server.isConnected()) {
       this.handleDisconnection();
     }
-  }
-
-  private getGameStatus() {
-    return this.gameStatus;
-  }
-
-  private isConnected() {
-    return this.connected;
   }
 
   private joinLobby(): void {
@@ -113,11 +118,19 @@ export default class GameClient implements ISubscriber {
     this.connected = false;
   }
 
+  private updateFrontEnd(msg: TTTMessageIn): void {
+    this.frontEndCallbacks.setWinner(msg.winner);
+    this.frontEndCallbacks.setPlayerNumber(msg.playerNumber);
+    this.frontEndCallbacks.setTurn(this.game.getTurn());
+    this.frontEndCallbacks.setGameStatus(this.gameStatus);
+  }
+
   private handleMessage(): void {
     const msg = this.server.getMessageIn();
     this.gameStatus = msg.status;
     this.gameId = msg.gameId;
     this.playerId = msg.playerId;
+    this.updateFrontEnd(msg);
     switch (this.gameStatus) {
       case "inLobby":
         break;
@@ -151,7 +164,8 @@ export default class GameClient implements ISubscriber {
   }
 
   private resizeGame(): void {
-    const dimensions = this.resizeController.getDimensions();
+    const dimensions = this.controllers.resizeController.getDimensions();
+    console.log(dimensions);
     this.canvas.width = dimensions[0];
     this.canvas.height = dimensions[1];
     this.game.setDimensions(dimensions);
@@ -159,7 +173,7 @@ export default class GameClient implements ISubscriber {
   }
 
   private makeMove(): void {
-    const coordinates = this.gameController.getCoordinates(this);
+    const coordinates = this.controllers.gameController.getCoordinates(this);
     const quadrant = this.game.getQuadrantNumber(coordinates);
     console.log("quadrant: " + quadrant);
     if (!this.connected) {

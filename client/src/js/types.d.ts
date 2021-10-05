@@ -6,8 +6,6 @@ export type GameCommand = "makeMove" | "joinGame" | "joinLobby";
 
 export type GameName = "TicTacToe";
 
-export type PlayerOptions = "joinLobby" | "joinGame" | "makeMove";
-
 export type GameResponse =
   | "initial"
   | "gameOver"

@@ -1,0 +1,22 @@
+.game {
+  &-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    &__player {
+      display: block;
+    }
+    &__winner {
+      display: block;
+    }
+    &__turn {
+      display: block;
+    }
+  }
+
+  &-canvas-container {
+    width: 100%;
+    height: 100%;
+  }
+}

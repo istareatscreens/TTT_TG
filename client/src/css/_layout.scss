@@ -1,0 +1,20 @@
+.game-container {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  /* prettier-ignore */
+  grid-template:
+". . . ." 5vh
+". game game ." 45vh
+". game game ." 45vh
+". . . ." 5vh
+/ 5vw 45vw 45vw 5vw
+}
+
+.game {
+  grid-area: game;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

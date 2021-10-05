@@ -1,0 +1,8 @@
+@use "@material/button/mdc-button";
+@use "@material/button";
+
+.btn {
+  @include button.container-fill-color(#92140c);
+  @include button.ink-color(#fff8f0);
+  font-size: 1rem;
+}

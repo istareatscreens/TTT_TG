@@ -4,12 +4,14 @@
   "description": "",
   "main": "src/js/index.js",
   "devDependencies": {
+    "@types/react-dom": "^17.0.9",
     "@types/uuid": "^8.3.1",
-    "autoprefixer": "^10.3.4",
+    "autoprefixer": "^10.3.6",
     "browser-sync": "^2.27.5",
-    "css-loader": "^6.2.0",
+    "css-loader": "^6.3.0",
     "cssnano": "^5.0.8",
     "del": "^6.0.0",
+    "extract-loader": "^5.1.0",
     "file-loader": "^6.2.0",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
@@ -18,7 +20,11 @@
     "gulp-postcss": "^9.0.1",
     "gulp-sass": "^5.0.0",
     "gulp-sourcemaps": "^3.0.0",
-    "sass": "^1.41.1",
+    "postcss-loader": "^3.0.0",
+    "precss": "^4.0.0",
+    "sass": "^1.42.1",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.3.0",
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.3",
     "webpack": "^5.53.0",
@@ -34,6 +40,11 @@
   "author": "istareatscreens",
   "license": "ISC",
   "dependencies": {
+    "@material/button": "^13.0.0",
+    "@material/card": "^13.0.0",
+    "react": "^17.0.2",
+    "react-bootstrap": "^2.0.0-rc.0",
+    "react-dom": "^17.0.2",
     "uuid": "^8.3.2"
   }
 }

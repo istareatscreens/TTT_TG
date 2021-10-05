@@ -26,7 +26,6 @@ export default class Quadrant {
     this.properties = properties;
     this.color = color;
 
-    const [width, height] = this.properties.dimensions;
     this.edgeBuffer = this.lineStroke * 3;
   }
 
@@ -67,8 +66,8 @@ export default class Quadrant {
     this.context.beginPath();
     this.context.moveTo(...start);
     this.context.lineTo(...end);
-    this.context.stroke();
     this.context.closePath();
+    this.context.stroke();
   }
 
   private drawO(): void {
@@ -84,6 +83,7 @@ export default class Quadrant {
       0,
       2 * Math.PI
     );
+    this.context.closePath();
     this.context.stroke();
   }
 

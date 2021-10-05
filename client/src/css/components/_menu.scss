@@ -1,0 +1,35 @@
+@use "@material/card";
+
+.menu {
+  @include card.core-styles;
+  @include absolute-axis-xy(40%);
+  height: 40%;
+  width: fit-content;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__title {
+    font-size: 5rem;
+    white-space: pre;
+    white-space: nowrap;
+    font-size: 5rem;
+    white-space: pre;
+    white-space: nowrap;
+    padding: 2rem 2rem 5rem 2rem;
+    display: inline-block;
+    line-height: 4rem;
+  }
+
+  &__buttons {
+    height: 30vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
