@@ -97,9 +97,11 @@ class MessageHandler
                     $this->deleteGame($gameId);
                 } else {
                     //notify other user of player leaving 
-                    $state = $this->games[$gameId]->getState();
-                    $winner = $this->games[$gameId]->getWinner();
-                    $playerNumber = $this->games[$gameId]->getPlayerNumber($playerId);
+                    $game = $this->games[$gameId];
+                    $state = $game->getState();
+                    $winner = $game->getWinner();
+                    $gameOverState = $game->getWinningState();
+                    $playerNumber = $game->getPlayerNumber($playerId);
                     $message = new MessageOut($playerId, $gameId);
                     array_push($clientAndMessage, [
                         $this->clientHandler->getClientByHash($clientHash),
@@ -107,7 +109,8 @@ class MessageHandler
                             "playerLeft",
                             $playerNumber,
                             $state,
-                            $winner
+                            $winner,
+                            $gameOverState
                         )
                     ]);
                 }
@@ -188,7 +191,8 @@ class MessageHandler
             "inGame",
             $game->getPlayerNumber($playerId),
             $game->getState(),
-            $game->getWinner()
+            $game->getWinner(),
+            $game->getWinningState()
         );
 
         echo "\n" . $message;
@@ -212,7 +216,8 @@ class MessageHandler
                 "playerRejoin",
                 $game->getPlayerNumber($playerId),
                 $game->getState(),
-                $game->getWinner()
+                $game->getWinner(),
+                $game->getWinningState()
             );
             echo "\n" . $message;
             $client->send(
@@ -249,6 +254,7 @@ class MessageHandler
         $gameOver = $game->gameOver();
         $status = ($gameOver) ?  "gameOver" : "inGame";
         $state = $game->getState();
+        $gameOverState = $game->getWinningState();
 
         $message = new MessageOut($playerId1, $gameId);
 
@@ -256,7 +262,8 @@ class MessageHandler
             $status,
             $game->getPlayerNumber($playerId1),
             $state,
-            $winner
+            $winner,
+            $gameOverState
         );
 
         echo "\n" . $message;
@@ -269,7 +276,8 @@ class MessageHandler
                 $status,
                 $game->getPlayerNumber($playerId2),
                 $game->getState(),
-                $winner
+                $winner,
+                $gameOverState
             );
             echo "\n" . $message;
             $client2->send($message);

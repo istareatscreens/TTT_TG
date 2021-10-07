@@ -1,3 +1,4 @@
+import { Mark } from "../common/enums";
 import ISubscriber from "../common/interfaces/ISubscriber";
 import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
@@ -16,6 +17,7 @@ interface FrontEndCallbacks {
   setTurn?: (input: any) => void;
   setPlayerNumber?: (input: any) => void;
   setGameStatus?: (input: any) => void;
+  setGameOver?: (input: any) => void;
 }
 
 export default class GameClient implements ISubscriber {
@@ -37,17 +39,26 @@ export default class GameClient implements ISubscriber {
     canvas: HTMLCanvasElement,
     frontEndCallBacks: FrontEndCallbacks
   ) {
-    this.gameId = "";
-    this.gameStatus = "initial";
-    this.playerId = "";
     this.server = server;
     this.canvas = canvas;
     this.game = game;
+    this.setInitialVariables();
     this.controllers = controllers;
     this.frontEndCallbacks = frontEndCallBacks;
     this.subscriberId = new UniqueId();
     this.connected = false;
     this.subscribe();
+  }
+
+  private setInitialVariables() {
+    this.gameId = "";
+    this.gameStatus = "initial";
+    this.playerId = "";
+  }
+
+  private reset() {
+    this.setInitialVariables();
+    this.joinLobby();
   }
 
   private subscribe(): void {
@@ -125,24 +136,37 @@ export default class GameClient implements ISubscriber {
     this.frontEndCallbacks.setGameStatus(this.gameStatus);
   }
 
+  private resetGameId(): void {
+    this.gameId = "";
+  }
+
   private handleMessage(): void {
-    const msg = this.server.getMessageIn();
-    this.gameStatus = msg.status;
-    this.gameId = msg.gameId;
-    this.playerId = msg.playerId;
-    this.updateFrontEnd(msg);
+    const message = this.server.getMessageIn();
+    const gameOverState = message.gameOverState;
+    this.playerId = message.playerId;
+    this.gameId = message.gameId;
+    this.gameStatus = message.status;
+    this.game.setMark(message.playerNumber);
+
     switch (this.gameStatus) {
       case "inLobby":
         break;
       case "inGame":
-        this.updateState(msg.state);
-        this.game.setWinner(msg.winner);
+        this.updateState(message.state);
+        this.game.setWinner(message.winner);
         break;
       case "gameOver":
-        this.updateState(msg.state);
-        this.game.setWinner(msg.winner);
+        this.updateState(message.state);
+        this.game.setWinner(message.winner);
+        this.resetGameId();
+        this.frontEndCallbacks.setGameOver(true);
+        if (gameOverState) {
+          this.game.setGameOverState(gameOverState);
+          this.game.draw();
+        }
         break;
       case "initial":
+        this.frontEndCallbacks.setGameOver(false);
         break;
       case "playerRejoin":
         break;
@@ -150,9 +174,10 @@ export default class GameClient implements ISubscriber {
         break;
       default:
         console.log(
-          `Invalid msg.status ${msg.status} message in handle message`
+          `Invalid msg.status ${message.status} message in handle message`
         );
     }
+    this.updateFrontEnd(message);
   }
 
   private updateState(state: number): void {
@@ -165,7 +190,6 @@ export default class GameClient implements ISubscriber {
 
   private resizeGame(): void {
     const dimensions = this.controllers.resizeController.getDimensions();
-    console.log(dimensions);
     this.canvas.width = dimensions[0];
     this.canvas.height = dimensions[1];
     this.game.setDimensions(dimensions);
@@ -176,7 +200,7 @@ export default class GameClient implements ISubscriber {
     const coordinates = this.controllers.gameController.getCoordinates(this);
     const quadrant = this.game.getQuadrantNumber(coordinates);
     console.log("quadrant: " + quadrant);
-    if (!this.connected) {
+    if (!this.connected || quadrant == null || !this.game.isTurn()) {
       return;
     }
     this.server.send({

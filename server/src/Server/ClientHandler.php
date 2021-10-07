@@ -107,7 +107,6 @@ class ClientHandler
 
     private function updateHash(ConnectionInterface $client, $playerId, $hash): void
     {
-
         $oldHash = $this->clientBiMap->getValue($playerId);
         if (key_exists($oldHash, $this->clients)) {
             unset($this->clients[$oldHash]);

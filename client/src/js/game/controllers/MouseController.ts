@@ -2,7 +2,7 @@ import ISubscriber from "../../common/interfaces/ISubscriber";
 import { Coordinates } from "../../types";
 import Controller from "./Controller";
 
-type ElementData = [element: HTMLElement, isBound: boolean];
+type ElementData = [element: HTMLElement, isAttached: boolean];
 
 export default class MouseController implements Controller {
   private coordinates: Map<string, Coordinates[]>;

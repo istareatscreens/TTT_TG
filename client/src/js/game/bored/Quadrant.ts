@@ -46,6 +46,12 @@ export default class Quadrant {
     }
   }
 
+  public getCenterCoordinate(): Coordinates {
+    const [x, y] = this.properties.coordinates;
+    const [width, height] = this.properties.dimensions;
+    return [x + width / 2, y + height / 2];
+  }
+
   private drawX(): void {
     const [x, y] = this.properties.coordinates;
     const [width, height] = this.properties.dimensions;

@@ -114,6 +114,7 @@ class TicTacToeTest extends TestCase
         $this->assertEquals(0b001000011000011001, $game->getState());
         $this->assertTrue($game->gameOver()); //game should be over
         $this->assertEquals($game->getWinner(), 2);
+        $this->assertEquals($game->getWinningState(), 0b1000001000001000);
         $game->makeMove($this->playerId1, 3); //try to change state after gameover
         $this->assertEquals(0b001000011000011001, $game->getState());
     }

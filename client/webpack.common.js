@@ -64,4 +64,5 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js", "jsx"],
   },
+  plugins: [require("autoprefixer"), require("cssnano")],
 };

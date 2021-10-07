@@ -14,7 +14,7 @@ class MessageOut
         $this->playerId = $playerId;
     }
 
-    public function createMessage(string $status, int $playerNumber = 0, $state = 0, int $winner = 0): string | false
+    public function createMessage(string $status, int $playerNumber = 0, $state = 0, int $winner = 0, int $gameOverState = 0): string | false
     {
         $data = array();
         $data["status"] = $status;
@@ -23,6 +23,7 @@ class MessageOut
         $data["state"] = $state;
         $data["playerNumber"] = $playerNumber;
         $data["winner"] = $winner;
+        $data["gameOverState"] = $gameOverState;
         return json_encode($data);
     }
 }

@@ -1,14 +1,20 @@
-.game-container {
+.games-container {
   width: 100vw;
   height: 100vh;
   display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+}
+
+.game-container {
+  display: grid;
   /* prettier-ignore */
   grid-template:
-". . . ." 5vh
-". game game ." 45vh
-". game game ." 45vh
-". . . ." 5vh
-/ 5vw 45vw 45vw 5vw
+". . . ." 5%
+". game game ." 45%
+". game game ." 45%
+". . . ." 5%
+/ 5% 45% 45% 5%
 }
 
 .game {

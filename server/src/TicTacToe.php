@@ -15,6 +15,7 @@ class TicTacToe implements GameInterface
     private int $playersMove;
     private int $movesLeft;
     private int $winner;
+    private int $winningState;
 
     public function __construct()
     {
@@ -22,6 +23,7 @@ class TicTacToe implements GameInterface
         $this->movesLeft = 9;
         $this->playersMove = 1; //player 1 moves first
         $this->winner = 0;
+        $this->winningState = 0;
     }
 
     public function createGame($id, string ...$playerIds): GameInterface
@@ -39,6 +41,11 @@ class TicTacToe implements GameInterface
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getWinningState(): int
+    {
+        return $this->winningState;
     }
 
     public function isPlayer($playerId): bool
@@ -151,6 +158,7 @@ class TicTacToe implements GameInterface
         foreach ($winningMasks as &$mask) {
             $result = $this->state & $mask;
             if ($this->containsThreeOfTheSameMarks($result, $playerNumber)) {
+                $this->winningState = $result;
                 return true;
             }
         }

@@ -7,21 +7,29 @@ export default class TicTacToe {
   private dimensions: Dimensions;
   private bored: GameBored;
   private state: number;
+  private gameOverState: number;
   private lineStroke: number;
   private winner: Mark;
   private turn: Mark;
+  private mark: Mark;
 
   public constructor(
     context: CanvasRenderingContext2D,
     dimensions: Dimensions
   ) {
-    this.lineStroke = 10;
     this.context = context;
     this.setDimensions(dimensions);
-    this.bored = new GameBored(context, dimensions, this.lineStroke);
+    this.reset();
+  }
+
+  public reset() {
+    this.lineStroke = 10;
+    this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
     this.state = 0;
     this.turn = Mark.X;
     this.winner = Mark.Empty;
+    this.gameOverState = 0;
+    this.mark = Mark.Empty;
   }
 
   public getTurn(): Mark {
@@ -33,6 +41,18 @@ export default class TicTacToe {
   }
   public getWinner(): Mark {
     return this.winner;
+  }
+
+  public setMark(mark: Mark): void {
+    this.mark = mark;
+  }
+
+  public getMark(): Mark {
+    return this.mark;
+  }
+
+  public isTurn() {
+    return this.mark === this.turn;
   }
 
   public setDimensions(dimensions: Dimensions) {
@@ -52,17 +72,23 @@ export default class TicTacToe {
   }
 
   public setState(state: number): void {
+    const { X, O } = Mark;
     if (state !== this.state) {
-      this.turn = Mark.X === this.turn ? Mark.X : Mark.O;
+      this.turn = X === this.turn ? O : X;
     }
     this.state = state;
     this.draw();
+  }
+
+  public setGameOverState(gameOverState: number): void {
+    this.gameOverState = gameOverState;
   }
 
   public draw(): void {
     //87381 all X
     //174762 all O
     this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
+    this.bored.setGameOverState(this.gameOverState);
     this.bored.draw(this.state);
   }
 }
