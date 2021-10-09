@@ -82,6 +82,7 @@ export default class TicTacToe {
 
   public setGameOverState(gameOverState: number): void {
     this.gameOverState = gameOverState;
+    this.draw();
   }
 
   public draw(): void {

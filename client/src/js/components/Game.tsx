@@ -6,7 +6,7 @@ import TicTacToe from "../game/TicTacToe";
 import SocketServer from "../server/SocketServer";
 import { Dimensions } from "../types";
 import { Mark } from "../common/enums";
-import IServer from "../server/IServer";
+import Loader from "./Loader";
 
 interface Props {}
 
@@ -22,7 +22,9 @@ export default function Game(): ReactElement {
   const [gameStatus, setGameStatus] = useState<string>(null);
   const [headerWidth, setHeaderWidth] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [player2Connected, setPlayer2Connected] = useState<boolean>(true);
+  const [playerDisconnected, setPlayerDisconnected] = useState<boolean>(false);
+  const [inLobby, setInLobby] = useState<boolean>(true);
+  const [connected, setConnected] = useState<boolean>(false);
 
   const setCanvasDimensions = (
     canvas: HTMLCanvasElement,
@@ -56,6 +58,9 @@ export default function Game(): ReactElement {
       setWinner,
       setGameStatus,
       setGameOver,
+      setPlayerDisconnected,
+      setInLobby,
+      setConnected,
     };
 
     const canvasContainer: HTMLDivElement = canvasContainerRef.current;
@@ -96,25 +101,90 @@ export default function Game(): ReactElement {
     }
   };
 
-  return (
-    <div className="game-container" ref={gameContainerRef}>
-      <div className="game" ref={canvasContainerRef}>
-        <header style={{ width: headerWidth }} className="game-header">
-          <h1 className="game-header__player">
-            You: {getPlayerSymbol(playerNumber)}
+  const resetGame = () => {
+    setGameOver(false);
+    setWinner(null);
+    setPlayerDisconnected(false);
+    setPlayerNumber(null);
+    setInLobby(false);
+    setGameStatus(null);
+    setTurn(null);
+    gameClient.current.reset();
+  };
+
+  const replayButton = () => {
+    return (
+      <button onClick={resetGame} className="btn-text mdc-button">
+        <span className="mdc-button__ripple"></span>
+        <span className="mdc-button__label">Replay</span>
+      </button>
+    );
+  };
+
+  const getOppositePlayer = (): string => {
+    const { X, O } = Mark;
+    return getPlayerSymbol(playerNumber == X ? O : X);
+  };
+
+  const getHeaderMessage = (): ReactElement => {
+    if (gameOver && winner === playerNumber) {
+      return (
+        <>
+          <h1 className="game-header__you-win">You Win!</h1>
+          {replayButton()}
+        </>
+      );
+    } else if (gameOver) {
+      return (
+        <>
+          <h1 className="game-header__winner">
+            {winner ? `${getPlayerSymbol(winner)} Wins!` : "Tie Game"}
           </h1>
-          {gameOver ? (
-            <h1 className="game-header__winner">
-              {winner ? `${getPlayerSymbol(winner)} Wins!` : "Tie Game"}
-            </h1>
-          ) : (
-            <h1 className="game-header__turn">
-              {`${getPlayerSymbol(turn)}'s Turn`}
-            </h1>
-          )}
-        </header>
-        <canvas className="game-canvas" ref={canvasRef}></canvas>
+          {replayButton()}
+        </>
+      );
+    } else if (playerDisconnected) {
+      return (
+        <>
+          <h1 className="game-header__player-disconnect">
+            {`${getOppositePlayer()} Left!`}
+          </h1>
+          {replayButton()}
+        </>
+      );
+    } else if (inLobby) {
+      return (
+        <>
+          <h1 className="game-header__player-in-lobby">
+            Waiting for Player...
+          </h1>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <h1 className="game-header__player">
+            Player {getPlayerSymbol(playerNumber)}
+          </h1>
+          <h1 className="game-header__turn">
+            {`${getPlayerSymbol(turn)}'s Turn`}
+          </h1>
+        </>
+      );
+    }
+  };
+
+  return (
+    <>
+      {!connected && <Loader />}
+      <div className="game-container" ref={gameContainerRef}>
+        <div className="game" ref={canvasContainerRef}>
+          <header style={{ width: headerWidth }} className="game-header">
+            {getHeaderMessage()}
+          </header>
+          <canvas className="game-canvas" ref={canvasRef}></canvas>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

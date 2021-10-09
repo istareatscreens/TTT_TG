@@ -5,4 +5,19 @@
   @include button.container-fill-color(#92140c);
   @include button.ink-color(#fff8f0);
   font-size: 1rem;
+  font-family: "Press Start 2P";
+}
+
+.btn-text {
+  @include button.ink-color(#92140c);
+  font-size: 1.5rem;
+  font-family: "Press Start 2P";
+  @include respond(small-size) {
+    @include button.height(1.4rem);
+    font-size: 1.4rem;
+  }
+  @include respond(tiny-size) {
+    @include button.height(1rem);
+    font-size: 1rem;
+  }
 }

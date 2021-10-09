@@ -2,7 +2,6 @@ import Grid from "./Grid";
 import Quadrant from "./Quadrant";
 import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
 import { Mark } from "../../common/enums";
-import GameOverScreen from "./GameOverScreen";
 
 //debug function
 function dec2bin(dec: number) {
@@ -27,6 +26,7 @@ export default class GameBored {
     this.context = context;
     this.dimensions = dimensions;
     this.gameOverState = 0;
+    this.context.globalAlpha = 1;
 
     this.grid = new Grid(context, lineStroke, dimensions);
     const [width, height] = dimensions;
@@ -69,6 +69,35 @@ export default class GameBored {
     this.gameOverState = gameOverState;
   }
 
+  public drawWinningLine(coordinates: Coordinates[]) {
+    let [x1, y1] = coordinates[0];
+    let [x3, y3] = coordinates[2];
+    const [width, height] = this.dimensions;
+
+    const edgeBuffer = this.lineStroke * 2;
+
+    const m = (x3 - x1) / (y3 - y1);
+
+    if (y1 !== y3) {
+      const yAdjustment = Math.abs(height / 6 - edgeBuffer);
+      y1 -= m > 0 ? yAdjustment : yAdjustment;
+      y3 += m > 0 ? yAdjustment : yAdjustment;
+    }
+    if (x1 !== x3) {
+      const xAdjustment = Math.abs(width / 6 - edgeBuffer);
+      x1 -= m > 0 ? xAdjustment : -xAdjustment;
+      x3 += m > 0 ? xAdjustment : -xAdjustment;
+    }
+
+    // Draw line
+    this.context.lineWidth = this.lineStroke * 1.5;
+    this.context.strokeStyle = "#92140c";
+    this.context.beginPath();
+    this.context.moveTo(x1, y1);
+    this.context.lineTo(x3, y3);
+    this.context.stroke();
+  }
+
   private drawGameOverState(gameOverState: number): void {
     const quadrants: QuadrantNumber[] = [];
     const getQuadrants =
@@ -84,12 +113,7 @@ export default class GameBored {
       coordinates.unshift(this.quadrants[quadrant].getCenterCoordinate())
     );
 
-    new GameOverScreen(
-      this.dimensions,
-      this.lineStroke,
-      this.context,
-      coordinates
-    ).draw();
+    this.drawWinningLine(coordinates);
   }
 
   private calculateQuadrantNumber(x: number, y: number): QuadrantNumber {

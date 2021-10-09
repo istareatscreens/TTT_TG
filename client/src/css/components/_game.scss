@@ -4,14 +4,38 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 1rem;
+
+    @include respond(small-size) {
+      font-size: 0.8rem;
+    }
+
+    @include respond(tiny-size) {
+      font-size: 0.6rem;
+    }
+
     &__player {
       display: block;
+      padding: 0.1rem;
     }
     &__winner {
       display: block;
+      padding: 0.1rem;
     }
     &__turn {
       display: block;
+      padding: 0.1rem;
+    }
+    &__player-disconnect {
+      display: block;
+      padding: 0.1rem;
+    }
+    &__inLobby {
+      display: block;
+      padding: 0.1rem;
+      white-space: nowrap;
     }
   }
 

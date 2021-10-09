@@ -4,6 +4,16 @@
   display: grid;
   grid-gap: 2rem;
   grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+
+  @include respond(small-size) {
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  }
+
+  @include respond(tiny-size) {
+    grid-gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(2.5rem, 1fr));
+  }
 }
 
 .game-container {

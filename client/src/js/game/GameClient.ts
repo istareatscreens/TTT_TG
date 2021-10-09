@@ -1,4 +1,3 @@
-import { Mark } from "../common/enums";
 import ISubscriber from "../common/interfaces/ISubscriber";
 import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
@@ -18,6 +17,9 @@ interface FrontEndCallbacks {
   setPlayerNumber?: (input: any) => void;
   setGameStatus?: (input: any) => void;
   setGameOver?: (input: any) => void;
+  setPlayerDisconnected?: (input: any) => void;
+  setInLobby?: (input: any) => void;
+  setConnected?: (input: any) => void;
 }
 
 export default class GameClient implements ISubscriber {
@@ -48,16 +50,19 @@ export default class GameClient implements ISubscriber {
     this.subscriberId = new UniqueId();
     this.connected = false;
     this.subscribe();
+    this.playerId = "";
   }
 
   private setInitialVariables() {
     this.gameId = "";
     this.gameStatus = "initial";
-    this.playerId = "";
   }
 
-  private reset() {
+  public reset() {
     this.setInitialVariables();
+    this.frontEndCallbacks.setGameOver(false);
+    this.game.reset();
+    this.game.draw();
     this.joinLobby();
   }
 
@@ -94,7 +99,7 @@ export default class GameClient implements ISubscriber {
       this.resizeGame();
     } else if (this.server.hasMessageIn()) {
       this.handleMessage();
-    } else if (this.server.isConnected()) {
+    } else if (this.server.isConnected() && !this.gameId) {
       this.joinLobby();
     } else if (this.server.isConnected()) {
       this.reconnectToGame();
@@ -105,6 +110,7 @@ export default class GameClient implements ISubscriber {
 
   private joinLobby(): void {
     this.connected = true;
+    this.frontEndCallbacks.setConnected(true);
     this.server.send({
       type: "joinLobby",
       game: "TicTacToe",
@@ -116,6 +122,7 @@ export default class GameClient implements ISubscriber {
 
   private reconnectToGame(): void {
     this.connected = true;
+    this.frontEndCallbacks.setConnected(true);
     this.server.send({
       type: "joinGame",
       game: "TicTacToe",
@@ -126,6 +133,7 @@ export default class GameClient implements ISubscriber {
   }
 
   private handleDisconnection(): void {
+    this.frontEndCallbacks.setConnected(false);
     this.connected = false;
   }
 
@@ -150,32 +158,36 @@ export default class GameClient implements ISubscriber {
 
     switch (this.gameStatus) {
       case "inLobby":
+        console.log(this.gameStatus);
+        this.frontEndCallbacks.setInLobby(true);
         break;
       case "inGame":
+        console.log(this.gameStatus);
+        this.frontEndCallbacks.setInLobby(false);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
         break;
       case "gameOver":
+        console.log(this.gameStatus);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
         this.resetGameId();
         this.frontEndCallbacks.setGameOver(true);
         if (gameOverState) {
           this.game.setGameOverState(gameOverState);
-          this.game.draw();
         }
         break;
-      case "initial":
-        this.frontEndCallbacks.setGameOver(false);
-        break;
       case "playerRejoin":
+        this.frontEndCallbacks.setPlayerDisconnected(false);
         break;
       case "playerLeft":
+        this.frontEndCallbacks.setPlayerDisconnected(true);
         break;
       default:
         console.log(
           `Invalid msg.status ${message.status} message in handle message`
         );
+        return;
     }
     this.updateFrontEnd(message);
   }

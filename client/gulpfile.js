@@ -62,10 +62,12 @@ function cssTask() {
 //    .pipe(dest(output));
 //}
 //
+
 function watchTask() {
   browserSync.init({
     server: {
       baseDir: "./public/",
+      ghostMode: false,
     },
   });
   livereload.listen();

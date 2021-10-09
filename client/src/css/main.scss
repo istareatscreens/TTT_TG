@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 *,
 *::before,
 *::after {
@@ -13,7 +15,7 @@ html {
 }
 
 body {
-  font-family: "Liberation Mono", Arial;
+  font-family: "Press Start 2P", "Liberation Mono", Arial;
   background: grey;
   font-weight: 400;
   line-height: 1.7;
@@ -31,3 +33,4 @@ body {
 @import "./components/button";
 @import "./components/game";
 @import "./components/menu";
+@import "./components/loader";

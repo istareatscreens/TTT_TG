@@ -5,8 +5,22 @@
   transform: translate(-50%, -50%);
 }
 
-@mixin debug-border {
-  border-color: red;
-  border-style: solid;
-  border-width: 1px;
+@mixin respond($breakpoint) {
+  @if $breakpoint == small-size {
+    @media (max-width: 500px) {
+      @content;
+    }
+    @media (max-height: 500px) {
+      @content;
+    }
+  }
+
+  @if $breakpoint == tiny-size {
+    @media (max-width: 350px) {
+      @content;
+    }
+    @media (max-height: 350px) {
+      @content;
+    }
+  }
 }
