@@ -1,7 +1,7 @@
 import ISubscriber from "../common/interfaces/ISubscriber";
 import { TTTMessageIn, TTTMessageOut } from "../game/message/TicTacToeMessage";
 import IServer from "./IServer";
-const url = "ws://localhost:8080";
+const url = "ws://localhost:80/ws/";
 
 export default class SocketServer implements IServer {
   private socket: WebSocket;

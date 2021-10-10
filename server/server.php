@@ -1,5 +1,4 @@
 <?php
-/* source: http://socketo.me/docs/hello-world */
 
 use Game\Server\ClientHandler;
 use Game\Db\Database;
@@ -10,6 +9,8 @@ use Game\TicTacToe;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
+use Ratchet\Session\SessionProvider;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -21,14 +22,23 @@ $clientHandler = new ClientHandler($db);
 
 $messageHandler = new MessageHandler($clientHandler, $gameFactory, $db);
 
+$memcache = new Memcached;
+$memcache->addServer('memcached', 11211);
+
+$session = new SessionProvider(
+    new WsServer(
+        new SocketServer($messageHandler)
+    ),
+    new Handler\MemcachedSessionHandler($memcache)
+);
+
+
 $server = IoServer::factory(
     new HttpServer(
-        new WsServer(
-            new SocketServer($messageHandler)
-        )
+        $session
     ),
     8080
 );
 
-echo "server listening on 8080\n";
 $server->run();
+//echo "server listening on 8080\n";

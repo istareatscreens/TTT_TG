@@ -16,6 +16,7 @@ const output = "./public/";
 const jsPath = "./src/js/**/*.*";
 const cssPath = "./src/css/**/*";
 const htmlPath = "./src/html/**/*";
+const phpPath = "./src/php/**/*";
 
 //Production
 function jsTaskProd() {
@@ -35,13 +36,14 @@ function jsTask() {
     .pipe(browserSync.stream())
     .pipe(dest(output));
 }
-
+/*
 function copyHtml() {
   return src([htmlPath])
     .pipe(htmlmin({ collapseWhitespace: true, removeComments: true }))
     .pipe(browserSync.stream())
     .pipe(gulp.dest("public"));
 }
+*/
 
 function cssTask() {
   return src([cssPath + ".scss", cssPath + ".css"])
@@ -49,6 +51,10 @@ function cssTask() {
     .pipe(webpack(require("./webpack.dev.js")))
     .pipe(browserSync.stream())
     .pipe(dest(output));
+}
+
+function copyPHP() {
+  return src([phpPath]).pipe(dest(output));
 }
 
 //function cssTask() {
@@ -71,14 +77,14 @@ function watchTask() {
     },
   });
   livereload.listen();
-  gulp.watch([cssPath, jsPath, htmlPath], parallel(cssTask, jsTask, copyHtml));
-  gulp.watch(htmlPath).on("change", browserSync.reload);
+  gulp.watch([cssPath, jsPath, phpPath], parallel(cssTask, jsTask, copyPHP));
+  gulp.watch(phpPath).on("change", browserSync.reload);
   gulp.watch(cssPath).on("change", browserSync.reload);
   gulp.watch(jsPath).on("change", browserSync.reload);
 }
 
 //BUILD Web Production
-exports.default = series(parallel(cleanTask, jsTaskProd, cssTask, copyHtml));
+exports.default = series(parallel(cleanTask, jsTaskProd, cssTask, copyPHP));
 
 //Develop Web
-exports.watch = series(parallel(jsTask, cssTask, copyHtml), watchTask);
+exports.watch = series(parallel(jsTask, cssTask, copyPHP), watchTask);

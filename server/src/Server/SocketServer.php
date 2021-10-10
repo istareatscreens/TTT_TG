@@ -2,7 +2,7 @@
 
 namespace Game\Server;
 
-use GameFactory;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
@@ -19,6 +19,8 @@ class SocketServer implements MessageComponentInterface
     {
         $this->messageHandler->addClient($conn);
         echo "New connection! ({$conn->resourceId})\n";
+        echo "\nSESSION ID: " . $conn->Session->get('name');
+        print_r($conn->Session->get('id'));
     }
 
     public function onMessage(ConnectionInterface $from, $msg): void

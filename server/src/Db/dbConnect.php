@@ -4,7 +4,7 @@ namespace Game\Db;
 
 function connectToDatabase()
 {
-    $debug = true;
+    $debug = false;
 
     $dbHost = ($debug) ? "127.0.0.1" : getenv('MYSQL_HOST');
     $dbPort = ($debug) ? "3306" : getenv('MYSQL_PORT');
@@ -12,7 +12,6 @@ function connectToDatabase()
     $dbPass = ($debug) ? "1234" : getenv('MYSQL_PASSWORD');
     $dbName = ($debug) ?  "tttdb" : getenv('MYSQL_DATABASE');
     try {
-        echo 'mysql:host=' . $dbHost . ';port=' . $dbPort . ';dbname=' . $dbName, $dbUser, $dbPass;
         $db = new \PDO('mysql:host=' . $dbHost . ';port=' . $dbPort . ';dbname=' . $dbName, $dbUser, $dbPass);
         $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);

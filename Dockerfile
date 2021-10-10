@@ -10,4 +10,4 @@ FROM nginx:latest
 
 COPY ./config/nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build-stage /home/node/app/public /usr/share/nginx/html
+COPY --from=build-stage /home/node/app/public /var/www/html/
