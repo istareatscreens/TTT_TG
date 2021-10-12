@@ -5,7 +5,6 @@ import React, {
   useRef,
   ReactElement,
 } from "react";
-import { TTTMessageIn } from "../game/message/TicTacToeMessage";
 import Arcade from "./Arcade";
 import Menu from "./Menu";
 

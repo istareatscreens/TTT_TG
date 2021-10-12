@@ -23,17 +23,17 @@ class ClientHandler
         $this->db = new PlayerState($db);
     }
 
-    public function addClient(ConnectionInterface $client, string $playerId): bool
+    public function addClient(ConnectionInterface $client, string $playerId, SocketServer $socketServer): bool
     {
         $hash = $this->getClientHash($client);
         if ($this->isInvalidValidClient($hash, $playerId)) {
             return false;
         }
 
-        // one connection per client
+        // one connection per client disconnect old instance
         if ($this->playerIdExists($playerId) && $this->playerIsConnected($playerId)) {
-            $client->close();
-            return false;
+            $oldClient = $this->getClientByPlayerId($playerId);
+            $socketServer->onClose($oldClient);
         }
 
         /* 
@@ -138,6 +138,8 @@ class ClientHandler
     {
         $oldHash = $this->clientBiMap->getValue($playerId);
         if (key_exists($oldHash, $this->clients)) {
+            $oldClient = $this->clients[$oldHash];
+            $oldClient->close();
             unset($this->clients[$oldHash]);
         }
         $this->clients[$hash] = $client;

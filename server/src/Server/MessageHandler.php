@@ -8,6 +8,7 @@ use Game\GameFactory;
 use Game\Library\Lobby;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
+use Ratchet\WebSocket\MessageComponentInterface;
 
 class MessageHandler
 {
@@ -34,9 +35,9 @@ class MessageHandler
         $this->gameFactory = $gameFactory;
     }
 
-    public function addClient(ConnectionInterface $client, $playerId): bool
+    public function addClient(ConnectionInterface $client, $playerId, SocketServer $socketServer): bool
     {
-        return $this->clientHandler->addClient($client, $playerId);
+        return $this->clientHandler->addClient($client, $playerId, $socketServer);
     }
 
     public function registerClient(

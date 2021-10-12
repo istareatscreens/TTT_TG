@@ -12,6 +12,7 @@ use Game\Server\MessageOut;
 use Test\Mock\ClientMock;
 use Game\TicTacToe;
 use Game\Server\MessageHandler;
+use Game\Server\SocketServer;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -35,6 +36,9 @@ class MessageHandlerTest extends TestCase
         $this->gameState = new GameState($this->db);
         $this->clientHandler = new ClientHandler($this->db);
         $this->gameFactory = new GameFactory();
+
+        $this->mockSocketServer = $this->createMock(SocketServer::class);
+        $this->mockSocketServer->method("onClose")->willReturn(0);
 
         $this->mockGame = $this->createMock(TicTacToe::class);
         $this->gameName = $this->removeNamespaceFromType($this->mockGame);
@@ -93,7 +97,7 @@ class MessageHandlerTest extends TestCase
         //join loby
         $client1 = new ClientMock();
         $playerId1 = "3884efd7-719e-4055-aff7-e341bc83629a";
-        $this->messageHandler->addClient($client1, $playerId1);
+        $this->messageHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
         $this->messageHandler->handleMessage($client1, $msgIn, $playerId1);
         $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
@@ -104,7 +108,7 @@ class MessageHandlerTest extends TestCase
         //start game
         $playerId2 = "7784efd7-719e-4055-aff7-e341bc83629a";
         $client2 = new ClientMock();
-        $this->messageHandler->addClient($client2, $playerId2);
+        $this->messageHandler->addClient($client2, $playerId2, $this->mockSocketServer);
         $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
         $this->messageHandler->handleMessage($client2, $msgIn, $playerId2);
         $playerId2 = $this->clientHandler->getPlayerIdByClient($client2);
@@ -126,7 +130,7 @@ class MessageHandlerTest extends TestCase
 
         //join game
         $client2 = new ClientMock();
-        $result = $this->clientHandler->addClient($client2, $playerId2);
+        $result = $this->clientHandler->addClient($client2, $playerId2, $this->mockSocketServer);
         $this->assertTrue($result);
         $msgIn = $this->makeMessageIn("joinGame", $this->gameName, $this->gameId, 2);
         $this->messageHandler->handleMessage($client2, $msgIn, $playerId2);
@@ -163,7 +167,7 @@ class MessageHandlerTest extends TestCase
         //join loby
         $client1 = new ClientMock();
         $playerId1 = "28079bce-79f0-4703-9600-98409d32e370";
-        $this->messageHandler->addClient($client1, $playerId1);
+        $this->messageHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
         $this->messageHandler->handleMessage($client1, $msgIn, $this->playerId1);
         $msg1 = new MessageOut();
@@ -172,7 +176,7 @@ class MessageHandlerTest extends TestCase
 
         // start game
         $client2 = new ClientMock();
-        $this->messageHandler->addClient($client2, $this->playerId2);
+        $this->messageHandler->addClient($client2, $this->playerId2, $this->mockSocketServer);
         $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
         $this->messageHandler->handleMessage($client2, $msgIn, $this->playerId2);
         $msg2 = new MessageOut($this->gameId);

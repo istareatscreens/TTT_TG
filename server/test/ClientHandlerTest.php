@@ -19,6 +19,9 @@ class ClientHandlerTest extends TestCase
         $this->db->resetDb();
         $this->clientHandler = new ClientHandler($this->db);
         $this->playerState = new PlayerState($this->db);
+
+        $this->mockSocketServer = $this->createMock(SocketServer::class);
+        $this->mockSocketServer->method("onClose")->willReturn(0);
     }
 
     protected function tearDown(): void
@@ -41,7 +44,7 @@ class ClientHandlerTest extends TestCase
     {
         //register client (no playerId)
         $client1 = new ClientMock();
-        $result = $this->clientHandler->addClient($client1, "");
+        $result = $this->clientHandler->addClient($client1, "", $this->mockSocketServer);
         $this->assertFalse($result);
         $result = $this->clientHandler->validateClient($client1, "");
         $this->assertFalse($result);
@@ -49,7 +52,7 @@ class ClientHandlerTest extends TestCase
         //valid player correct hash
         $client1 = new ClientMock();
         $playerId1 = "ad27d471-9448-46c8-8142-eadbac1f6706";
-        $result = $this->clientHandler->addClient($client1, $playerId1);
+        $result = $this->clientHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $this->assertTrue($result);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
@@ -61,7 +64,7 @@ class ClientHandlerTest extends TestCase
 
         //different hash valid playerId
         $client1 = new ClientMock();
-        $result = $this->clientHandler->addClient($client1, $playerId1);
+        $result = $this->clientHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
 
@@ -77,7 +80,7 @@ class ClientHandlerTest extends TestCase
         //valid player correct hash
         $client1 = new ClientMock();
         $playerId1 = "652f4035-d953-4b1c-b78d-338a2fff79cd";
-        $result = $this->clientHandler->addClient($client1, $playerId1);
+        $result = $this->clientHandler->addClient($client1, $playerId1, $this->mockScoketServer);
         $this->assertTrue($result);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
@@ -98,7 +101,7 @@ class ClientHandlerTest extends TestCase
         //valid player correct hash
         $client1 = new ClientMock();
         $playerId1 = "27e1eb63-a16c-4d6f-8ac3-9bfba20abfe6";
-        $this->clientHandler->addClient($client1, $playerId1);
+        $this->clientHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
         $this->assertTrue($this->clientHandler->playerIsConnected($playerId1));

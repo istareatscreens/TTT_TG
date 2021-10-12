@@ -36,7 +36,11 @@ class SocketServer implements MessageComponentInterface
         }
 
         $playerId = $this->getSessionId($conn);
-        if (!$this->messageHandler->addClient($conn, $playerId)) {
+        if ($playerId === "") {
+            $conn->close();
+            return;
+        }
+        if (!$this->messageHandler->addClient($conn, $playerId, $this)) {
             $conn->close();
         }
     }
@@ -52,7 +56,10 @@ class SocketServer implements MessageComponentInterface
         );
         $msg = json_decode($msg);
         $playerId = $this->getSessionId($from);
-
+        if ($playerId === "") {
+            $from->close();
+            return;
+        }
         $this->messageHandler->handleMessage($from, $msg, $playerId);
     }
 
@@ -60,6 +67,7 @@ class SocketServer implements MessageComponentInterface
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->messageHandler->disconnectClient($conn);
+        $conn->close();
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
