@@ -4,8 +4,6 @@ namespace Game;
 
 use Game\GameInterface;
 
-use function PHPUnit\Framework\throwException;
-
 class TicTacToe implements GameInterface
 {
 

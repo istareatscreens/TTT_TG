@@ -2,25 +2,43 @@
 
 namespace Game\Server;
 
+use Exception;
+use Game\Library\Uuid;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class SocketServer implements MessageComponentInterface
 {
-    protected $messageHandler;
+    protected MessageHandler $messageHandler;
+    private bool $develop;
 
-    public function __construct(MessageHandler $messageHandler)
+    public function __construct(MessageHandler $messageHandler, bool $develop)
     {
         $this->messageHandler = $messageHandler;
+        $this->develop = $develop;
+    }
+
+    private function getSessionId(ConnectionInterface $conn): string
+    {
+        try {
+            return $this->develop ?  Uuid::v4() : $conn->Session->get('id');
+        } catch (Exception $e) {
+            return "";
+        }
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->messageHandler->addClient($conn);
-        echo "New connection! ({$conn->resourceId})\n";
-        echo "\nSESSION ID: " . $conn->Session->get('name');
-        print_r($conn->Session->get('id'));
+        if ($this->develop) {
+            echo "\nNew connection! ({$conn->resourceId})\n";
+            echo "\nSESSION ID: " . $conn->Session->get('id');
+        }
+
+        $playerId = $this->getSessionId($conn);
+        if (!$this->messageHandler->addClient($conn, $playerId)) {
+            $conn->close();
+        }
     }
 
     public function onMessage(ConnectionInterface $from, $msg): void
@@ -33,7 +51,9 @@ class SocketServer implements MessageComponentInterface
             $msg,
         );
         $msg = json_decode($msg);
-        $this->messageHandler->handleMessage($msg, $from);
+        $playerId = $this->getSessionId($from);
+
+        $this->messageHandler->handleMessage($from, $msg, $playerId);
     }
 
     public function onClose(ConnectionInterface $conn)

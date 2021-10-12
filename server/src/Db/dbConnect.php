@@ -2,15 +2,15 @@
 
 namespace Game\Db;
 
-function connectToDatabase()
+function connectToDatabase(bool $develop)
 {
-    $debug = false;
 
-    $dbHost = ($debug) ? "127.0.0.1" : getenv('MYSQL_HOST');
-    $dbPort = ($debug) ? "3306" : getenv('MYSQL_PORT');
-    $dbUser = ($debug) ? "root" : getenv('MYSQL_USER');
-    $dbPass = ($debug) ? "1234" : getenv('MYSQL_PASSWORD');
-    $dbName = ($debug) ?  "tttdb" : getenv('MYSQL_DATABASE');
+    $dbHost = ($develop) ? "127.0.0.1" : getenv('MYSQL_HOST');
+    $dbPort = ($develop) ? "3306" : getenv('MYSQL_PORT');
+    $dbUser = ($develop) ? "root" : getenv('MYSQL_USER');
+    $dbPass = ($develop) ? "1234" : getenv('MYSQL_PASSWORD');
+    $dbName = ($develop) ?  "tttdb" : getenv('MYSQL_DATABASE');
+
     try {
         $db = new \PDO('mysql:host=' . $dbHost . ';port=' . $dbPort . ';dbname=' . $dbName, $dbUser, $dbPass);
         $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);

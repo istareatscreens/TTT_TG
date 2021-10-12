@@ -15,7 +15,7 @@ class ClientHandlerTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->db = new Database();
+        $this->db = new Database(true);
         $this->db->resetDb();
         $this->clientHandler = new ClientHandler($this->db);
         $this->playerState = new PlayerState($this->db);
@@ -41,15 +41,16 @@ class ClientHandlerTest extends TestCase
     {
         //register client (no playerId)
         $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
+        $result = $this->clientHandler->addClient($client1, "");
+        $this->assertFalse($result);
         $result = $this->clientHandler->validateClient($client1, "");
-        $this->assertTrue($result);
+        $this->assertFalse($result);
 
         //valid player correct hash
         $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
         $playerId1 = "ad27d471-9448-46c8-8142-eadbac1f6706";
-        $this->playerState->savePlayer($playerId1, $client1->resourceId);
+        $result = $this->clientHandler->addClient($client1, $playerId1);
+        $this->assertTrue($result);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
 
@@ -60,6 +61,7 @@ class ClientHandlerTest extends TestCase
 
         //different hash valid playerId
         $client1 = new ClientMock();
+        $result = $this->clientHandler->addClient($client1, $playerId1);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
 
@@ -74,9 +76,9 @@ class ClientHandlerTest extends TestCase
     {
         //valid player correct hash
         $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
-        $playerId1 = "4df0cbda-df38-4ebd-9ed4-f1e9043ad699";
-        $this->playerState->savePlayer($playerId1, $client1->resourceId);
+        $playerId1 = "652f4035-d953-4b1c-b78d-338a2fff79cd";
+        $result = $this->clientHandler->addClient($client1, $playerId1);
+        $this->assertTrue($result);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
 
@@ -95,9 +97,8 @@ class ClientHandlerTest extends TestCase
     {
         //valid player correct hash
         $client1 = new ClientMock();
-        $this->clientHandler->addClient($client1);
-        $playerId1 = "4df0cbda-df38-4ebd-9ed4-f1e9043ad699";
-        $this->playerState->savePlayer($playerId1, $client1->resourceId);
+        $playerId1 = "27e1eb63-a16c-4d6f-8ac3-9bfba20abfe6";
+        $this->clientHandler->addClient($client1, $playerId1);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
         $this->assertTrue($this->clientHandler->playerIsConnected($playerId1));

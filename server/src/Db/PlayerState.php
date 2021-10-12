@@ -12,10 +12,10 @@ class PlayerState
         $this->db = $db;
     }
 
-    public function savePlayer(string $playerId, string $hash): void
+    public function savePlayer(string $playerId, string $hash): bool
     {
         $query = "INSERT INTO player (player_token, client_hash) VALUES (UUID_TO_BIN(:token), :client_hash)";
-        $this->db->query(
+        return $this->db->query(
             $query,
             array(
                 "token" => $playerId,
@@ -24,10 +24,10 @@ class PlayerState
         );
     }
 
-    public function deletePlayer(string $playerId)
+    public function deletePlayer(string $playerId): bool
     {
         $query = "DELETE FROM game WHERE player_token = UUID_TO_BIN(:token)";
-        $this->db->query($query, ["token" => $playerId]);
+        return $this->db->query($query, ["token" => $playerId]);
     }
 
     public function playerExistsByToken(string $playerId): bool
@@ -71,12 +71,12 @@ class PlayerState
         );
     }
 
-    public function updateClientHash(string $playerId, string $hash = "")
+    public function updateClientHash(string $playerId, string $hash = ""): bool
     {
         $query = "UPDATE player " .
             "SET client_hash = :client_hash " .
             "WHERE player_token = UUID_TO_BIN(:token)";
-        $this->db->query(
+        return $this->db->query(
             $query,
             [
                 "token" => $playerId,

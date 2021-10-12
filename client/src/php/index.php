@@ -1,5 +1,4 @@
 <?php
-ob_start();
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler;
@@ -22,8 +21,10 @@ $storage = new NativeSessionStorage(
 
 $session = new Session($storage);
 $session->start();
-$uuid = Uuid::v4();
-$session->set('id', $uuid);
-ob_end_flush();
+
+if (!$session->has('id')) {
+    $uuid = Uuid::v4();
+    $session->set('id', $uuid);
+}
 
 require_once "home.php";

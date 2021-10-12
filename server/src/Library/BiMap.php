@@ -12,6 +12,12 @@ class BiMap
         $this->VtoK = [];
     }
 
+    public function print()
+    {
+        print_r($this->KtoV);
+        print_r($this->VtoK);
+    }
+
     public function getKey($v)
     {
         if ($this->hasValue($v)) {

@@ -11,13 +11,11 @@ export interface TTTMessageOut extends IMessageOut {
   type: GameCommand;
   game: GameName;
   gameId: string;
-  playerId: string;
   position: QuadrantNumber;
 }
 
 export interface TTTMessageIn extends IMessageIn {
   status: GameResponse;
-  playerId: string;
   gameId: string;
   state: number;
   playerNumber: Mark;

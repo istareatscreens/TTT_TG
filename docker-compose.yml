@@ -19,9 +19,11 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - db
+      - memcached
     env_file:
       - .env
   memcached: # port 11211
+    container_name: memcached
     image: memcached:latest
     ports:
       - "11211:11211"
@@ -34,6 +36,9 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    depends_on:
+      - db
+      - memcached
   composer-socket-server:
     image: "composer"
     volumes:

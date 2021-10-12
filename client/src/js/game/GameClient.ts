@@ -25,7 +25,6 @@ interface FrontEndCallbacks {
 export default class GameClient implements ISubscriber {
   private gameId: string;
   private gameStatus: GameResponse;
-  private playerId: string;
   private canvas: HTMLCanvasElement;
   private server: IServer;
   private controllers: Controllers;
@@ -50,7 +49,6 @@ export default class GameClient implements ISubscriber {
     this.subscriberId = new UniqueId();
     this.connected = false;
     this.subscribe();
-    this.playerId = "";
   }
 
   private setInitialVariables() {
@@ -115,7 +113,6 @@ export default class GameClient implements ISubscriber {
       type: "joinLobby",
       game: "TicTacToe",
       gameId: this.gameId,
-      playerId: this.playerId,
       position: null,
     });
   }
@@ -127,7 +124,6 @@ export default class GameClient implements ISubscriber {
       type: "joinGame",
       game: "TicTacToe",
       gameId: this.gameId,
-      playerId: this.playerId,
       position: null,
     });
   }
@@ -151,7 +147,6 @@ export default class GameClient implements ISubscriber {
   private handleMessage(): void {
     const message = this.server.getMessageIn();
     const gameOverState = message.gameOverState;
-    this.playerId = message.playerId;
     this.gameId = message.gameId;
     this.gameStatus = message.status;
     this.game.setMark(message.playerNumber);
@@ -219,7 +214,6 @@ export default class GameClient implements ISubscriber {
       type: "makeMove",
       game: "TicTacToe",
       gameId: this.gameId,
-      playerId: this.playerId,
       position: quadrant,
     });
   }

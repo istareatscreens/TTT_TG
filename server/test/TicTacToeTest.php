@@ -15,7 +15,7 @@ class TicTacToeTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->db = new Database();
+        $this->db = new Database(true);
         $this->db->resetDb();
         $this->gameId = Uuid::v4();
         $this->playerId1 = Uuid::v4();

@@ -2,6 +2,7 @@
 
 namespace Game\Server;
 
+use Exception;
 use Game\Db\Database;
 use Game\Db\PlayerState;
 use Game\Library\BiMap;
@@ -13,7 +14,7 @@ class ClientHandler
 {
     private $clients;
     private PlayerState $db;
-    private BiMap $clientBiMap; //key uuid, value hash
+    private BiMap $clientBiMap; //key playerId, value hash
 
     public function __construct(Database $db)
     {
@@ -22,9 +23,31 @@ class ClientHandler
         $this->db = new PlayerState($db);
     }
 
-    public function addClient(ConnectionInterface $client): void
+    public function addClient(ConnectionInterface $client, string $playerId): bool
     {
-        $this->clients[$this->getClientHash($client)] = ($client);
+        $hash = $this->getClientHash($client);
+        if ($this->isInvalidValidClient($hash, $playerId)) {
+            return false;
+        }
+
+        // one connection per client
+        if ($this->playerIdExists($playerId) && $this->playerIsConnected($playerId)) {
+            $client->close();
+            return false;
+        }
+
+        /* 
+            if player does not exists register them, 
+            if they do exist leave validateClient to update hash so other players are notified
+        */
+        if ((!$this->playerIdExists($playerId) && $this->registerUser($client, $playerId))
+            || $this->playerIdExists($playerId)
+        ) {
+            $this->clients[$hash] = ($client);
+            return true;
+        }
+
+        return false;
     }
 
     public function getClientHash(ConnectionInterface $client)
@@ -36,9 +59,17 @@ class ClientHandler
         }
     }
 
-    public function getClientByPlayerId($playerId): ConnectionInterface
+    public function getClientByPlayerId(string $playerId): ConnectionInterface | NULL
     {
+        if (!$this->clientBiMap->hasKey($playerId)) {
+            return NULL;
+        }
         return $this->clients[$this->clientBiMap->getValue($playerId)];
+    }
+
+    public function playerIdExists(string $playerId): bool
+    {
+        return $this->clientBiMap->hasKey($playerId);
     }
 
     public function clientHasPlayerId(ConnectionInterface $client): bool
@@ -93,19 +124,17 @@ class ClientHandler
         return $this->clientBiMap->getKey($this->getClientHash($client));
     }
 
-    private function registerUser(ConnectionInterface $client): bool
+    private function registerUser(ConnectionInterface $client, string $playerId): bool
     {
-        $uuid = Uuid::v4();
         $hash = $this->getClientHash($client);
-        if (is_null($hash)) {
-            return false;
+        if (!$this->db->getPlayerDataFromToken($playerId) && $this->saveUserToDb($playerId, $hash)) {
+            $this->clientBiMap->put($playerId, $hash);
+            return true;
         }
-        $this->clientBiMap->put($uuid, $hash);
-        $this->saveUserToDb($uuid, $hash);
-        return true;
+        return false;
     }
 
-    private function updateHash(ConnectionInterface $client, $playerId, $hash): void
+    private function updateHash(ConnectionInterface $client, $playerId, $hash): bool
     {
         $oldHash = $this->clientBiMap->getValue($playerId);
         if (key_exists($oldHash, $this->clients)) {
@@ -114,18 +143,24 @@ class ClientHandler
         $this->clients[$hash] = $client;
         $this->clientBiMap->removeKey($playerId);
         $this->clientBiMap->put($playerId, $hash);
-        $this->db->updateClientHash($playerId, $hash);
+        return $this->db->updateClientHash($playerId, $hash);
     }
 
-    private function saveUserToDb(string $playerId, string $hash): void
+    private function saveUserToDb(string $playerId, string $hash): bool
     {
-        $this->db->savePlayer($playerId, $hash);
+        return $this->db->savePlayer($playerId, $hash);
+    }
+
+    private function isInvalidValidClient(string $hash, string $playerId): bool
+    {
+        return is_null($hash) || is_null($playerId) || $hash === "" || $playerId === "" || !Uuid::isUuid($playerId);
     }
 
     public function validateClient(ConnectionInterface $client, string $playerId): bool
     {
         $hash = $this->getClientHash($client);
-        if (is_null($hash) || $hash === "") {
+        if ($this->isInvalidValidClient($hash, $playerId)) {
+            $client->close();
             return false;
         }
 
@@ -137,13 +172,9 @@ class ClientHandler
             return $playerId === $this->clientBiMap->getKey($hash);
         }
 
-        //check if uuid is valid if not register
-        if (!Uuid::isUuid($playerId)) {
-            return $this->registerUser($client);
-        }
-
         //check if new client
         if ($this->db->playerExistsByToken($playerId)) {
+
             $this->updateHash($client, $playerId, $hash);
             return true;
         }

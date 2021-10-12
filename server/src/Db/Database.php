@@ -8,10 +8,12 @@ class Database
 {
 
     private \PDO $db;
+    private bool $develop;
 
-    public function __construct()
+    public function __construct(bool $develop)
     {
-        $this->db = connectToDatabase();
+        $this->db = connectToDatabase($develop);
+        $this->develop = $develop;
     }
 
     public function select(string $sqlQuery, array $params)
@@ -26,13 +28,15 @@ class Database
         }
     }
 
-    public function query(string $sqlQuery, array $params): void
+    public function query(string $sqlQuery, array $params): bool
     {
         try {
             $query = $this->db->prepare($sqlQuery);
             $query->execute($params);
+            return true;
         } catch (\PDOException $e) {
             $this->handleError($e, $sqlQuery);
+            return false;
         }
     }
 
@@ -50,7 +54,7 @@ class Database
 
     public function resetDb()
     {
-        $this->db = connectToDatabase();
+        $this->db = connectToDatabase($this->develop);
         $truncate = "TRUNCATE TABLE ";
         $this->db->exec("SET FOREIGN_KEY_CHECKS=0");
         $this->db->exec($truncate . "player");
