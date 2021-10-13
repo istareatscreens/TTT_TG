@@ -1,4 +1,6 @@
 import React, { ReactElement, useRef, useState, useEffect } from "react";
+import { useLocation, useHistory } from "react-router-dom";
+import { validate as validateUuid } from "uuid";
 import WindowController from "../game/controllers/WindowController";
 import MouseController from "../game/controllers/MouseController";
 import GameClient from "../game/GameClient";
@@ -7,10 +9,12 @@ import SocketServer from "../server/SocketServer";
 import { Dimensions } from "../types";
 import { Mark } from "../common/enums";
 import Loader from "./Loader";
+import { Location } from "history";
+import { UniqueId } from "../common/UniqueId";
 
-interface Props {}
+interface GameProps {}
 
-export default function Game(): ReactElement {
+const Game = ({}: GameProps): ReactElement => {
   const gameContainerRef = useRef(null);
   const canvasRef = useRef(null);
   const canvasContainerRef = useRef(null);
@@ -25,6 +29,10 @@ export default function Game(): ReactElement {
   const [playerDisconnected, setPlayerDisconnected] = useState<boolean>(false);
   const [inLobby, setInLobby] = useState<boolean>(true);
   const [connected, setConnected] = useState<boolean>(false);
+  const [gameId, setGameId] = useState<string>("");
+  const history = useHistory();
+
+  const location = useLocation();
 
   const setCanvasDimensions = (
     canvas: HTMLCanvasElement,
@@ -50,8 +58,36 @@ export default function Game(): ReactElement {
     return Math.min(canvasContainer.clientWidth, canvasContainer.clientHeight);
   };
 
+  const getGameIdFromUrl = (location: Location<unknown>): string => {
+    const gameId: string = location.pathname.substring(1);
+    console.log("get in getGAMEIdFromUrl ID:", gameId);
+    console.log(gameId);
+    console.log(validateUuid(gameId));
+    console.log("IS TRU IN GET URL:", validateUuid(gameId) ? gameId : "");
+    return validateUuid(gameId) ? gameId : "";
+  };
+
+  const handleInvalidGame = () => {
+    history.push("/");
+    console.log("Invalid route", "/");
+  };
+  const updateGameId = (gameId: string) => {
+    // url hack
+    console.log("UPDATE GAME", gameId, window.history);
+    console.log("LOCATION: ", location);
+    window.history.replaceState(null, "Tic Tac Toe", `/#/${gameId}`);
+    history.push(`/${gameId}`);
+    console.log("after UPDATE GAME", gameId, window.history);
+    console.log("after LOCATION: ", location);
+  };
+
   //setup game
   useEffect(() => {
+    const gameId = getGameIdFromUrl(location);
+    setGameId(gameId);
+    console.log("SHOULD HAVE GAME ID in use effect");
+
+    // gameId = gameId ? "" : gameId;
     const stateCallbacks = {
       setPlayerNumber,
       setTurn,
@@ -61,6 +97,8 @@ export default function Game(): ReactElement {
       setPlayerDisconnected,
       setInLobby,
       setConnected,
+      handleInvalidGame,
+      updateGameId,
     };
 
     const canvasContainer: HTMLDivElement = canvasContainerRef.current;
@@ -84,8 +122,8 @@ export default function Game(): ReactElement {
       server,
       game,
       { gameController: gameController, resizeController: resizeController },
-      canvas,
-      stateCallbacks
+      stateCallbacks,
+      { canvas: canvas, gameId: gameId }
     );
     gameClient.current.start();
   }, []);
@@ -176,15 +214,26 @@ export default function Game(): ReactElement {
 
   return (
     <>
-      {!connected && <Loader />}
       <div className="game-container" ref={gameContainerRef}>
         <div className="game" ref={canvasContainerRef}>
-          <header style={{ width: headerWidth }} className="game-header">
-            {getHeaderMessage()}
-          </header>
-          <canvas className="game-canvas" ref={canvasRef}></canvas>
+          {connected && (
+            <header
+              style={{ width: headerWidth }}
+              className="game-header fade-in-long"
+            >
+              {getHeaderMessage()}
+            </header>
+          )}
+          <canvas
+            className="game-canvas"
+            style={{ display: connected ? "unset" : "none" }}
+            ref={canvasRef}
+          ></canvas>
         </div>
       </div>
+      {!connected && <Loader message="Connecting" />}
     </>
   );
-}
+};
+
+export default Game;

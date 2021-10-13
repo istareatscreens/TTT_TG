@@ -67,6 +67,9 @@ class TicTacToe implements GameInterface
 
     public function getPlayerNumber(string $playerId): int
     {
+        echo "\nin get player number: " . $playerId . "\n";
+        print_r($this->players);
+
         return $this->players[$playerId];
     }
 

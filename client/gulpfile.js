@@ -4,13 +4,15 @@ const browserSync = require("browser-sync");
 const livereload = require("gulp-livereload");
 const { src, series, parallel, dest } = require("gulp");
 const webpack = require("webpack-stream");
+const rename = require("gulp-rename");
 const del = require("del");
 
 const output = "./public/";
 const jsPath = "./src/js/**/*.*";
 const cssPath = "./src/css/**/*";
-const htmlPath = "./src/html/**/*";
+const htmlPath = "./src/php/home.php";
 const phpPath = "./src/php/**/*";
+const imagePath = "./src/images/**/*";
 
 function jsTask() {
   return src([jsPath, "!node_modules"])
@@ -30,7 +32,10 @@ function jsDevTask() {
 }
 
 function copyDevHtml() {
-  return src([htmlPath]).pipe(browserSync.stream()).pipe(gulp.dest("public"));
+  return src([htmlPath])
+    .pipe(rename({ basename: "index", extname: ".html" }))
+    .pipe(browserSync.stream())
+    .pipe(gulp.dest("public"));
 }
 
 function cssDevTask() {
@@ -52,6 +57,10 @@ function copyPHP() {
   return src([phpPath]).pipe(dest(output));
 }
 
+function copyAssets() {
+  return src([imagePath]);
+}
+
 function watchTask() {
   browserSync.init({
     server: {
@@ -70,7 +79,12 @@ function watchTask() {
 }
 
 //BUILD Web Production
-exports.default = series(parallel(cleanTask, jsTask, cssTask, copyPHP));
+exports.default = series(
+  parallel(cleanTask, jsTask, cssTask, copyPHP, copyAssets)
+);
 
 //Develop Web
-exports.watch = series(parallel(jsDevTask, cssDevTask, copyDevHtml), watchTask);
+exports.watch = series(
+  parallel(jsDevTask, cssDevTask, copyDevHtml, copyAssets),
+  watchTask
+);

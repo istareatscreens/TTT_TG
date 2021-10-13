@@ -5,6 +5,8 @@
   "main": "src/js/index.js",
   "devDependencies": {
     "@types/react-dom": "^17.0.9",
+    "@types/react-router": "^5.1.17",
+    "@types/react-router-dom": "^5.3.1",
     "@types/uuid": "^8.3.1",
     "autoprefixer": "^10.3.6",
     "browser-sync": "^2.27.5",

@@ -20,6 +20,13 @@ interface FrontEndCallbacks {
   setPlayerDisconnected?: (input: any) => void;
   setInLobby?: (input: any) => void;
   setConnected?: (input: any) => void;
+  handleInvalidGame?: () => void;
+  updateGameId?: (gameId: string) => void;
+}
+
+interface GameClientProperties {
+  gameId: string;
+  canvas: HTMLCanvasElement;
 }
 
 export default class GameClient implements ISubscriber {
@@ -37,22 +44,22 @@ export default class GameClient implements ISubscriber {
     server: IServer,
     game: TicTacToe,
     controllers: Controllers,
-    canvas: HTMLCanvasElement,
-    frontEndCallBacks: FrontEndCallbacks
+    frontEndCallBacks: FrontEndCallbacks,
+    properties: GameClientProperties
   ) {
     this.server = server;
-    this.canvas = canvas;
+    this.canvas = properties.canvas;
     this.game = game;
-    this.setInitialVariables();
     this.controllers = controllers;
     this.frontEndCallbacks = frontEndCallBacks;
     this.subscriberId = new UniqueId();
     this.connected = false;
+    this.setInitialVariables(properties.gameId);
     this.subscribe();
   }
 
-  private setInitialVariables() {
-    this.gameId = "";
+  private setInitialVariables(gameId: string = "") {
+    this.gameId = gameId;
     this.gameStatus = "initial";
   }
 
@@ -98,8 +105,10 @@ export default class GameClient implements ISubscriber {
     } else if (this.server.hasMessageIn()) {
       this.handleMessage();
     } else if (this.server.isConnected() && !this.gameId) {
+      console.log("in update GAME ID:", this.gameId, !this.gameId);
       this.joinLobby();
     } else if (this.server.isConnected()) {
+      console.log("in reconnect update GAME ID:", this.gameId, !this.gameId);
       this.reconnectToGame();
     } else if (!this.server.isConnected()) {
       this.handleDisconnection();
@@ -144,10 +153,20 @@ export default class GameClient implements ISubscriber {
     this.gameId = "";
   }
 
+  private setGameId(gameId: string) {
+    console.log("set game id", gameId, this.gameId);
+    if (this.gameId === "" && gameId !== "" && gameId !== this.gameId) {
+      this.gameId = gameId;
+      console.log("set game id in conditional", gameId, gameId);
+      console.log();
+      this.frontEndCallbacks.updateGameId(this.gameId);
+    }
+  }
+
   private handleMessage(): void {
     const message = this.server.getMessageIn();
     const gameOverState = message.gameOverState;
-    this.gameId = message.gameId;
+    this.setGameId(message.gameId);
     this.gameStatus = message.status;
     this.game.setMark(message.playerNumber);
 
@@ -177,6 +196,10 @@ export default class GameClient implements ISubscriber {
         break;
       case "playerLeft":
         this.frontEndCallbacks.setPlayerDisconnected(true);
+        break;
+      case "invalidGame":
+        console.log("IN invalid game");
+        this.frontEndCallbacks.handleInvalidGame();
         break;
       default:
         console.log(

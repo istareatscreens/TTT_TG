@@ -10,6 +10,7 @@
       "moduleResolution": "Node",
       "lib": [ "dom", "dom.iterable", "esnext" ],
       "downlevelIteration": true,
+      "skipLibCheck": true
     },
     "exclude": ["node_modules"],
     "include": ["src/js", "src/js/index.ts"]

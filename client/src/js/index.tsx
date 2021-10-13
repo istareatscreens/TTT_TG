@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 
 function hideLoader() {
   const elements = document.getElementById("loader");
@@ -17,7 +18,9 @@ function hideAllElements(elements: any) {
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <HashRouter>
+      <App />
+    </HashRouter>
   </React.StrictMode>,
   document.getElementById("root"),
   hideLoader

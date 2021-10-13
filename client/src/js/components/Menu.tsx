@@ -5,24 +5,22 @@ import React, {
   useRef,
   ReactElement,
 } from "react";
+import { Link } from "react-router-dom";
 
-interface Props {
-  handleStartButton: () => void;
-}
+interface Props {}
 
-export default function Menu({ handleStartButton }: Props): ReactElement {
+export default function Menu(): ReactElement {
   return (
     <>
-      <div className="menu">
+      <div className="menu fade-in">
         <div className="mdc-card">
           <h1 className="menu__title title">Tic Tac Toe</h1>
           <div className="menu__buttons">
-            <button
-              onClick={handleStartButton}
-              className="btn mdc-button mdc-button--raised"
-            >
-              <span className="mdc-button__label">Start Game</span>
-            </button>
+            <Link to="/lobby">
+              <button className="btn mdc-button mdc-button--raised">
+                <span className="mdc-button__label">Start Game</span>
+              </button>
+            </Link>
           </div>
         </div>
       </div>

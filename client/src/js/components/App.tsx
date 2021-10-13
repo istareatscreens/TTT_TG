@@ -1,27 +1,38 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  ReactElement,
-} from "react";
+import React, { useState, ReactElement } from "react";
 import Arcade from "./Arcade";
 import Menu from "./Menu";
+import { RouteComponentProps, Switch, Route } from "react-router-dom";
+
+interface Props {
+  alt: string;
+}
 
 export default function App(): ReactElement {
-  const [inGame, setInGame] = useState(false);
-
-  const handleStartButton = () => {
-    setInGame(!inGame);
-  };
-
   return (
     <div className="main">
+      <Switch>
+        <Route path="/" component={Menu} exact>
+          <Menu />
+        </Route>
+        <Route path="/lobby" exact>
+          <Arcade />
+        </Route>
+        <Route path="/:id" exact>
+          <Arcade />
+        </Route>
+      </Switch>
+      {/*
       {inGame ? (
         <Arcade></Arcade>
       ) : (
-        <Menu handleStartButton={handleStartButton}></Menu>
+        <Route
+          path="/"
+          render={(_: RouteComponentProps) => (
+            <Menu handleStartButton={handleStartButton}></Menu>
+          )}
+        />
       )}
+      */}
     </div>
   );
 }

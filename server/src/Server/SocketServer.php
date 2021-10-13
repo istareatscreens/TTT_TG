@@ -60,6 +60,7 @@ class SocketServer implements MessageComponentInterface
             $from->close();
             return;
         }
+        echo "MESSAGE FROM PLAYER ID: " . $playerId;
         $this->messageHandler->handleMessage($from, $msg, $playerId);
     }
 

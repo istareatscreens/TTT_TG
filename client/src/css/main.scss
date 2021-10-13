@@ -1,11 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
-
 *,
 *::before,
 *::after {
   margin: 0;
   padding: 0;
   box-sizing: inherit;
+  text-decoration: none;
 }
 
 html {
@@ -28,6 +27,7 @@ body {
 @import "mixins";
 @import "font";
 @import "layout";
+@import "animation";
 
 // components
 @import "./components/button";
