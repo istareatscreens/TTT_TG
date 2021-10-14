@@ -38,9 +38,9 @@ export default function Loader({ message }: Props): ReactElement {
             <p>O</p>
           </div>
         </div>
-        <div className="loader__message loader__message--adjustment fade-in">
+        <div className="loader__message fade-in">
+          {message}
           <div className="dots-wrapper">
-            {message}
             <p>·</p>
             <p>·</p>
             <p>·</p>

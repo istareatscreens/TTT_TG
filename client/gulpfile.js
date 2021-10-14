@@ -58,7 +58,7 @@ function copyPHP() {
 }
 
 function copyAssets() {
-  return src([imagePath]).output(dest(output));
+  return src([imagePath]).pipe(dest(output));
 }
 
 function watchTask() {
