@@ -1,23 +1,17 @@
-import { Mark } from "../../common/enums";
-import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
+import { Mark } from "../../../common/enums";
+import { Coordinates, QuadrantNumber } from "../../../types";
+import IQuadrant, { QuadrantProperties } from "./IQuadrant";
 
-interface MarkProperties {
-  coordinates: Coordinates;
-  dimensions: Dimensions;
-  mark: Mark;
-  quadrant: QuadrantNumber;
-}
-
-export default class Quadrant {
+export default class Quadrant implements IQuadrant {
   private context: CanvasRenderingContext2D;
-  private properties: MarkProperties;
+  private properties: QuadrantProperties;
   private lineStroke: number;
   private color: string;
   private edgeBuffer: number;
 
   public constructor(
     context: CanvasRenderingContext2D,
-    properties: MarkProperties,
+    properties: QuadrantProperties,
     lineStroke: number,
     color: string = "black"
   ) {
@@ -31,7 +25,7 @@ export default class Quadrant {
 
   public draw(): void {
     const { X, O, Empty } = Mark;
-    switch (this.properties.mark) {
+    switch (this.properties.content) {
       case X:
         this.drawX();
         break;
@@ -106,7 +100,7 @@ export default class Quadrant {
 
   public isEmpty(): boolean {
     return !(
-      Mark.X === this.properties.mark || this.properties.mark === Mark.O
+      Mark.X === this.properties.content || this.properties.content === Mark.O
     );
   }
 

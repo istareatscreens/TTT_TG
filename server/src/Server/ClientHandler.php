@@ -169,14 +169,14 @@ class ClientHandler
         /*
         check if client has identifier,
         if identifier is not equal to supplied return false
+        do not allow clients to change playerID
         */
         if ($this->clientBiMap->hasValue($hash)) {
             return $playerId === $this->clientBiMap->getKey($hash);
         }
 
-        //check if new client
+        // check if new client
         if ($this->db->playerExistsByToken($playerId)) {
-
             $this->updateHash($client, $playerId, $hash);
             return true;
         }

@@ -26,6 +26,12 @@ export type GameProperties = [
   canvas: HTMLCanvasElement
 ];
 
+export type QuadrantType = "TicTacToe" | "Mark";
+
+export type QuadrantPosition =
+  | [board: QuadrantNumber, quadrant: QuadrantNumber]
+  | null;
+
 /*
 export interface MessageIn {
   status: GameStatus;

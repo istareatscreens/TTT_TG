@@ -1,8 +1,9 @@
-import GameBored from "./bored/GameBored";
+import GameBored from "./bored/GameBoard";
 import { Coordinates, Dimensions, QuadrantNumber } from "../types";
 import { Mark } from "../common/enums";
+import IGame from "./IGame";
 
-export default class TicTacToe {
+export default class TicTacToe implements IGame {
   private context: CanvasRenderingContext2D;
   private dimensions: Dimensions;
   private bored: GameBored;
@@ -51,15 +52,15 @@ export default class TicTacToe {
     return this.mark;
   }
 
-  public isTurn() {
+  public isTurn(): boolean {
     return this.mark === this.turn;
   }
 
-  public setDimensions(dimensions: Dimensions) {
+  public setDimensions(dimensions: Dimensions): void {
     this.dimensions = dimensions;
   }
 
-  public clearGame() {
+  public clearGame(): void {
     this.context.clearRect(0, 0, ...this.dimensions);
   }
 

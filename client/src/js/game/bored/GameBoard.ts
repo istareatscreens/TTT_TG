@@ -1,5 +1,5 @@
 import Grid from "./Grid";
-import Quadrant from "./Quadrant";
+import Quadrant from "./quadrant/Quadrant";
 import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
 import { Mark } from "../../common/enums";
 
@@ -8,7 +8,7 @@ function dec2bin(dec: number) {
   return (dec >>> 0).toString(2);
 }
 
-export default class GameBored {
+export default class GameBoard {
   private grid: Grid;
   private context: CanvasRenderingContext2D;
   private dimensions: Dimensions;
@@ -137,7 +137,7 @@ export default class GameBored {
       {
         coordinates: quadrantCoordinates,
         dimensions: this.quadrantDimensions,
-        mark: mark,
+        content: mark,
         quadrant: this.calculateQuadrantNumber(xPosition, yPosition),
       },
       this.lineStroke

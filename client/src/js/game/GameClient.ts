@@ -3,6 +3,7 @@ import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
 import { Dimensions, GameResponse } from "../types";
 import Controller from "./controllers/Controller";
+import IGame from "./IGame";
 import { TTTMessageIn } from "./message/TicTacToeMessage";
 import TicTacToe from "./TicTacToe";
 
@@ -36,13 +37,13 @@ export default class GameClient implements ISubscriber {
   private server: IServer;
   private controllers: Controllers;
   private subscriberId: UniqueId;
-  private game: TicTacToe;
+  private game: IGame;
   private connected: boolean;
   private frontEndCallbacks: FrontEndCallbacks;
 
   constructor(
     server: IServer,
-    game: TicTacToe,
+    game: IGame,
     controllers: Controllers,
     frontEndCallBacks: FrontEndCallbacks,
     properties: GameClientProperties

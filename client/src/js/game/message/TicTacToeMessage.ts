@@ -4,6 +4,7 @@ import {
   GameName,
   GameResponse,
   QuadrantNumber,
+  QuadrantPosition,
 } from "../../types";
 import { IMessage, IMessageIn, IMessageOut } from "./IMessage";
 
@@ -11,7 +12,7 @@ export interface TTTMessageOut extends IMessageOut {
   type: GameCommand;
   game: GameName;
   gameId: string;
-  position: QuadrantNumber;
+  position: QuadrantNumber | QuadrantPosition;
 }
 
 export interface TTTMessageIn extends IMessageIn {
