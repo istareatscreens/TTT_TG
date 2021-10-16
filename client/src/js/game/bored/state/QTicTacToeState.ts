@@ -7,7 +7,19 @@ export default class QTicTacToeState implements IGameState {
   private states: QuantumState;
   private iterator: QuadrantIterator;
 
-  public constructor(states: QuantumState) {
+  public constructor(
+    states: QuantumState = [
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+      "b0",
+    ]
+  ) {
     this.setState(states);
     this.iterator = new QuadrantIterator();
   }
@@ -21,7 +33,7 @@ export default class QTicTacToeState implements IGameState {
   }
 
   public iterate(): Content {
-    const state = this.states[9 - this.iterator.getIterator()]; //right number in list is 0,0
+    const state = this.states[8 - this.iterator.getIterator()]; //right number in list is 0,0
     this.iterator.incrementIterator();
     return state;
   }

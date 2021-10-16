@@ -36,7 +36,7 @@ export default class Quadrant implements IQuadrant {
         //do nothing
         break;
       default:
-        console.log("Invalid input");
+        console.error("Invalid input");
     }
   }
 
@@ -98,7 +98,7 @@ export default class Quadrant implements IQuadrant {
     );
   }
 
-  public isEmpty(): boolean {
+  public isEmpty(coordinates: Coordinates): boolean {
     return !(
       Mark.X === this.properties.content || this.properties.content === Mark.O
     );

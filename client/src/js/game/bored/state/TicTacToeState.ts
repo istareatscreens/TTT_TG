@@ -13,13 +13,10 @@ export default class TicTacToeState implements IGameState {
   }
 
   public setState(state: number): void {
-    console.log("SET STATE: ", state);
     this.state = state;
-    console.log("SET STATE: ", this.state);
   }
 
   public getState(): number {
-    console.log("SET STATE", this.state);
     return this.state;
   }
 

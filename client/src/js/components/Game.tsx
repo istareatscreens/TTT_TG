@@ -11,6 +11,7 @@ import { Mark } from "../common/enums";
 import Loader from "./Loader";
 import { Location } from "history";
 import { UniqueId } from "../common/UniqueId";
+import QTicTacToe from "../game/QTicTacToe";
 
 interface GameProps {}
 
@@ -114,7 +115,7 @@ const Game = ({}: GameProps): ReactElement => {
 
     // create game
     const server = new SocketServer();
-    const game = new TicTacToe(context, dimensions);
+    const game = new QTicTacToe(context, dimensions);
     const resizeController = new WindowController(canvasContainer);
     const gameController = new MouseController();
 

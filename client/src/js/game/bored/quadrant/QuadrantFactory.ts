@@ -17,8 +17,18 @@ export default class QuadrantFactory {
     this.color = color;
   }
 
+  private convertBoardStateToNumber(state: string) {
+    try {
+      return parseInt(state.substring(1));
+    } catch (e) {
+      console.error(`Invalid board qState converstion: ${e}`);
+      return 0;
+    }
+  }
+
   public createQuadrant(properties: QuadrantProperties) {
-    if (typeof properties.quadrant === "string") {
+    if (typeof properties.content === "string") {
+      properties.content = this.convertBoardStateToNumber(properties.content);
       return new QauntumQuadrant(
         this.context,
         properties,

@@ -4,6 +4,8 @@ import { Content, Coordinates, Dimensions, QuadrantNumber } from "../../types";
 import { Mark } from "../../common/enums";
 import IGameState from "./state/IGameState";
 import TicTacToeState from "./state/TicTacToeState";
+import QuadrantFactory from "./quadrant/QuadrantFactory";
+import IQuadrant from "./quadrant/IQuadrant";
 
 //debug function
 function dec2bin(dec: number) {
@@ -16,9 +18,10 @@ export default class GameBoard {
   private dimensions: Dimensions;
   private lineStroke: number;
   private quadrantDimensions: Dimensions;
-  private quadrants: Array<Quadrant>;
+  private quadrants: Array<IQuadrant>;
   private gameOverState: IGameState; //place in a marked state object
   private coordinates: Coordinates;
+  private quadrantFactory: QuadrantFactory;
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -33,6 +36,7 @@ export default class GameBoard {
     this.gameOverState = new TicTacToeState();
     this.context.globalAlpha = 1;
 
+    this.quadrantFactory = new QuadrantFactory(context, lineStroke);
     this.grid = new Grid(context, lineStroke, dimensions, coordinates);
     const [width, height] = dimensions;
     this.quadrantDimensions = [width / 3, height / 3];
@@ -144,27 +148,30 @@ export default class GameBoard {
       ((2 - (yPosition % 3)) * height) / 3,
     ];
 
-    const quadrantMark = new Quadrant(this.context, this.lineStroke, {
+    const properties = {
+      gridOffset: [this.lineStroke, this.lineStroke] as Coordinates,
       coordinates: this.adjustCoordinatesWithOffset(...quadrantCoordinates),
       dimensions: this.quadrantDimensions,
       content: content,
       quadrant: this.calculateQuadrantNumber(xPosition, yPosition),
-    });
+    };
 
-    quadrantMark.draw();
+    const quadrant = this.quadrantFactory.createQuadrant(properties);
 
-    this.quadrants.push(quadrantMark);
+    quadrant.draw();
+
+    this.quadrants.push(quadrant);
   }
 
   public isValidMove(coordinates: Coordinates): boolean {
     return (
       (!this.grid.isInsideGrid(...coordinates) &&
-        this.findQuadrant(coordinates)?.isEmpty()) ??
+        this.findQuadrant(coordinates)?.isEmpty(coordinates)) ??
       false
     );
   }
 
-  private findQuadrant(coordinates: Coordinates): Quadrant | undefined {
+  private findQuadrant(coordinates: Coordinates): IQuadrant | undefined {
     return this.quadrants.find(
       (quadrant) =>
         !this.grid.isInsideGrid(...coordinates) &&

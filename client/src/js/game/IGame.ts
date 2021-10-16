@@ -4,6 +4,7 @@ import {
   Dimensions,
   QuadrantNumber,
   QuadrantPosition,
+  QuantumState,
 } from "../types";
 
 export default interface IGame {
@@ -19,7 +20,7 @@ export default interface IGame {
   getQuadrantNumber: (
     coordinates: Coordinates
   ) => QuadrantNumber | QuadrantPosition;
-  setState: (state: number | number[]) => void;
+  setState: (state: number | QuantumState) => void;
   setGameOverState: (gameOverState: number) => void;
   draw: () => void;
 }

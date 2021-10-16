@@ -1,4 +1,4 @@
-import { Coordinates, QuadrantNumber } from "../../../types";
+import { Coordinates, Dimensions, QuadrantNumber } from "../../../types";
 import GameBoard from "../GameBoard";
 import TicTacToeState from "../state/TicTacToeState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";
@@ -8,6 +8,7 @@ export default class QauntumQuadrant implements IQuadrant {
   private properties: QuadrantProperties;
   private markedQuadrant: Quadrant;
   private gameBoard: GameBoard | null;
+  private edgeBuffer: number;
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -15,8 +16,46 @@ export default class QauntumQuadrant implements IQuadrant {
     lineStroke: number,
     color: string = "black"
   ) {
+    this.edgeBuffer = this.calculateEdgeBuffer(...properties.dimensions);
     this.markedQuadrant = new Quadrant(context, lineStroke, properties, color);
-    this.gameBoard = new GameBoard(context, properties.dimensions, lineStroke);
+    this.gameBoard = new GameBoard(
+      context,
+      this.adjustDimensions(...properties.dimensions, ...properties.gridOffset),
+      lineStroke,
+      this.adjustCoordinates(
+        ...properties.coordinates,
+        ...properties.gridOffset
+      )
+    );
+    this.properties = properties;
+  }
+
+  private calculateEdgeBuffer(width: number, height: number) {
+    return Math.min(width, height) * 0.05;
+  }
+
+  private adjustCoordinates(
+    x: number,
+    y: number,
+    xOffset: number,
+    yOffset: number
+  ): Coordinates {
+    return [
+      Math.abs(x + this.edgeBuffer / 2 + xOffset / 2),
+      Math.abs(y + this.edgeBuffer / 2 + yOffset / 2),
+    ];
+  }
+
+  public adjustDimensions(
+    width: number,
+    height: number,
+    widthOffset: number,
+    heightOffset: number
+  ): Dimensions {
+    return [
+      width - this.edgeBuffer - widthOffset / 2,
+      height - this.edgeBuffer - heightOffset / 2,
+    ];
   }
 
   public draw(): void {
