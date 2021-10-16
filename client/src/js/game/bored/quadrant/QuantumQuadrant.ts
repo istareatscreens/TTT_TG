@@ -1,12 +1,12 @@
 import { Coordinates, QuadrantNumber } from "../../../types";
 import GameBoard from "../GameBoard";
+import TicTacToeState from "../state/TicTacToeState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";
 import Quadrant from "./Quadrant";
 
 export default class QauntumQuadrant implements IQuadrant {
   private properties: QuadrantProperties;
   private markedQuadrant: Quadrant;
-  private isGameBoard: boolean;
   private gameBoard: GameBoard | null;
 
   public constructor(
@@ -15,23 +15,12 @@ export default class QauntumQuadrant implements IQuadrant {
     lineStroke: number,
     color: string = "black"
   ) {
-    this.markedQuadrant = new Quadrant(context, properties, lineStroke, color);
-    this.isGameBoard = this.checkIfQuadrantIsGameboard();
-    this.gameBoard = this.isGameBoard
-      ? (properties.content as GameBoard)
-      : null;
+    this.markedQuadrant = new Quadrant(context, lineStroke, properties, color);
+    this.gameBoard = new GameBoard(context, properties.dimensions, lineStroke);
   }
 
   public draw(): void {
-    if (this.isGameBoard) {
-      this.gameBoard.draw();
-    } else {
-      this.markedQuadrant.draw();
-    }
-  }
-
-  private checkIfQuadrantIsGameboard(): boolean {
-    return typeof this.properties.content === "object";
+    this.gameBoard.draw(new TicTacToeState(this.properties.content as number));
   }
 
   public getCenterCoordinate(): Coordinates {
@@ -43,9 +32,7 @@ export default class QauntumQuadrant implements IQuadrant {
   }
 
   public isEmpty(coordinates: Coordinates): boolean {
-    return this.isGameBoard
-      ? this.gameBoard.isValidMove(coordinates)
-      : this.markedQuadrant.isEmpty();
+    return this.gameBoard.isValidMove(coordinates);
   }
 
   public getNumber(): QuadrantNumber {

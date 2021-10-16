@@ -14,7 +14,7 @@
     0
   </script>
   <link rel="stylesheet" href="./bundle.css" />
-  <link rel="shortcut icon" type="img/png" href="favicon.png" />
+  <link rel="shortcut icon" type="img/png" href="favicon.ico" />
   <title>tic tac toe</title>
   <script src="./main.js" type="text/javascript" defer></script>
 </head>

@@ -226,12 +226,16 @@ const Game = ({}: GameProps): ReactElement => {
           )}
           <canvas
             className="game-canvas"
-            style={{ display: connected ? "unset" : "none" }}
+            style={
+              {} //{ display: connected ? "unset" : "none" }
+            }
             ref={canvasRef}
           ></canvas>
         </div>
       </div>
-      {!connected && <Loader message="Connecting" />}
+      {
+        //!connected && <Loader message="Connecting" />
+      }
     </>
   );
 };

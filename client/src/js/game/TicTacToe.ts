@@ -2,13 +2,14 @@ import GameBored from "./bored/GameBoard";
 import { Coordinates, Dimensions, QuadrantNumber } from "../types";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
+import TicTacToeState from "./bored/state/TicTacToeState";
 
 export default class TicTacToe implements IGame {
   private context: CanvasRenderingContext2D;
   private dimensions: Dimensions;
   private bored: GameBored;
-  private state: number;
-  private gameOverState: number;
+  private state: TicTacToeState;
+  private gameOverState: TicTacToeState;
   private lineStroke: number;
   private winner: Mark;
   private turn: Mark;
@@ -26,10 +27,10 @@ export default class TicTacToe implements IGame {
   public reset() {
     this.lineStroke = 10;
     this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
-    this.state = 0;
+    this.state = new TicTacToeState(0);
     this.turn = Mark.X;
     this.winner = Mark.Empty;
-    this.gameOverState = 0;
+    this.gameOverState = new TicTacToeState();
     this.mark = Mark.Empty;
   }
 
@@ -74,21 +75,22 @@ export default class TicTacToe implements IGame {
 
   public setState(state: number): void {
     const { X, O } = Mark;
-    if (state !== this.state) {
+    if (state !== this.state.getState()) {
       this.turn = X === this.turn ? O : X;
     }
-    this.state = state;
+    this.state.setState(state);
     this.draw();
   }
 
   public setGameOverState(gameOverState: number): void {
-    this.gameOverState = gameOverState;
+    this.gameOverState = new TicTacToeState(gameOverState);
     this.draw();
   }
 
   public draw(): void {
     //87381 all X
     //174762 all O
+    console.log(this.dimensions);
     this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
     this.bored.setGameOverState(this.gameOverState);
     this.bored.draw(this.state);

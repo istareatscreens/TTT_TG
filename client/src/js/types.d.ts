@@ -32,6 +32,10 @@ export type QuadrantPosition =
   | [board: QuadrantNumber, quadrant: QuadrantNumber]
   | null;
 
+export type QuantumState = (Mark | string)[];
+
+export type States = number | QuantumState;
+export type Content = Mark | string;
 /*
 export interface MessageIn {
   status: GameStatus;

@@ -1,5 +1,10 @@
 import { Mark } from "../../../common/enums";
-import { Coordinates, Dimensions, QuadrantNumber } from "../../../types";
+import {
+  Content,
+  Coordinates,
+  Dimensions,
+  QuadrantNumber,
+} from "../../../types";
 import TicTacToe from "../../TicTacToe";
 import GameBored from "../GameBoard";
 
@@ -14,7 +19,6 @@ export default interface IQuadrant {
 export interface QuadrantProperties {
   coordinates: Coordinates;
   dimensions: Dimensions;
-  content: Mark | GameBored;
+  content: Content;
   quadrant: QuadrantNumber;
-  state?: number;
 }

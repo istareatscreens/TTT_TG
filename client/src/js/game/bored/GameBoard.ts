@@ -1,7 +1,9 @@
 import Grid from "./Grid";
 import Quadrant from "./quadrant/Quadrant";
-import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
+import { Content, Coordinates, Dimensions, QuadrantNumber } from "../../types";
 import { Mark } from "../../common/enums";
+import IGameState from "./state/IGameState";
+import TicTacToeState from "./state/TicTacToeState";
 
 //debug function
 function dec2bin(dec: number) {
@@ -15,41 +17,45 @@ export default class GameBoard {
   private lineStroke: number;
   private quadrantDimensions: Dimensions;
   private quadrants: Array<Quadrant>;
-  private gameOverState: number;
+  private gameOverState: IGameState; //place in a marked state object
+  private coordinates: Coordinates;
 
   public constructor(
     context: CanvasRenderingContext2D,
     dimensions: Dimensions,
-    lineStroke: number
+    lineStroke: number,
+    coordinates: Coordinates = [0, 0]
   ) {
     this.lineStroke = lineStroke;
     this.context = context;
     this.dimensions = dimensions;
-    this.gameOverState = 0;
+    this.coordinates = coordinates;
+    this.gameOverState = new TicTacToeState();
     this.context.globalAlpha = 1;
 
-    this.grid = new Grid(context, lineStroke, dimensions);
+    this.grid = new Grid(context, lineStroke, dimensions, coordinates);
     const [width, height] = dimensions;
     this.quadrantDimensions = [width / 3, height / 3];
     this.quadrants = [];
   }
 
-  public draw(state: number = 0): void {
-    this.context.clearRect(0, 0, ...this.dimensions);
+  public draw(state: IGameState): void {
+    const [x, y] = this.coordinates;
+    this.context.clearRect(x, y, ...this.dimensions);
     this.grid.draw();
     this.drawMarks(state);
-    if (this.gameOverState) {
+    if (this.gameOverState.getState()) {
       this.drawGameOverState(this.gameOverState);
     }
   }
 
-  private drawMarks(state: number): void {
+  private drawMarks(state: IGameState): void {
     this.iterateOverState(state, this.markQuadrant.bind(this));
   }
 
   private iterateOverState(
-    state: number,
-    callback: (x: number, y: number, mark: Mark) => void
+    state: IGameState,
+    callback: (x: number, y: number, content: Content) => void
   ): void {
     /* 
       each two bits represents a quadrant
@@ -59,13 +65,13 @@ export default class GameBoard {
     */
     for (let y = 0; y < 3; y++) {
       for (let x = 0; x < 3; x++) {
-        callback(x, y, 3 & state);
-        state >>>= 2;
+        //abstract the 3 & state, state >>>=2; !!!
+        callback(x, y, state.iterate());
       }
     }
   }
 
-  public setGameOverState(gameOverState: number): void {
+  public setGameOverState(gameOverState: IGameState): void {
     this.gameOverState = gameOverState;
   }
 
@@ -93,12 +99,18 @@ export default class GameBoard {
     this.context.lineWidth = this.lineStroke * 1.5;
     this.context.strokeStyle = "#92140c";
     this.context.beginPath();
-    this.context.moveTo(x1, y1);
-    this.context.lineTo(x3, y3);
+    this.context.moveTo(...this.adjustCoordinatesWithOffset(x1, y1));
+    this.context.lineTo(...this.adjustCoordinatesWithOffset(x3, y3));
     this.context.stroke();
   }
 
-  private drawGameOverState(gameOverState: number): void {
+  private adjustCoordinatesWithOffset(x: number, y: number): Coordinates {
+    const [xOffset, yOffset] = this.coordinates;
+    return [x + xOffset, y + yOffset];
+  }
+
+  // create a quadrant factory object
+  private drawGameOverState(gameOverState: IGameState): void {
     const quadrants: QuadrantNumber[] = [];
     const getQuadrants =
       (quadrants: QuadrantNumber[]) => (x: number, y: number, mark: Mark) => {
@@ -123,7 +135,7 @@ export default class GameBoard {
   private markQuadrant(
     xPosition: number,
     yPosition: number,
-    mark: Mark // value must be < 3
+    content: Content // value must be < 3
   ): void {
     const [width, height] = this.dimensions;
 
@@ -132,16 +144,12 @@ export default class GameBoard {
       ((2 - (yPosition % 3)) * height) / 3,
     ];
 
-    const quadrantMark = new Quadrant(
-      this.context,
-      {
-        coordinates: quadrantCoordinates,
-        dimensions: this.quadrantDimensions,
-        content: mark,
-        quadrant: this.calculateQuadrantNumber(xPosition, yPosition),
-      },
-      this.lineStroke
-    );
+    const quadrantMark = new Quadrant(this.context, this.lineStroke, {
+      coordinates: this.adjustCoordinatesWithOffset(...quadrantCoordinates),
+      dimensions: this.quadrantDimensions,
+      content: content,
+      quadrant: this.calculateQuadrantNumber(xPosition, yPosition),
+    });
 
     quadrantMark.draw();
 

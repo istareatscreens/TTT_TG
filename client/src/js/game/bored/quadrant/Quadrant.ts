@@ -11,8 +11,8 @@ export default class Quadrant implements IQuadrant {
 
   public constructor(
     context: CanvasRenderingContext2D,
-    properties: QuadrantProperties,
     lineStroke: number,
+    properties: QuadrantProperties,
     color: string = "black"
   ) {
     this.context = context;
