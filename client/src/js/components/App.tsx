@@ -11,7 +11,7 @@ export default function App(): ReactElement {
   return (
     <div className="main">
       <Switch>
-        <Route path="/" component={Menu} exact>
+        <Route path="/" exact>
           <Menu />
         </Route>
         <Route path="/lobby" exact>

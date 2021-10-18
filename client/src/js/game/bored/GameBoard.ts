@@ -12,6 +12,13 @@ function dec2bin(dec: number) {
   return (dec >>> 0).toString(2);
 }
 
+interface BoardProperties {
+  gridColor: string;
+  markColor: string;
+  lineStroke: number;
+  gridStroke: number;
+}
+
 export default class GameBoard {
   private grid: Grid;
   private context: CanvasRenderingContext2D;
@@ -22,22 +29,30 @@ export default class GameBoard {
   private gameOverState: IGameState; //place in a marked state object
   private coordinates: Coordinates;
   private quadrantFactory: QuadrantFactory;
+  private gridStroke: number;
 
   public constructor(
     context: CanvasRenderingContext2D,
     dimensions: Dimensions,
-    lineStroke: number,
+    properties: BoardProperties,
     coordinates: Coordinates = [0, 0]
   ) {
-    this.lineStroke = lineStroke;
+    this.lineStroke = properties.lineStroke;
     this.context = context;
     this.dimensions = dimensions;
     this.coordinates = coordinates;
     this.gameOverState = new TicTacToeState();
     this.context.globalAlpha = 1;
+    this.gridStroke = properties.gridStroke;
 
-    this.quadrantFactory = new QuadrantFactory(context, lineStroke);
-    this.grid = new Grid(context, lineStroke, dimensions, coordinates);
+    this.quadrantFactory = new QuadrantFactory(context, this.lineStroke);
+    this.grid = new Grid(
+      context,
+      this.gridStroke,
+      dimensions,
+      coordinates,
+      properties.gridColor
+    );
     const [width, height] = dimensions;
     this.quadrantDimensions = [width / 3, height / 3];
     this.quadrants = [];
@@ -149,7 +164,7 @@ export default class GameBoard {
     ];
 
     const properties = {
-      gridOffset: [this.lineStroke, this.lineStroke] as Coordinates,
+      gridOffset: [this.gridStroke, this.gridStroke] as Coordinates,
       coordinates: this.adjustCoordinatesWithOffset(...quadrantCoordinates),
       dimensions: this.quadrantDimensions,
       content: content,

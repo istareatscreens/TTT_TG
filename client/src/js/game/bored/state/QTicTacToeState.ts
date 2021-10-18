@@ -9,9 +9,9 @@ export default class QTicTacToeState implements IGameState {
 
   public constructor(
     states: QuantumState = [
+      "b87381",
       "b0",
-      "b0",
-      "b0",
+      "b87381",
       "b0",
       "b0",
       "b0",

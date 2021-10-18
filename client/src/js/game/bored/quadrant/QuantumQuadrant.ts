@@ -21,7 +21,12 @@ export default class QauntumQuadrant implements IQuadrant {
     this.gameBoard = new GameBoard(
       context,
       this.adjustDimensions(...properties.dimensions, ...properties.gridOffset),
-      lineStroke,
+      {
+        lineStroke: lineStroke,
+        gridStroke: lineStroke,
+        gridColor: color,
+        markColor: color,
+      },
       this.adjustCoordinates(
         ...properties.coordinates,
         ...properties.gridOffset

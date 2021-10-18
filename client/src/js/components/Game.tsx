@@ -61,10 +61,8 @@ const Game = ({}: GameProps): ReactElement => {
 
   const getGameIdFromUrl = (location: Location<unknown>): string => {
     const gameId: string = location.pathname.substring(1);
-    console.log("get in getGAMEIdFromUrl ID:", gameId);
     console.log(gameId);
     console.log(validateUuid(gameId));
-    console.log("IS TRU IN GET URL:", validateUuid(gameId) ? gameId : "");
     return validateUuid(gameId) ? gameId : "";
   };
 
@@ -74,19 +72,29 @@ const Game = ({}: GameProps): ReactElement => {
   };
   const updateGameId = (gameId: string) => {
     // url hack
-    console.log("UPDATE GAME", gameId, window.history);
-    console.log("LOCATION: ", location);
     window.history.replaceState(null, "Tic Tac Toe", `/#/${gameId}`);
     history.push(`/${gameId}`);
-    console.log("after UPDATE GAME", gameId, window.history);
-    console.log("after LOCATION: ", location);
   };
 
-  //setup game
+  const loadFont = async () => {
+    const font = new FontFace(
+      "Press Start P",
+      "url(https://fonts.gstatic.com/s/pressstart2p/v9/e3t4euO8T-267oIAQAu6jDQyK3nYivN04w.woff2)"
+    );
+    await font.load();
+    document.fonts.add(font);
+  };
+
   useEffect(() => {
+    (async () => createGame())();
+  }, []);
+
+  const createGame = async () => {
     const gameId = getGameIdFromUrl(location);
     setGameId(gameId);
-    console.log("SHOULD HAVE GAME ID in use effect");
+
+    await loadFont();
+    await document.fonts.ready;
 
     // gameId = gameId ? "" : gameId;
     const stateCallbacks = {
@@ -106,6 +114,7 @@ const Game = ({}: GameProps): ReactElement => {
     const canvas: HTMLCanvasElement = canvasRef.current;
 
     const context = canvas.getContext("2d");
+    context.save();
 
     const dimension = getDimension();
     const dimensions: Dimensions = [dimension, dimension];
@@ -127,7 +136,7 @@ const Game = ({}: GameProps): ReactElement => {
       { canvas: canvas, gameId: gameId }
     );
     gameClient.current.start();
-  }, []);
+  };
 
   const getPlayerSymbol = (number: Mark): string => {
     switch (number) {

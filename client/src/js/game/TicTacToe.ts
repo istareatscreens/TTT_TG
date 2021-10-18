@@ -26,7 +26,12 @@ export default class TicTacToe implements IGame {
 
   public reset() {
     this.lineStroke = 10;
-    this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
+    this.bored = new GameBored(this.context, this.dimensions, {
+      lineStroke: this.lineStroke,
+      gridStroke: this.lineStroke,
+      gridColor: "black",
+      markColor: "black",
+    });
     this.state = new TicTacToeState(0);
     this.turn = Mark.X;
     this.winner = Mark.Empty;
@@ -91,8 +96,15 @@ export default class TicTacToe implements IGame {
     //87381 all X
     //174762 all O
     console.log(this.dimensions);
-    this.bored = new GameBored(this.context, this.dimensions, this.lineStroke);
+    this.bored = new GameBored(this.context, this.dimensions, {
+      lineStroke: this.lineStroke,
+      gridStroke: this.lineStroke,
+      gridColor: "black",
+      markColor: "black",
+    });
     this.bored.setGameOverState(this.gameOverState);
-    this.bored.draw(this.state);
+    //this.bored.draw(this.state);
+    //this.bored.draw(new TicTacToeState(0b101010010101101010));
+    this.bored.draw(new TicTacToeState(87381));
   }
 }
