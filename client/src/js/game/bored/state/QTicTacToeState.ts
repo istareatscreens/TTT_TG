@@ -1,6 +1,4 @@
-import { Mark } from "../../../common/enums";
-import { Content, QuantumState, States } from "../../../types";
-import IGameState from "./IGameState";
+import IGameState, { Content, QuantumState, States } from "./IGameState";
 import QuadrantIterator from "./QuadrantIterator";
 
 export default class QTicTacToeState implements IGameState {
@@ -9,14 +7,14 @@ export default class QTicTacToeState implements IGameState {
 
   public constructor(
     states: QuantumState = [
-      "b87381",
-      "b0",
-      "b87381",
-      "b0",
-      "b0",
-      "b0",
-      "b0",
-      "b0",
+      "b87381,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
+      "b87381,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
+      "b0,0,0,0,0,0,0,0,0,0",
       "b0",
     ]
   ) {

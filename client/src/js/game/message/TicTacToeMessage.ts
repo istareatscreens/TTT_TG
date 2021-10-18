@@ -6,6 +6,7 @@ import {
   QuadrantNumber,
   QuadrantPosition,
 } from "../../types";
+import { States } from "../bored/state/IGameState";
 import { IMessage, IMessageIn, IMessageOut } from "./IMessage";
 
 export interface TTTMessageOut extends IMessageOut {
@@ -18,7 +19,7 @@ export interface TTTMessageOut extends IMessageOut {
 export interface TTTMessageIn extends IMessageIn {
   status: GameResponse;
   gameId: string;
-  state: number;
+  state: States;
   playerNumber: Mark;
   winner: Mark;
   gameOverState: number;

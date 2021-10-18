@@ -1,8 +1,7 @@
 import Grid from "./Grid";
-import Quadrant from "./quadrant/Quadrant";
-import { Content, Coordinates, Dimensions, QuadrantNumber } from "../../types";
+import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
 import { Mark } from "../../common/enums";
-import IGameState from "./state/IGameState";
+import IGameState, { Content } from "./state/IGameState";
 import TicTacToeState from "./state/TicTacToeState";
 import QuadrantFactory from "./quadrant/QuadrantFactory";
 import IQuadrant from "./quadrant/IQuadrant";
@@ -154,7 +153,7 @@ export default class GameBoard {
   private markQuadrant(
     xPosition: number,
     yPosition: number,
-    content: Content // value must be < 3
+    content: Content
   ): void {
     const [width, height] = this.dimensions;
 

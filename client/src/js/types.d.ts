@@ -31,22 +31,3 @@ export type QuadrantType = "TicTacToe" | "Mark";
 export type QuadrantPosition =
   | [board: QuadrantNumber, quadrant: QuadrantNumber]
   | null;
-
-export type QuantumState = (Mark | string)[];
-
-export type States = number | QuantumState;
-export type Content = Mark | string;
-/*
-export interface MessageIn {
-  status: GameStatus;
-  state: number;
-  gameId: string;
-  winner: Mark;
-}
-
-export interface MessageOut {
-  type: PlayerOptions;
-  gameId: number;
-  quadrant: QuadrantNumber;
-}
-*/

@@ -1,12 +1,8 @@
 import GameBored from "./bored/GameBoard";
-import {
-  Coordinates,
-  Dimensions,
-  QuadrantNumber,
-  QuantumState,
-} from "../types";
+import { Coordinates, Dimensions, QuadrantNumber } from "../types";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
+import { QuantumState } from "./bored/state/IGameState";
 import TicTacToeState from "./bored/state/TicTacToeState";
 import QTicTacToeState from "./bored/state/QTicTacToeState";
 

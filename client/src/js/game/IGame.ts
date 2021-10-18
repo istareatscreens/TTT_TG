@@ -4,8 +4,8 @@ import {
   Dimensions,
   QuadrantNumber,
   QuadrantPosition,
-  QuantumState,
 } from "../types";
+import { States } from "./bored/state/IGameState";
 
 export default interface IGame {
   reset: () => void;
@@ -20,7 +20,7 @@ export default interface IGame {
   getQuadrantNumber: (
     coordinates: Coordinates
   ) => QuadrantNumber | QuadrantPosition;
-  setState: (state: number | QuantumState) => void;
+  setState: (state: States) => void;
   setGameOverState: (gameOverState: number) => void;
   draw: () => void;
 }

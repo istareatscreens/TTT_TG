@@ -2,6 +2,7 @@ import ISubscriber from "../common/interfaces/ISubscriber";
 import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
 import { Dimensions, GameResponse } from "../types";
+import { States } from "./bored/state/IGameState";
 import Controller from "./controllers/Controller";
 import IGame from "./IGame";
 import { TTTMessageIn } from "./message/TicTacToeMessage";
@@ -211,7 +212,7 @@ export default class GameClient implements ISubscriber {
     this.updateFrontEnd(message);
   }
 
-  private updateState(state: number): void {
+  private updateState(state: States): void {
     this.game.setState(state);
   }
 

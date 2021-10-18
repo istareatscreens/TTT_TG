@@ -17,7 +17,7 @@ export default class QuadrantFactory {
     this.color = color;
   }
 
-  private convertBoardStateToNumber(state: string) {
+  private convertBoardStateToNumber(state: string): number {
     try {
       return parseInt(state.substring(1));
     } catch (e) {
@@ -26,9 +26,17 @@ export default class QuadrantFactory {
     }
   }
 
+  private parseTurnNumbers(state: string): (number | string[])[] {
+    const [stateString, ...numbers] = state.split(",");
+    return [this.convertBoardStateToNumber(stateString), numbers];
+  }
+
   public createQuadrant(properties: QuadrantProperties) {
     if (typeof properties.content === "string") {
-      properties.content = this.convertBoardStateToNumber(properties.content);
+      //properties.content = this.convertBoardStateToNumber(properties.content);
+      const [state, numbers] = this.parseTurnNumbers(properties.content);
+      properties.content = state as number;
+      properties.moveNumbers = numbers as string[];
       return new QauntumQuadrant(
         this.context,
         properties,

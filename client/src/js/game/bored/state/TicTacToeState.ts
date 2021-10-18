@@ -1,6 +1,5 @@
 import { Mark } from "../../../common/enums";
-import { Content } from "../../../types";
-import IGameState from "./IGameState";
+import IGameState, { Content } from "./IGameState";
 import QuadrantIterator from "./QuadrantIterator";
 
 export default class TicTacToeState implements IGameState {

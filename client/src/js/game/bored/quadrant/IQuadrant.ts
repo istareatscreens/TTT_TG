@@ -1,9 +1,5 @@
-import {
-  Content,
-  Coordinates,
-  Dimensions,
-  QuadrantNumber,
-} from "../../../types";
+import { Coordinates, Dimensions, QuadrantNumber } from "../../../types";
+import { Content } from "../state/IGameState";
 
 export default interface IQuadrant {
   draw: () => void;
@@ -18,5 +14,6 @@ export interface QuadrantProperties {
   coordinates: Coordinates;
   dimensions: Dimensions;
   content: Content;
+  moveNumbers?: string[];
   quadrant: QuadrantNumber;
 }
