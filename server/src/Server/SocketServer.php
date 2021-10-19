@@ -22,8 +22,10 @@ class SocketServer implements MessageComponentInterface
     private function getSessionId(ConnectionInterface $conn): string
     {
         try {
-            return $this->develop ?  Uuid::v4() : $conn->Session->get('id');
+            $id = $this->develop ?  Uuid::v4() : $conn->Session->get('id');
+            return (is_null($id)) ? "" : $id;
         } catch (Exception $e) {
+            echo $e;
             return "";
         }
     }
