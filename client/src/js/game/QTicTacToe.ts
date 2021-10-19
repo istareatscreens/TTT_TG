@@ -1,5 +1,10 @@
 import GameBored from "./bored/GameBoard";
-import { Coordinates, Dimensions, QuadrantNumber } from "../types";
+import {
+  Coordinates,
+  Dimensions,
+  QuadrantLocation,
+  QuadrantNumber,
+} from "../types";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
 import { QuantumState } from "./bored/state/IGameState";
@@ -24,6 +29,10 @@ export default class QTicTacToe implements IGame {
     this.context = context;
     this.setDimensions(dimensions);
     this.reset();
+  }
+
+  public setTurn(turn: Mark): void {
+    this.turn = turn;
   }
 
   public reset() {
@@ -72,7 +81,10 @@ export default class QTicTacToe implements IGame {
     this.context.clearRect(0, 0, ...this.dimensions);
   }
 
-  public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
+  public getQuadrantNumber(coordinates: Coordinates): QuadrantLocation {
+    if (coordinates === undefined) {
+      console.log("HERE WTF", coordinates);
+    }
     if (this.bored.isValidMove(coordinates)) {
       console.log(this.bored.getQuadrantNumber(coordinates));
       return this.bored.getQuadrantNumber(coordinates);
@@ -81,12 +93,6 @@ export default class QTicTacToe implements IGame {
   }
 
   public setState(state: QuantumState): void {
-    const { X, O } = Mark;
-    /*
-    if (state !== this.state.getState()) {
-      this.turn = X === this.turn ? O : X;
-    }
-    */
     this.state.setState(state);
     this.draw();
   }

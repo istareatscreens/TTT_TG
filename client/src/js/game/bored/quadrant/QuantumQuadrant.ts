@@ -1,4 +1,9 @@
-import { Coordinates, Dimensions, QuadrantNumber } from "../../../types";
+import {
+  Coordinates,
+  Dimensions,
+  QuadrantCoordinate,
+  QuadrantNumber,
+} from "../../../types";
 import GameBoard from "../GameBoard";
 import TicTacToeState from "../state/TicTacToeState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";
@@ -76,10 +81,17 @@ export default class QauntumQuadrant implements IQuadrant {
   }
 
   public isEmpty(coordinates: Coordinates): boolean {
-    return this.gameBoard.isValidMove(coordinates);
+    return (
+      (!this.properties?.locked ?? true) &&
+      this.gameBoard.isValidMove(coordinates)
+    );
   }
 
-  public getNumber(): QuadrantNumber {
-    return this.markedQuadrant.getNumber();
+  public getNumber(coordinates: Coordinates): QuadrantCoordinate {
+    console.log("in get number", coordinates);
+    return [
+      this.markedQuadrant.getNumber(),
+      this.gameBoard.getQuadrantNumber(coordinates) as QuadrantNumber,
+    ];
   }
 }

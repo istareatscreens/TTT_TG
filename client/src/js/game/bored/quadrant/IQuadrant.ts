@@ -1,12 +1,18 @@
-import { Coordinates, Dimensions, QuadrantNumber } from "../../../types";
+import {
+  Coordinates,
+  Dimensions,
+  QuadrantLocation,
+  QuadrantNumber,
+} from "../../../types";
 import { Content } from "../state/IGameState";
 
 export default interface IQuadrant {
   draw: () => void;
   getCenterCoordinate: () => Coordinates;
   isInQuadrant: (xCoordinate: number, yCoordinate: number) => boolean;
-  isEmpty: (coordinates: Coordinates) => boolean;
-  getNumber: () => QuadrantNumber;
+  isEmpty: (coordinates?: Coordinates) => boolean;
+  getNumber: (coordinates?: Coordinates) => QuadrantLocation;
+  isLocked?: () => boolean;
 }
 
 export interface QuadrantProperties {
@@ -14,6 +20,7 @@ export interface QuadrantProperties {
   coordinates: Coordinates;
   dimensions: Dimensions;
   content: Content;
-  moveNumbers?: string[];
   quadrant: QuadrantNumber;
+  moveNumbers?: string[];
+  locked?: boolean;
 }

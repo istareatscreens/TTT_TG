@@ -23,6 +23,7 @@ export interface TTTMessageIn extends IMessageIn {
   playerNumber: Mark;
   winner: Mark;
   gameOverState: number;
+  turn: Mark;
 }
 
 export class TicTacToeMessage implements IMessage {

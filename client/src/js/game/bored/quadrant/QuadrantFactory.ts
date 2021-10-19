@@ -19,24 +19,34 @@ export default class QuadrantFactory {
 
   private convertBoardStateToNumber(state: string): number {
     try {
-      return parseInt(state.substring(1));
+      return parseInt(state);
     } catch (e) {
       console.error(`Invalid board qState converstion: ${e}`);
       return 0;
     }
   }
 
-  private parseTurnNumbers(state: string): (number | string[])[] {
-    const [stateString, ...numbers] = state.split(",");
-    return [this.convertBoardStateToNumber(stateString), numbers];
+  private parseTurnNumbers(
+    unparsedState: string
+  ): (boolean | number | string[])[] {
+    const [state, ...numbers] = unparsedState.split(",");
+    const locked = "L" === unparsedState[0];
+    return [
+      locked,
+      this.convertBoardStateToNumber(locked ? state.substring(1) : state),
+      numbers,
+    ];
   }
 
   public createQuadrant(properties: QuadrantProperties) {
     if (typeof properties.content === "string") {
       //properties.content = this.convertBoardStateToNumber(properties.content);
-      const [state, numbers] = this.parseTurnNumbers(properties.content);
+      const [locked, state, numbers] = this.parseTurnNumbers(
+        properties.content
+      );
       properties.content = state as number;
       properties.moveNumbers = numbers as string[];
+      properties.locked = locked as boolean;
       return new QauntumQuadrant(
         this.context,
         properties,

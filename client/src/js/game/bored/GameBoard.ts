@@ -1,5 +1,10 @@
 import Grid from "./Grid";
-import { Coordinates, Dimensions, QuadrantNumber } from "../../types";
+import {
+  Coordinates,
+  Dimensions,
+  QuadrantLocation,
+  QuadrantNumber,
+} from "../../types";
 import { Mark } from "../../common/enums";
 import IGameState, { Content } from "./state/IGameState";
 import TicTacToeState from "./state/TicTacToeState";
@@ -189,11 +194,11 @@ export default class GameBoard {
     return this.quadrants.find(
       (quadrant) =>
         !this.grid.isInsideGrid(...coordinates) &&
-        quadrant.isInQuadrant(...coordinates)
+        quadrant.isInQuadrant?.(...coordinates)
     );
   }
 
-  public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
-    return this.findQuadrant(coordinates)?.getNumber() ?? null;
+  public getQuadrantNumber(coordinates: Coordinates): QuadrantLocation {
+    return this.findQuadrant(coordinates)?.getNumber(coordinates) ?? null;
   }
 }

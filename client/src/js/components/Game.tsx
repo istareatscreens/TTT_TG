@@ -124,7 +124,7 @@ const Game = ({}: GameProps): ReactElement => {
 
     // create game
     const server = new SocketServer();
-    const game = new QTicTacToe(context, dimensions);
+    const game = new TicTacToe(context, dimensions);
     const resizeController = new WindowController(canvasContainer);
     const gameController = new MouseController();
 

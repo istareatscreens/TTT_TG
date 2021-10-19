@@ -1,5 +1,10 @@
 import GameBored from "./bored/GameBoard";
-import { Coordinates, Dimensions, QuadrantNumber } from "../types";
+import {
+  Coordinates,
+  Dimensions,
+  QuadrantLocation,
+  QuadrantNumber,
+} from "../types";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
 import TicTacToeState from "./bored/state/TicTacToeState";
@@ -43,6 +48,10 @@ export default class TicTacToe implements IGame {
     return this.turn;
   }
 
+  public setTurn(turn: Mark): void {
+    this.turn = turn;
+  }
+
   public setWinner(winner: Mark): void {
     this.winner = winner;
   }
@@ -70,7 +79,7 @@ export default class TicTacToe implements IGame {
     this.context.clearRect(0, 0, ...this.dimensions);
   }
 
-  public getQuadrantNumber(coordinates: Coordinates): QuadrantNumber {
+  public getQuadrantNumber(coordinates: Coordinates): QuadrantLocation {
     if (this.bored.isValidMove(coordinates)) {
       console.log(this.bored.getQuadrantNumber(coordinates));
       return this.bored.getQuadrantNumber(coordinates);
@@ -103,8 +112,8 @@ export default class TicTacToe implements IGame {
       markColor: "black",
     });
     this.bored.setGameOverState(this.gameOverState);
-    //this.bored.draw(this.state);
+    this.bored.draw(this.state);
     //this.bored.draw(new TicTacToeState(0b101010010101101010));
-    this.bored.draw(new TicTacToeState(87381));
+    //this.bored.draw(new TicTacToeState(87381));
   }
 }

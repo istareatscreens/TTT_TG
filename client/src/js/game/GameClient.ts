@@ -160,7 +160,6 @@ export default class GameClient implements ISubscriber {
     if (this.gameId === "" && gameId !== "" && gameId !== this.gameId) {
       this.gameId = gameId;
       console.log("set game id in conditional", gameId, gameId);
-      console.log();
       this.frontEndCallbacks.updateGameId(this.gameId);
     }
   }
@@ -171,6 +170,7 @@ export default class GameClient implements ISubscriber {
     this.setGameId(message.gameId);
     this.gameStatus = message.status;
     this.game.setMark(message.playerNumber);
+    this.game.setTurn(message.turn);
 
     switch (this.gameStatus) {
       case "inLobby":

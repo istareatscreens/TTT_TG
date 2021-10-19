@@ -17,6 +17,9 @@ export type GameResponse =
   | "gameOver";
 
 export type QuadrantNumber = null | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type QuadrantCoordinate = [QuadrantNumber, QuadrantNumber];
+
+export type QuadrantLocation = QuadrantNumber | QuadrantCoordinate;
 
 export interface Game {}
 
@@ -26,6 +29,7 @@ export type GameProperties = [
   canvas: HTMLCanvasElement
 ];
 
+// not used
 export type QuadrantType = "TicTacToe" | "Mark";
 
 export type QuadrantPosition =
