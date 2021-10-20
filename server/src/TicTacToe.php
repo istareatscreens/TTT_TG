@@ -122,6 +122,7 @@ class TicTacToe implements GameInterface
 
         return $moveComplete;
     }
+
     private function setMovesLeft(int $moves): void
     {
         $this->movesLeft = $moves;

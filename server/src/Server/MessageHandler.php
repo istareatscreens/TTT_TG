@@ -191,31 +191,10 @@ class MessageHandler
         }
         $game = $this->games[$gameId];
 
-
-        //$message = new MessageOut($game);
         $this->sendMessage(
             $client,
             $this->createMessageWithGameInfo("inGame", $game, $playerId)
-            /*
-            $message->createMessage(
-                "inGame",
-                $game->getPlayerNumber($playerId)
-            )
-            */
         );
-        /*
-        $message = new MessageOut($gameId);
-        $message = $message->createMessage(
-            "inGame",
-            $game->getPlayerNumber($playerId),
-            $game->getState(),
-            $game->getPlayersMove(),
-            $game->getWinner(),
-            $game->getWinningState()
-        );
-
-        $this->sendMessage($client, $message);
-        */
 
         if (!$reconnect) {
             return;
@@ -292,7 +271,7 @@ class MessageHandler
 
             $this->sendMessage(
                 $client2,
-                $this->createMessageWithGameInfo($status, $game, $playerId1)
+                $this->createMessageWithGameInfo($status, $game, $playerId2)
             );
         }
 
