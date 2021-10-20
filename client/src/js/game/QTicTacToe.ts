@@ -93,8 +93,14 @@ export default class QTicTacToe implements IGame {
   }
 
   public setState(state: QuantumState): void {
-    this.state.setState(state);
-    this.draw();
+    if (this.state.getState() !== state) {
+      this.state = new QTicTacToeState(state);
+      this.draw();
+    }
+  }
+
+  public gameIsOver(): boolean {
+    return this.gameOverState.getState() !== 0;
   }
 
   public setGameOverState(gameOverState: number): void {

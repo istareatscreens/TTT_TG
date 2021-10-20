@@ -164,13 +164,16 @@ export default class GameClient implements ISubscriber {
     }
   }
 
-  private handleMessage(): void {
-    const message = this.server.getMessageIn();
-    const gameOverState = message.gameOverState;
+  private handleGameMessage(message: TTTMessageIn): void {
     this.setGameId(message.gameId);
-    this.gameStatus = message.status;
     this.game.setMark(message.playerNumber);
     this.game.setTurn(message.turn);
+  }
+
+  private handleMessage(): void {
+    const message = this.server.getMessageIn();
+    const gameOverState = message?.gameOverState ?? false;
+    this.gameStatus = message.status;
 
     switch (this.gameStatus) {
       case "inLobby":
@@ -178,12 +181,14 @@ export default class GameClient implements ISubscriber {
         this.frontEndCallbacks.setInLobby(true);
         break;
       case "inGame":
+        this.handleGameMessage(message);
         console.log(this.gameStatus);
         this.frontEndCallbacks.setInLobby(false);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
         break;
       case "gameOver":
+        this.handleGameMessage(message);
         console.log(this.gameStatus);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
@@ -194,9 +199,11 @@ export default class GameClient implements ISubscriber {
         }
         break;
       case "playerRejoin":
+        this.handleGameMessage(message);
         this.frontEndCallbacks.setPlayerDisconnected(false);
         break;
       case "playerLeft":
+        this.handleGameMessage(message);
         this.frontEndCallbacks.setPlayerDisconnected(true);
         break;
       case "invalidGame":
@@ -232,7 +239,12 @@ export default class GameClient implements ISubscriber {
     const coordinates = this.controllers.gameController.getCoordinates(this);
     const quadrant = this.game.getQuadrantNumber(coordinates);
     console.log("quadrant: " + quadrant);
-    if (!this.connected || quadrant == null || !this.game.isTurn()) {
+    if (
+      !this.connected ||
+      quadrant == null ||
+      !this.game.isTurn() ||
+      this.game.gameIsOver()
+    ) {
       return;
     }
     this.server.send({

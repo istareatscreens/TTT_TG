@@ -18,6 +18,7 @@ export default interface IGame {
   setTurn: (turn: Mark) => void;
   setDimensions: (dimensions: Dimensions) => void;
   clearGame: () => void;
+  gameIsOver: () => boolean;
   getQuadrantNumber: (
     coordinates: Coordinates
   ) => QuadrantNumber | QuadrantLocation;

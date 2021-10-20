@@ -44,6 +44,10 @@ export default class TicTacToe implements IGame {
     this.mark = Mark.Empty;
   }
 
+  public gameIsOver(): boolean {
+    return this.gameOverState.getState() !== 0;
+  }
+
   public getTurn(): Mark {
     return this.turn;
   }
@@ -88,12 +92,10 @@ export default class TicTacToe implements IGame {
   }
 
   public setState(state: number): void {
-    const { X, O } = Mark;
     if (state !== this.state.getState()) {
-      this.turn = X === this.turn ? O : X;
+      this.state = new TicTacToeState(state);
+      this.draw();
     }
-    this.state.setState(state);
-    this.draw();
   }
 
   public setGameOverState(gameOverState: number): void {

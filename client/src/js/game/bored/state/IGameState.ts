@@ -2,7 +2,7 @@ import { Mark } from "../../../common/enums";
 
 export default interface IGameState {
   setState: (state: States) => void;
-  getState: () => number | States;
+  getState: () => States;
   iterate: () => Content;
 }
 

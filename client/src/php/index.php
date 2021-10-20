@@ -22,6 +22,14 @@ $storage = new NativeSessionStorage(
 $session = new Session($storage);
 $session->start();
 
+if (
+    $session->has('id') &&
+    is_null($session->get('id')) ||
+    $session->get('id') === ""
+) {
+    $session->remove('id');
+}
+
 if (!$session->has('id')) {
     $uuid = Uuid::v4();
     $session->set('id', $uuid);

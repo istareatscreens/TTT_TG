@@ -63,15 +63,18 @@ export default class Quadrant implements IQuadrant {
 
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
-    this.context.fillText("X", x + width / 1.8, y + height / 1.8);
+    this.context.fillText(mark, x + width / 1.8, y + height / 1.8);
 
     // Number
+    if (!number) {
+      return;
+    }
     const text2 = `${fontSize / 10}px '${font}'`;
     this.context.font = text2;
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
     this.context.fillText(
-      "55",
+      number,
       x + width / 2 + fontSize / 1.7,
       y + height / 1.2
     );
