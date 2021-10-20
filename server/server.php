@@ -12,7 +12,7 @@ use Ratchet\Server\IoServer;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$develop = false;
+$develop = true;
 $db = new Database($develop);
 $db->resetDb();
 $gameFactory = new GameFactory();

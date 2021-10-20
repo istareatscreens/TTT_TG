@@ -15,6 +15,7 @@ interface GameInterface
     public function getPlayers(): array;
     public function getPlayerNumber(string $playerId): int;
     public function getWinner();
+    public function getPlayersMove(): int;
     public function makeMove(string $playerId, int $position): bool;
     public function gameOver(): bool;
     public function validPosition($position): bool;

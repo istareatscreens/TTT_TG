@@ -41,6 +41,11 @@ class TicTacToe implements GameInterface
         return $this->id;
     }
 
+    public function getPlayersMove(): int
+    {
+        return $this->playersMove;
+    }
+
     public function getWinningState(): int
     {
         return $this->winningState;

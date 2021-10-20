@@ -5,10 +5,12 @@ namespace Game\Server;
 use Game\Db\Database;
 use Game\Db\GameState;
 use Game\GameFactory;
+use Game\GameInterface;
 use Game\Library\Lobby;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
-use Ratchet\WebSocket\MessageComponentInterface;
+use Game\Server\Messages\GameMessage;
+use Game\Server\Messages\StatusMessage;
 
 class MessageHandler
 {
@@ -49,7 +51,9 @@ class MessageHandler
 
     public function disconnectClient(ConnectionInterface $client): void
     {
+        echo "\n !!!!!!HERE Disconnect ";
         if (!$this->clientHandler->clientExists($client)) {
+            echo "\n !!!!!!HERE Client does not exist";
             return;
         }
 
@@ -72,6 +76,17 @@ class MessageHandler
         foreach ($this->lobbies as &$lobby) {
             $lobby->remove($hash);
         }
+    }
+
+
+    private function createMessage(string $status): string
+    {
+        return (new StatusMessage($status))->getMessage();
+    }
+
+    private function createMessageWithGameInfo(string $status, GameInterface $game, $playerId): string
+    {
+        return (new StatusMessage($status))->addTo(new GameMessage($game, $playerId))->getMessage();
     }
 
     private function handleGamesAfterDisconnect($playerIdDisconnect): void
@@ -97,23 +112,13 @@ class MessageHandler
                 if (is_null($clientHash)) {
                     $this->deleteGame($gameId);
                 } else {
+
                     //notify other user of player leaving 
                     $game = $this->games[$gameId];
-                    $state = $game->getState();
-                    $winner = $game->getWinner();
-                    $gameOverState = $game->getWinningState();
-                    $playerNumber = $game->getPlayerNumber($playerId);
-                    $message = new MessageOut($gameId);
-                    array_push($clientAndMessage, [
+                    $this->sendMessage(
                         $this->clientHandler->getClientByHash($clientHash),
-                        $message->createMessage(
-                            "playerLeft",
-                            $playerNumber,
-                            $state,
-                            $winner,
-                            $gameOverState
-                        )
-                    ]);
+                        $this->createMessageWithGameInfo("playerLeft", $game, $playerId)
+                    );
                 }
             }
         }
@@ -123,7 +128,6 @@ class MessageHandler
             $this->sendMessage($client, $message);
         }
     }
-
 
     private function sendMessage(ConnectionInterface $client, string $message): void
     {
@@ -149,6 +153,7 @@ class MessageHandler
 
     public function handleMessage(ConnectionInterface $client, $msg, string $playerId): void
     {
+        var_dump($msg);
 
         if (!$this->validMessage($msg)) {
             return;
@@ -180,24 +185,37 @@ class MessageHandler
 
     private function joinGame($gameId, $client, $reconnect): void
     {
-        echo "\nIN JOIN GAME: " . $gameId . " reconnect " . $reconnect . "\n";
         $playerId = $this->clientHandler->getPlayerIdByClient($client);
         if (!$this->checkValidGameRequest($gameId, $client, $playerId)) {
             return;
         }
         $game = $this->games[$gameId];
 
-        echo "\nIS valid game!!";
+
+        //$message = new MessageOut($game);
+        $this->sendMessage(
+            $client,
+            $this->createMessageWithGameInfo("inGame", $game, $playerId)
+            /*
+            $message->createMessage(
+                "inGame",
+                $game->getPlayerNumber($playerId)
+            )
+            */
+        );
+        /*
         $message = new MessageOut($gameId);
         $message = $message->createMessage(
             "inGame",
             $game->getPlayerNumber($playerId),
             $game->getState(),
+            $game->getPlayersMove(),
             $game->getWinner(),
             $game->getWinningState()
         );
 
         $this->sendMessage($client, $message);
+        */
 
         if (!$reconnect) {
             return;
@@ -205,30 +223,18 @@ class MessageHandler
 
         // notify other player
         $players = $game->getPlayers();
-        echo "Players in game: \n";
-        print_r($players);
-        echo "\n";
         foreach ($players as $player) {
-            echo "\nLoop player\n";
             if ($playerId === $player) {
-                echo "\nsame as user player\n";
                 continue;
             }
             $client = $this->clientHandler->getClientByPlayerId($player);
             if (is_null($client)) {
-                echo "\nclient doesnt exist\n";
                 return;
             }
-            echo "\nSending message\n";
-            $message = new MessageOut($gameId);
-            $message = $message->createMessage(
-                "playerRejoin",
-                $game->getPlayerNumber($player),
-                $game->getState(),
-                $game->getWinner(),
-                $game->getWinningState()
+            $this->sendMessage(
+                $client,
+                $this->createMessageWithGameInfo("playerRejoin", $game, $player)
             );
-            $this->sendMessage($client, $message);
         }
     }
 
@@ -239,7 +245,7 @@ class MessageHandler
 
     private function checkValidGameRequest($gameId, $client, $playerId)
     {
-        $message = (new MessageOut())->createMessage("invalidGame");
+        $message = $this->createMessage("invalidGame");
         if (!$this->gameExists($gameId)) {
             $this->sendMessage($client, $message);
             return false;
@@ -268,38 +274,26 @@ class MessageHandler
             return;
         }
 
-        $winner = $game->getWinner();
         $gameOver = $game->gameOver();
         $status = ($gameOver) ?  "gameOver" : "inGame";
-        $state = $game->getState();
-        $gameOverState = $game->getWinningState();
 
-        $message = new MessageOut($gameId);
-
-        $message = $message->createMessage(
-            $status,
-            $game->getPlayerNumber($playerId1),
-            $state,
-            $winner,
-            $gameOverState
+        $this->sendMessage(
+            $client1,
+            $this->createMessageWithGameInfo($status, $game, $playerId1)
         );
 
-        $this->sendMessage($client1, $message);
-
         if ($this->clientHandler->playerIsConnected($playerId2)) {
+
             $client2 = $this->clientHandler->getClientByPlayerId($playerId2);
+
             if (is_null($client2)) {
                 return;
             }
-            $message = new MessageOut($gameId);
-            $message = $message->createMessage(
-                $status,
-                $game->getPlayerNumber($playerId2),
-                $game->getState(),
-                $winner,
-                $gameOverState
+
+            $this->sendMessage(
+                $client2,
+                $this->createMessageWithGameInfo($status, $game, $playerId1)
             );
-            $this->sendMessage($client2, $message);
         }
 
         if ($gameOver) {
@@ -319,6 +313,7 @@ class MessageHandler
         if (!key_exists($gameType, $this->lobbies)) {
             $this->createLobby($gameType);
         }
+
         $lobby = &$this->lobbies[$gameType];
         $lobby->queue($hash);
     }
@@ -341,7 +336,6 @@ class MessageHandler
         $client1Hash = $lobby->shift();
         $client2Hash = $lobby->shift();
 
-        echo "\n JOINING GAME WITH Hash1" . $client1Hash . " hash2 " . $client2Hash . "\n";
         $client1 = $this->clientHandler->getClientByHash($client1Hash);
         $client2 = $this->clientHandler->getClientByHash($client2Hash);
         $this->createGame($gameType, $client1, $client2);
@@ -349,11 +343,7 @@ class MessageHandler
 
     private function notifyPlayerTheyAreInLobby(ConnectionInterface $client)
     {
-        $playerId = $this->clientHandler->getPlayerIdByClient($client);
-        $message = new MessageOut();
-        $message = $message->createMessage("inLobby");
-        echo "\n SENT: " . $message;
-        $this->sendMessage($client, $message);
+        $this->sendMessage($client, $this->createMessage("inLobby"));
     }
 
     private function createGame($gameType, $client1, $client2): void
@@ -363,7 +353,6 @@ class MessageHandler
 
         $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
         $playerId2 = $this->clientHandler->getPlayerIdByClient($client2);
-        echo "\nIN CREATE GAME" . "P1: " . $playerId1 . "P2:" . $playerId2 . "\n";
 
         $game = $this->gameFactory->createGame(
             $gameType,
@@ -378,16 +367,16 @@ class MessageHandler
             $playerId2
         )) {
             $this->games[$game->getId()] = $game;
+            $status = "inGame";
+            $this->sendMessage(
+                $client1,
+                $this->createMessageWithGameInfo($status, $game, $playerId1)
+            );
 
-            $message = new MessageOut($game->getId());
-            $playerNumber1 = $game->getPlayerNumber($playerId1);
-            $playerNumber2 = $game->getPlayerNumber($playerId2);
-            $message = $message->createMessage("inGame", $playerNumber1);
-            $this->sendMessage($client1, $message);
-
-            $message = new MessageOut($game->getId());
-            $message = $message->createMessage("inGame", $playerNumber2);
-            $this->sendMessage($client2, $message);
+            $this->sendMessage(
+                $client2,
+                $this->createMessageWithGameInfo($status, $game, $playerId2)
+            );
         };
     }
 }

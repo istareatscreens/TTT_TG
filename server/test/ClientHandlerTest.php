@@ -7,6 +7,7 @@ use Game\Db\Database;
 use Game\Db\PlayerState;
 use Game\Server\ClientHandler;
 use Test\Mock\ClientMock;
+use Game\Server\SocketServer;
 use PHPUnit\Framework\TestCase;
 
 require_once "Mock/ClientMock.php";
@@ -80,7 +81,7 @@ class ClientHandlerTest extends TestCase
         //valid player correct hash
         $client1 = new ClientMock();
         $playerId1 = "652f4035-d953-4b1c-b78d-338a2fff79cd";
-        $result = $this->clientHandler->addClient($client1, $playerId1, $this->mockScoketServer);
+        $result = $this->clientHandler->addClient($client1, $playerId1, $this->mockSocketServer);
         $this->assertTrue($result);
         $result = $this->clientHandler->validateClient($client1, $playerId1);
         $this->assertTrue($result);
