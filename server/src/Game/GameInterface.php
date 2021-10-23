@@ -1,6 +1,6 @@
 <?php
 
-namespace Game;
+namespace Game\Game;
 
 interface GameInterface
 {
@@ -10,13 +10,13 @@ interface GameInterface
     */
     public function createGame(int $id, string ...$playerIds): GameInterface;
 
-    public function getId(): string;
+    public function getId(): mixed;
     public function isPlayer($playerId): bool;
     public function getPlayers(): array;
     public function getPlayerNumber(string $playerId): int;
     public function getWinner();
     public function getPlayersMove(): int;
-    public function makeMove(string $playerId, int $position): bool;
+    public function makeMove(string $playerId, mixed $position): bool;
     public function gameOver(): bool;
     public function validPosition($position): bool;
     public function getState();

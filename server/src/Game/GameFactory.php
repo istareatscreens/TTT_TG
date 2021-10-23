@@ -1,6 +1,6 @@
 <?php
 
-namespace Game;
+namespace Game\Game;
 
 use Reflection;
 

@@ -2,7 +2,7 @@
 
 namespace Game\Server;
 
-use Game\GameInterface;
+use Game\Game\GameInterface;
 
 class MessageOut
 {

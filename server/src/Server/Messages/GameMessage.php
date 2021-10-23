@@ -3,12 +3,10 @@
 namespace Game\Server\Messages;
 
 use Game\Server\Messages\Message;
-use Game\GameInterface;
+use Game\Game\GameInterface;
 
 class GameMessage extends Message
 {
-    private GameInterface $game;
-
     public function __construct(GameInterface $game, $playerId)
     {
         $this->game = $game;

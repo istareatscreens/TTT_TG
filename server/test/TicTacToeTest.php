@@ -4,9 +4,9 @@
 namespace Test;
 
 use Game\Db\Database;
-use Game\GameFactory;
+use Game\Game\GameFactory;
 use Game\Library\Uuid;
-use Game\TicTacToe;
+use Game\Game\TicTacToe;
 use PHPUnit\Framework\TestCase;
 
 require_once "Mock/ClientMock.php";

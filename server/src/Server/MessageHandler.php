@@ -4,8 +4,8 @@ namespace Game\Server;
 
 use Game\Db\Database;
 use Game\Db\GameState;
-use Game\GameFactory;
-use Game\GameInterface;
+use Game\Game\GameFactory;
+use Game\Game\GameInterface;
 use Game\Library\Lobby;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
