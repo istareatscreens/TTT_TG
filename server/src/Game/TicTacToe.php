@@ -14,11 +14,6 @@ class TicTacToe extends AbstractTicTacToe
         parent::__construct(isset($players) ? $players : new RandomAssign());
     }
 
-    public function validPosition($quadrant): bool
-    {
-        return $quadrant > -1 && $quadrant < 9;
-    }
-
     public function makeMove(string $playerId, mixed $quadrant): bool
     {
         $moveComplete = false;
@@ -57,17 +52,7 @@ class TicTacToe extends AbstractTicTacToe
 
     private function wonGame(int $playerNumber): bool
     {
-        $winningMasks = array(
-            0b110000110000110000,
-            0b001100001100001100,
-            0b000011000011000011,
-            0b110000001100000011,
-            0b000011001100110000,
-            0b111111000000000000,
-            0b000000111111000000,
-            0b000000000000111111
-        );
-        foreach ($winningMasks as &$mask) {
+        foreach (parent::$winningMasks as &$mask) {
             $result = $this->getState() & $mask;
             if ($this->containsThreeOfTheSameMarks($result, $playerNumber)) {
                 $this->setWinningState($result);
@@ -75,15 +60,5 @@ class TicTacToe extends AbstractTicTacToe
             }
         }
         return false;
-    }
-
-    private function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
-    {
-        $counter = 0;
-        for ($quadrant = 0; $quadrant < 9; $quadrant++) {
-            $resultMark = $this->getQuadrantMark($quadrant, $result);
-            $counter += $playerNumber === $resultMark ? 1 : 0;
-        }
-        return $counter === 3;
     }
 }

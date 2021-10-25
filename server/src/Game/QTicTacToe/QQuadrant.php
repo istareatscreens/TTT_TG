@@ -9,8 +9,9 @@ class QQuadrant
     private array $moveMarkMap; // move => playerNumber
     private int | TicTacToe $content;
     private array $moves;
+    private int $id;
 
-    public function __construct(TicTacToe $ttt)
+    public function __construct(TicTacToe $ttt, int $id)
     {
         $this->content = $ttt;
         $this->moves = [
@@ -20,6 +21,12 @@ class QQuadrant
         ];
         $this->locked = false;
         $this->moveMarkMap = [];
+        $this->id = $id;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getMark(): int
@@ -29,7 +36,7 @@ class QQuadrant
 
     public function getMoveList(): array
     {
-        return $this->moveMarkList;
+        return $this->moveMarkMap;
     }
 
     public function mark(int $playerNumber): void
@@ -43,6 +50,13 @@ class QQuadrant
         return is_int($this->content);
     }
 
+    public function setPlayersMove(int $playerNumber): void
+    {
+        if (!$this->isMarked()) {
+            $this->content->setPlayersMove($playerNumber);
+        }
+    }
+
     public function markQuadrant(): void
     {
         if (!is_int($this->content) && $this->content->gameOver()) {
@@ -52,7 +66,13 @@ class QQuadrant
 
     private function isLastMoveNumber($moveNumber): bool
     {
-        return $moveNumber === array_key_last($this->moveMarkMap);
+        return count($this->moveMarkMap) !== 0
+            && $moveNumber === $this->getLastMove();
+    }
+
+    private function getLastMove()
+    {
+        return $this->moveMarkMap[array_key_last($this->moveMarkMap)][0];
     }
 
     private function moveNumberExists($moveNumber): bool
@@ -62,7 +82,7 @@ class QQuadrant
                 return true;
             }
         }
-        return true;
+        return false;
     }
 
     public function makeMove(string $playerId, int $qudrant, int $moveNumber): bool
@@ -78,23 +98,25 @@ class QQuadrant
 
         $this->moves[$qudrant] = $moveNumber;
         array_push(
-            $this->moveMap,
+            $this->moveMarkMap,
             [
                 $moveNumber,
                 $this->content->getPlayerNumber($playerId)
             ]
         );
+        return true;
     }
 
 
-    public function getState(int $currentMove): int | string
+    public function getState(int $currentMove, bool $lock): int | string
     {
         if ($this->isMarked()) {
             return  $this->getMark();
         }
-        $state =  $this->content->getState();
-        $state += ($this->isLastMoveNumber($currentMove) ?  "L" : "")
-            + "," + implode(",", $this->moves);
+        $state =
+            ($this->isLastMoveNumber($currentMove) && $lock ?  "L" : "")
+            . $this->content->getState()
+            . "," . implode(",", $this->moves);
 
         return $state;
     }

@@ -8,6 +8,7 @@ use Game\Game\PlayerAssignment\RandomAssign;
 use Game\Game\PlayerAssignment\SetAssign;
 use Game\Game\TicTacToe;
 use Game\Game\QTicTacToe\QQuadrant;
+use function Game\Game\QTicTacToe\dFSCycleCheck;
 
 class QTicTacToe extends AbstractTicTacToe
 {
@@ -38,22 +39,11 @@ class QTicTacToe extends AbstractTicTacToe
         $ttt = new TicTacToe(new SetAssign());
         for ($i = 0; $i < 9; $i++) {
             $newGame->quadrants[$i] = new QQuadrant(
-                $ttt->createGame($i, ...$players)
+                $ttt->createGame($i, ...$players),
+                $i
             );
         }
         return $newGame;
-    }
-
-    /*
-    protected function outOfMoves(): bool
-    {
-        return $this->getMovesLeft() === 0;
-    }
-    */
-
-    public function validPosition($quadrant): bool
-    {
-        return false;
     }
 
     private function finishMove(): void
@@ -68,7 +58,15 @@ class QTicTacToe extends AbstractTicTacToe
         $this->moves = 2;
         $this->previousQuadrant = -1;
         $this->moveNumber++;
-        $this->setPlayersMove(($this->players === 1) ? 2 : 1);
+        $this->setPlayersMove(($this->getPlayersMove() === 1) ? 2 : 1);
+        $this->changeTurnInQuadrant($this->getPlayersMove());
+    }
+
+    private function changeTurnInQuadrant(int $playersMove): void
+    {
+        foreach ($this->quadrants as $quadrant) {
+            $quadrant->setPlayersMove($playersMove);
+        }
     }
 
     private function updateGraph($quadrant): void
@@ -80,38 +78,61 @@ class QTicTacToe extends AbstractTicTacToe
         $this->addToGraph($quadrant, $this->previousQuadrant);
     }
 
+    public function validPosition($quadrant): bool
+    {
+        try {
+            return parent::validPosition($quadrant[0])
+                && parent::validPosition($quadrant[1]);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     private function collapseState($quadrant): void
     {
-        $getConnectedQuadrant = function ($move, $quadrant) {
+
+        $getConnectedQuadrant = function ($move) {
             [$quadrant1, $quadrant2] = $this->edgeList[$move];
-            return ($quadrant1 === $quadrant) ? $quadrant2 : $quadrant1;
+            return ($this->quadrants[$quadrant1]->isMarked()) ? $quadrant2 : $quadrant1;
         };
 
-        //$marks = array_fill(0, count($this->quadrants), -1);
         $visited = array_fill(0, $this->moveNumber + 1, false);
 
         // handle initial quadrant
         $moveList = $this->quadrants[$quadrant]->getMoveList();
-        [$move, $mark] = array_pop($moveList);
+        [$move, $playerNumber] = array_pop($moveList);
         //$this->quadrants[$quadrant]->mark($mark);
-        $this->markQuadrant($quadrant, $mark, $move);
-        //$marks[$quadrant] = $mark;
+        //$this->markQuadrant($quadrant, $mark, $move);
+        $this->markQuadrant($quadrant, $playerNumber);
+        $playerNumbers[$quadrant] = $playerNumber;
         $visited[$move] = true;
 
-        $stack = $moveList;
-        while (count($stack)) {
-            [$move, $mark] = array_pop($stack);
-            if ($visited[$move]) {
+        while (count($moveList)) {
+
+            [$move, $playerNumber] = array_pop($moveList);
+            $quadrant = $getConnectedQuadrant($move);
+            if ($visited[$move] || $this->quadrants[$quadrant]->isMarked()) {
+                echo "exit \n";
                 continue;
             }
-            $quadrant = $getConnectedQuadrant($move, $quadrant);
             $visited[$move] = true;
-            //$marks[$quadrant] = $mark;
-            $this->markQuadrant($quadrant, $mark, $move);
-            // $this->quadrants[$quadrant]->mark($mark);
-            echo "\nUpdated Quadrant: " . $quadrant . " mark: " . $mark;
-            array_merge($this->quadrants[$quadrant]->getMoveList(), $stack);
+            $playerNumbers[$quadrant] = $playerNumber;
+            // $this->markQuadrant($quadrant, $mark, $move);
+            //$this->quadrants[$quadrant]->mark($mark);
+            $this->markQuadrant($quadrant, $playerNumber);
+            $moveList = [...$this->quadrants[$quadrant]->getMoveList(), ...$moveList];
         }
+    }
+
+    private function markQuadrant(int $quadrant, int $playerNumber)
+    {
+        if (!$this->quadrantIsEmpty($quadrant, parent::getState())) {
+            echo "Error: QTicTacToe impossible to reach point markQuadrant";
+            return;
+        }
+        $this->quadrants[$quadrant]->mark($playerNumber);
+        $this->decrementMoves();
+        $this->changeState($quadrant, $playerNumber);
     }
 
     public function makeMove(string $playerId, mixed $quadrant): bool
@@ -119,8 +140,8 @@ class QTicTacToe extends AbstractTicTacToe
         [$quadrant, $position] = $quadrant;
         if (
             !$this->isPlayer($playerId)
-            || !$this->validPosition($quadrant)
-            || !$this->validPosition($position)
+            || !parent::validPosition($quadrant)
+            || !parent::validPosition($position)
         ) {
             return false;
         }
@@ -142,10 +163,60 @@ class QTicTacToe extends AbstractTicTacToe
         if ($this->checkForCycle($quadrant)) {
             $this->collapseState(random_int(0, 1) ? $this->previousQuadrant : $quadrant);
             $this->handleLastQuadrant();
+            $this->wonGame();
         }
         $this->previousQuadrant = $quadrant;
         $this->finishMove();
         return true;
+    }
+
+    private function wonGame(): void
+    {
+        $player1WinningStates = $this->findWinningStates(1);
+        $player2WinningStates = $this->findWinningStates(2);
+        $states = [...$player1WinningStates, ...$player2WinningStates];
+        if (!count($player1WinningStates) && !count($player2WinningStates)) {
+            return;
+        } else if (count($player1WinningStates) > count($player2WinningStates)) {
+            $this->setWinner(1);
+            $this->setWinningState($states);
+        } else if (count($player1WinningStates) < count($player2WinningStates)) {
+            $this->setWinner(2);
+            $this->setWinningState($states);
+        } else if (count($player1WinningStates) === count($player2WinningStates)) {
+            $this->setWinner(0);
+            $this->setWinningState($states);
+        } else {
+            throw new \Exception("Unreachable condition in wonGame");
+        }
+    }
+
+    protected function setWinningState($winningStates)
+    {
+        $finalState = 0;
+        foreach ($winningStates as $state) {
+            $finalState |= $state;
+        }
+        parent::setWinningState($finalState);
+    }
+
+    private function assignMarkToMask($playerNumber, $mask)
+    {
+        return ($playerNumber === 1) ?
+            $mask & 0b010101010101010101 :
+            $mask & 0b101010101010101010;
+    }
+
+    private function findWinningStates($playerNumber): array
+    {
+        $states = [];
+        foreach (parent::$winningMasks as $mask) {
+            $result = parent::getState() & $mask;
+            if ($this->containsThreeOfTheSameMarks($result, $playerNumber)) {
+                array_push($states, $this->assignMarkToMask($playerNumber, $mask));
+            }
+        }
+        return $states;
     }
 
     private function handleLastQuadrant(): void
@@ -156,13 +227,14 @@ class QTicTacToe extends AbstractTicTacToe
 
         $playerNumber = $this->getPlayersMove() === 1 ? 2 : 1;
         $quadrant = $this->findLastQuadrant();
-        $this->markQuadrant($quadrant, $playerNumber);
+        //$this->markQuadrant($quadrant, $playerNumber);
+        $this->quadrants[$quadrant]->mark($playerNumber);
         $this->decrementMoves();
     }
 
     private function findLastQuadrant(): int
     {
-        foreach ($this->quardants as $quadrant) {
+        foreach ($this->quadrants as $quadrant) {
             if ($quadrant->isMarked()) {
                 continue;
             }
@@ -174,37 +246,26 @@ class QTicTacToe extends AbstractTicTacToe
 
     private function checkForCycle($quadrant): bool
     {
-        $map = [];
-        foreach ($this->graph[$quadrant] as $node) {
-            if (++$map[$node] === 2) {
-                return true;
-            }
-        }
-        return dFSCycleCheck($this->graph)($quadrant);
+        return GraphMethods::checkForParallelCycle($this->graph, $quadrant) ||
+            GraphMethods::dFSCycleCheck($this->graph)($quadrant);
     }
 
-    private function markQuadrant($quadrant, $playerNumber, $move = null): void
+    public function getState(): mixed
     {
-        $this->updateBoardState($quadrant, $playerNumber);
-        unset($graph[$quadrant]);
-        if (isset($move)) {
-            unset($edgeList[$move]);
+        if ($this->outOfMoves()) {
+            return parent::getState();
         }
-    }
-
-    private function updateBoardState($quadrant, $playerNumber)
-    {
-        if (!$this->quadrantIsEmpty($quadrant, parent::getState())) {
-            throw new \Exception("Unreachable state trying to add to an already marked State");
+        $state = [];
+        foreach ($this->quadrants as $quadrant) {
+            array_push(
+                $state,
+                $quadrant->getState(
+                    $this->moveNumber,
+                    $this->moves === 1
+                )
+            );
         }
-        $this->updateState($quadrant, $playerNumber);
-    }
-
-    private function updateState($quadrant, $playerNumber): void
-    {
-        $this->quadrants[$quadrant]->mark($playerNumber);
-        $this->changeState($quadrant, $playerNumber);
-        $this->decrementMoves();
+        return $state;
     }
 
     private function decrementMoves()
@@ -214,7 +275,7 @@ class QTicTacToe extends AbstractTicTacToe
 
     private function addToGraph($quadrant1, $quadrant2): void
     {
-        array_push($this->edgeList, $quadrant1, $quadrant2);
+        array_push($this->edgeList, [$quadrant1, $quadrant2]);
         array_push($this->graph[$quadrant1], $quadrant2);
         array_push($this->graph[$quadrant2], $quadrant1);
     }

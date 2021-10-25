@@ -7,6 +7,16 @@ use Game\Game\PlayerAssignment\PlayersInterface;
 
 abstract class AbstractTicTacToe implements GameInterface
 {
+    protected static $winningMasks = array(
+        0b110000110000110000,
+        0b001100001100001100,
+        0b000011000011000011,
+        0b110000001100000011,
+        0b000011001100110000,
+        0b111111000000000000,
+        0b000000111111000000,
+        0b000000000000111111
+    );
 
     private int $state;
     private $id;
@@ -54,7 +64,11 @@ abstract class AbstractTicTacToe implements GameInterface
         return $this->playersMove;
     }
 
-    protected function setPlayersMove(int $playersMove): void
+
+    /* 
+    hacky solution to turn sync problem in QTicTacToe should not be included in interface
+    */
+    public function setPlayersMove(int $playersMove): void
     {
         $this->playersMove = $playersMove;
     }
@@ -97,13 +111,10 @@ abstract class AbstractTicTacToe implements GameInterface
         */
     }
 
-    /*
-    
     public function validPosition($quadrant): bool
     {
         return $quadrant > -1 && $quadrant < 9;
     }
-    */
 
     public function getWinner(): int
     {
@@ -122,7 +133,7 @@ abstract class AbstractTicTacToe implements GameInterface
 
     protected function isPlayersMove($playerNumber)
     {
-        return ($playerNumber !== $this->playersMove);
+        return ($playerNumber === $this->playersMove);
     }
 
     /*
@@ -172,7 +183,7 @@ abstract class AbstractTicTacToe implements GameInterface
         return $this->outOfMoves() || $this->winner !== 0;
     }
 
-    public function getState(): int
+    public function getState(): mixed
     {
         return $this->state;
     }
@@ -219,7 +230,8 @@ abstract class AbstractTicTacToe implements GameInterface
         return false;
     }
 
-    private function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
+    */
+    protected function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
     {
         $counter = 0;
         for ($quadrant = 0; $quadrant < 9; $quadrant++) {
@@ -229,7 +241,6 @@ abstract class AbstractTicTacToe implements GameInterface
         return $counter === 3;
     }
 
-    */
     protected function outOfMoves(): bool
     {
         return !($this->movesLeft > 0 && $this->movesLeft < 10);
