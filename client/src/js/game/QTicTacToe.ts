@@ -2,6 +2,7 @@ import GameBored from "./bored/GameBoard";
 import {
   Coordinates,
   Dimensions,
+  GameName,
   QuadrantLocation,
   QuadrantNumber,
 } from "../types";
@@ -30,6 +31,9 @@ export default class QTicTacToe implements IGame {
     this.setDimensions(dimensions);
     this.reset();
   }
+  public getName(): GameName {
+    return "QTicTacToe";
+  }
 
   public setTurn(turn: Mark): void {
     this.turn = turn;
@@ -37,6 +41,7 @@ export default class QTicTacToe implements IGame {
 
   public reset() {
     this.lineStroke = 10;
+    //this.lineStroke = Math.min(this.dimensions[0], this.dimensions[1]) * 0.1; //lineStroke;
     this.bored = new GameBored(this.context, this.dimensions, {
       lineStroke: this.lineStroke,
       gridStroke: this.lineStroke * 1.5,
@@ -82,9 +87,6 @@ export default class QTicTacToe implements IGame {
   }
 
   public getQuadrantNumber(coordinates: Coordinates): QuadrantLocation {
-    if (coordinates === undefined) {
-      console.log("HERE WTF", coordinates);
-    }
     if (this.bored.isValidMove(coordinates)) {
       console.log(this.bored.getQuadrantNumber(coordinates));
       return this.bored.getQuadrantNumber(coordinates);

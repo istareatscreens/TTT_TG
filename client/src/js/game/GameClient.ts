@@ -122,7 +122,7 @@ export default class GameClient implements ISubscriber {
     this.frontEndCallbacks.setConnected(true);
     this.server.send({
       type: "joinLobby",
-      game: "TicTacToe",
+      game: this.game.getName(),
       gameId: this.gameId,
       position: null,
     });
@@ -133,7 +133,7 @@ export default class GameClient implements ISubscriber {
     this.frontEndCallbacks.setConnected(true);
     this.server.send({
       type: "joinGame",
-      game: "TicTacToe",
+      game: this.game.getName(),
       gameId: this.gameId,
       position: null,
     });
@@ -249,7 +249,7 @@ export default class GameClient implements ISubscriber {
     }
     this.server.send({
       type: "makeMove",
-      game: "TicTacToe",
+      game: this.game.getName(),
       gameId: this.gameId,
       position: quadrant,
     });

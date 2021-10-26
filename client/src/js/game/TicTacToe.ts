@@ -2,6 +2,7 @@ import GameBored from "./bored/GameBoard";
 import {
   Coordinates,
   Dimensions,
+  GameName,
   QuadrantLocation,
   QuadrantNumber,
 } from "../types";
@@ -29,8 +30,13 @@ export default class TicTacToe implements IGame {
     this.reset();
   }
 
+  public getName(): GameName {
+    return "TicTacToe";
+  }
+
   public reset() {
     this.lineStroke = 10;
+    //this.lineStroke = Math.min(this.dimensions[0], this.dimensions[1]) * 0.1; //lineStroke;
     this.bored = new GameBored(this.context, this.dimensions, {
       lineStroke: this.lineStroke,
       gridStroke: this.lineStroke,

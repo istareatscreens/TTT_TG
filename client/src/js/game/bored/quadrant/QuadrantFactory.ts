@@ -31,6 +31,7 @@ export default class QuadrantFactory {
   ): (boolean | number | string[])[] {
     const [state, ...numbers] = unparsedState.split(",");
     const locked = "L" === unparsedState[0];
+    console.log("Numbers:", numbers);
     return [
       locked,
       this.convertBoardStateToNumber(locked ? state.substring(1) : state),

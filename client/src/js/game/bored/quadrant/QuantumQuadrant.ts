@@ -31,6 +31,7 @@ export default class QauntumQuadrant implements IQuadrant {
         gridStroke: lineStroke,
         gridColor: color,
         markColor: color,
+        moveNumbers: properties.moveNumbers,
       },
       this.adjustCoordinates(
         ...properties.coordinates,

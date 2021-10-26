@@ -21,6 +21,7 @@ interface BoardProperties {
   markColor: string;
   lineStroke: number;
   gridStroke: number;
+  moveNumbers?: string[];
 }
 
 export default class GameBoard {
@@ -34,6 +35,7 @@ export default class GameBoard {
   private coordinates: Coordinates;
   private quadrantFactory: QuadrantFactory;
   private gridStroke: number;
+  private moveNumbers: string[];
 
   public constructor(
     context: CanvasRenderingContext2D,
@@ -42,6 +44,7 @@ export default class GameBoard {
     coordinates: Coordinates = [0, 0]
   ) {
     this.lineStroke = properties.lineStroke;
+    this.moveNumbers = properties.moveNumbers ?? [];
     this.context = context;
     this.dimensions = dimensions;
     this.coordinates = coordinates;
@@ -173,6 +176,7 @@ export default class GameBoard {
       dimensions: this.quadrantDimensions,
       content: content,
       quadrant: this.calculateQuadrantNumber(xPosition, yPosition),
+      moveNumbers: this.moveNumbers,
     };
 
     const quadrant = this.quadrantFactory.createQuadrant(properties);

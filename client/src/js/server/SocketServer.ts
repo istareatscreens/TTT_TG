@@ -62,6 +62,7 @@ export default class SocketServer implements IServer {
   }
 
   public send(message: TTTMessageOut): void {
+    console.log(message);
     this.socket.send(JSON.stringify(message));
   }
 

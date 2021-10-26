@@ -4,7 +4,7 @@ export type Dimensions = [width: number, height: number];
 export type Coordinates = [x: number, y: number];
 export type GameCommand = "makeMove" | "joinGame" | "joinLobby";
 
-export type GameName = "TicTacToe";
+export type GameName = "TicTacToe" | "QTicTacToe";
 
 export type GameResponse =
   | "initial"

@@ -2,12 +2,14 @@ import { Mark } from "../common/enums";
 import {
   Coordinates,
   Dimensions,
+  GameName,
   QuadrantLocation,
   QuadrantNumber,
 } from "../types";
 import { States } from "./bored/state/IGameState";
 
 export default interface IGame {
+  getName: () => GameName;
   reset: () => void;
   getTurn: () => Mark;
   setWinner: (winner: Mark) => void;
