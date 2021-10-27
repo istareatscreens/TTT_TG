@@ -148,7 +148,7 @@ export default class GameBoard {
       let line: Coordinates[] = [];
       // winning horizontal line draw
       const getMark = (index: QuadrantNumber): Content =>
-        this.quadrants?.[index]?.getContent() ?? 0;
+        this.quadrants?.[index]?.getContent?.() ?? 0;
       let mark = getMark((3 * i) as QuadrantNumber);
       let initialMark = mark;
       for (let j = 3 * i; j < 3 + 3 * i; j++) {
@@ -169,7 +169,7 @@ export default class GameBoard {
     for (let i = 0; i < 3; i++) {
       let line: Coordinates[] = [];
       const getMark = (index: QuadrantNumber): Content =>
-        this.quadrants?.[index]?.getContent() ?? 0;
+        this.quadrants?.[index]?.getContent?.() ?? 0;
       let mark = getMark(i as QuadrantNumber);
       let initialMark = mark;
       for (let j = i; j < 9; j += 3) {
@@ -189,7 +189,7 @@ export default class GameBoard {
   private drawBackwardSlashLine(isValidQuadrant: IsValidQuadrant): void {
     let line: Coordinates[] = [];
     const getMark = (index: QuadrantNumber): Content =>
-      this.quadrants?.[index]?.getContent() ?? 0;
+      this.quadrants?.[index]?.getContent?.() ?? 0;
     let mark = getMark(0);
     const initialMark = mark;
     for (let j = 0; j < 9; j += 4) {
@@ -204,16 +204,10 @@ export default class GameBoard {
     }
   }
 
-  private drawFowardSlashLine(
-    isValidQuadrant: (
-      initialMark: Content,
-      mark: Content,
-      index: number
-    ) => boolean
-  ): void {
+  private drawFowardSlashLine(isValidQuadrant: IsValidQuadrant): void {
     const line: Coordinates[] = [];
     const getMark = (index: QuadrantNumber): Content =>
-      this.quadrants?.[index]?.getContent() ?? 0;
+      this.quadrants?.[index]?.getContent?.() ?? 0;
     let mark = getMark(2);
     const initialMark = mark;
     for (let j = 2; j < 7; j += 2) {
@@ -257,115 +251,6 @@ export default class GameBoard {
     this.drawFowardSlashLine(isValidQuadrant);
     this.drawHorizontalWinningLines(isValidQuadrant);
     this.drawVeritcleWinningLines(isValidQuadrant);
-
-    /*
-    for (let i = 0; i < 3; i++) {
-      let line: Coordinates[] = [];
-
-      // winning horizontal line draw
-      let mark = this.quadrants?.[3 * i]?.getContent() ?? 0;
-      let initialMark = mark;
-      for (let j = 3 * i; j < 3 + 3 * i; j++) {
-        mark = this.quadrants?.[3 * i]?.getContent() ?? 0;
-        if (isValidQuadrant(initialMark, mark, j)) {
-          line = [];
-          break;
-        }
-        console.log("here: ", mark);
-        line.unshift(this.quadrants[j].getCenterCoordinate());
-      }
-
-      console.log("draw line |", line);
-      if (line.length === 3) {
-        console.log("HERE IN PRINT Hor LINE");
-        this.drawWinningLine(line);
-      }
-
-      line = [];
-      // winning vertical line draw
-      mark = this.quadrants?.[i]?.getContent() ?? 0;
-      initialMark = mark;
-      for (let j = i; j < 9; j += 3) {
-        mark = this.quadrants?.[i]?.getContent() ?? 0;
-        if (
-          !quadrants.includes(j as QuadrantNumber) ||
-          //mark !== (this.quadrants[j]?.getContent() ?? 0) ||
-          mark !== initialMark ||
-          mark === 0
-        ) {
-          console.log("HERE");
-          console.log(line);
-
-          line = [];
-          break;
-        }
-        console.log("here: ", mark);
-        line.unshift(this.quadrants[j].getCenterCoordinate());
-      }
-
-      console.log("draw line --", line);
-      if (line.length === 3) {
-        console.log("HERE IN PRINT Hor LINE");
-        this.drawWinningLine(line);
-      }
-
-      line = [];
-      // only need to do one pass by under
-      if (i === 1) {
-        continue;
-      }
-
-      // line \
-      mark = this.quadrants?.[quadrants[0]]?.getContent() ?? 0;
-      initialMark = mark;
-      for (let j = 0; j < 9; j += 4) {
-        mark = this.quadrants?.[j]?.getContent() ?? 0;
-        if (
-          !quadrants.includes(j as QuadrantNumber) ||
-          mark !== initialMark ||
-          mark === 0
-        ) {
-          line = [];
-          break;
-        }
-        console.log("here: ", mark);
-        line.unshift(this.quadrants[j].getCenterCoordinate());
-      }
-
-      console.log("draw line", line);
-      if (line.length === 3) {
-        console.log("HERE IN PRINT Hor LINE");
-        this.drawWinningLine(line);
-      }
-      line = [];
-
-      console.log("HERE FOR / line: ");
-      // line /
-      mark = this.quadrants?.[2]?.getContent() ?? 0;
-      initialMark = mark;
-      for (let j = 2; j < 7; j += 2) {
-        mark = this.quadrants?.[2]?.getContent() ?? 0;
-        if (
-          !quadrants.includes(j as QuadrantNumber) ||
-          mark !== initialMark ||
-          mark === 0
-        ) {
-          line = [];
-          console.log("HERE in break FOR / line: ");
-          break;
-        }
-        console.log("here in / cross: ", mark, "Num j: ", j);
-        line.unshift(this.quadrants[j].getCenterCoordinate());
-      }
-
-      console.log("draw line for /", line);
-      if (line.length === 3) {
-        console.log("HERE IN PRINT Hor LINE");
-        this.drawWinningLine(line);
-      }
-      line = [];
-    }
-    */
   }
 
   private calculateQuadrantNumber(x: number, y: number): QuadrantNumber {

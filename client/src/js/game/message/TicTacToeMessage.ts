@@ -7,7 +7,9 @@ import {
   QuadrantPosition,
 } from "../../types";
 import { States } from "../bored/state/IGameState";
-import { IMessage, IMessageIn, IMessageOut } from "./IMessage";
+
+export interface IMessageIn {}
+export interface IMessageOut {}
 
 export interface TTTMessageOut extends IMessageOut {
   type: GameCommand;
@@ -24,14 +26,4 @@ export interface TTTMessageIn extends IMessageIn {
   winner: Mark;
   gameOverState: number;
   turn: Mark;
-}
-
-export class TicTacToeMessage implements IMessage {
-  public messageOut: TTTMessageOut[];
-  public messageIn: TTTMessageOut[];
-
-  public setMessageIn(message: TTTMessageOut) {}
-  public getMessageIn(message: TTTMessageOut) {}
-  public getMessageOut(message: TTTMessageIn) {}
-  public setMessageOut(message: TTTMessageIn) {}
 }

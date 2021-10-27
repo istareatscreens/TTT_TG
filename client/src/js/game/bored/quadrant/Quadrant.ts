@@ -27,7 +27,7 @@ export default class Quadrant implements IQuadrant {
   private getMoveNumber(): number {
     try {
       return parseInt(
-        this.properties?.moveNumbers?.[8 - this.properties.quadrant] ?? "-1"
+        this.properties?.moveNumbers?.[this.properties.quadrant] ?? "-1"
       );
     } catch (Exception) {
       return -1;
@@ -36,6 +36,19 @@ export default class Quadrant implements IQuadrant {
 
   public draw(): void {
     const { X, O, Empty } = Mark;
+    console.log(
+      "Quadrant: ",
+      this.properties.quadrant,
+      "Content: ",
+      this.properties.content,
+      "move Number",
+      this.getMoveNumber()
+    );
+
+    if (typeof this.properties.content == "object") {
+      return;
+    }
+
     switch (this.properties.content) {
       case X:
         this.drawMark("X", this.getMoveNumber());

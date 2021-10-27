@@ -8,7 +8,7 @@ import {
 } from "../types";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
-import { QuantumState } from "./bored/state/IGameState";
+import IGameState, { QuantumState, States } from "./bored/state/IGameState";
 import TicTacToeState from "./bored/state/TicTacToeState";
 import QTicTacToeState from "./bored/state/QTicTacToeState";
 
@@ -16,7 +16,7 @@ export default class QTicTacToe implements IGame {
   private context: CanvasRenderingContext2D;
   private dimensions: Dimensions;
   private bored: GameBored;
-  private state: QTicTacToeState;
+  private state: IGameState;
   private gameOverState: TicTacToeState;
   private lineStroke: number;
   private winner: Mark;
@@ -94,8 +94,15 @@ export default class QTicTacToe implements IGame {
     return null;
   }
 
-  public setState(state: QuantumState): void {
-    if (this.state.getState() !== state) {
+  public setState(state: States): void {
+    if (this.state.getState() === state) {
+      return;
+    }
+
+    if (typeof state === "number") {
+      this.state = new TicTacToeState(state);
+      this.draw();
+    } else if (typeof state === "object") {
       this.state = new QTicTacToeState(state);
       this.draw();
     }
