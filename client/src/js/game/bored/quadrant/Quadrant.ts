@@ -1,5 +1,6 @@
 import { Mark } from "../../../common/enums";
 import { Coordinates, QuadrantNumber } from "../../../types";
+import { Content } from "../state/IGameState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";
 
 export default class Quadrant implements IQuadrant {
@@ -139,6 +140,10 @@ export default class Quadrant implements IQuadrant {
     return !(
       Mark.X === this.properties.content || this.properties.content === Mark.O
     );
+  }
+
+  public getContent(): Content {
+    return this.properties.content;
   }
 
   public getNumber(): QuadrantNumber {

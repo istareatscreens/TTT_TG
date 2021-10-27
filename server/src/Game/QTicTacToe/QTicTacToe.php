@@ -81,7 +81,9 @@ class QTicTacToe extends AbstractTicTacToe
     public function validPosition($quadrant): bool
     {
         try {
-            return parent::validPosition($quadrant[0])
+            return is_array($quadrant) &&
+                count($quadrant) === 2
+                && parent::validPosition($quadrant[0])
                 && parent::validPosition($quadrant[1]);
         } catch (\Exception $e) {
             return false;
@@ -175,6 +177,15 @@ class QTicTacToe extends AbstractTicTacToe
         $player1WinningStates = $this->findWinningStates(1);
         $player2WinningStates = $this->findWinningStates(2);
         $states = [...$player1WinningStates, ...$player2WinningStates];
+        echo "\nPlayer1 States";
+        print_r($player1WinningStates);
+        echo "\nPlayer 2 States";
+        print_r($player2WinningStates);
+        echo "\nP1 Count";
+        echo count($player1WinningStates);
+        echo "\nP2 Count";
+        echo count($player2WinningStates);
+        echo "\n";
         if (!count($player1WinningStates) && !count($player2WinningStates)) {
             return;
         } else if (count($player1WinningStates) > count($player2WinningStates)) {

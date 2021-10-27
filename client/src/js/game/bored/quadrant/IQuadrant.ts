@@ -13,6 +13,7 @@ export default interface IQuadrant {
   isEmpty: (coordinates?: Coordinates) => boolean;
   getNumber: (coordinates?: Coordinates) => QuadrantLocation;
   isLocked?: () => boolean;
+  getContent?: () => Content;
 }
 
 export interface QuadrantProperties {

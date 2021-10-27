@@ -16,6 +16,12 @@ function dec2bin(dec: number) {
   return (dec >>> 0).toString(2);
 }
 
+type IsValidQuadrant = (
+  initialMark: Content,
+  mark: Content,
+  index: number
+) => boolean;
+
 interface BoardProperties {
   gridColor: string;
   markColor: string;
@@ -102,6 +108,7 @@ export default class GameBoard {
   }
 
   public drawWinningLine(coordinates: Coordinates[]) {
+    console.log("HERE in draw function is being called", coordinates);
     let [x1, y1] = coordinates[0];
     let [x3, y3] = coordinates[2];
     const [width, height] = this.dimensions;
@@ -115,6 +122,7 @@ export default class GameBoard {
       y1 -= m > 0 ? yAdjustment : yAdjustment;
       y3 += m > 0 ? yAdjustment : yAdjustment;
     }
+
     if (x1 !== x3) {
       const xAdjustment = Math.abs(width / 6 - edgeBuffer);
       x1 -= m > 0 ? xAdjustment : -xAdjustment;
@@ -135,23 +143,229 @@ export default class GameBoard {
     return [x + xOffset, y + yOffset];
   }
 
+  private drawHorizontalWinningLines(isValidQuadrant: IsValidQuadrant): void {
+    for (let i = 0; i < 3; i++) {
+      let line: Coordinates[] = [];
+      // winning horizontal line draw
+      const getMark = (index: QuadrantNumber): Content =>
+        this.quadrants?.[index]?.getContent() ?? 0;
+      let mark = getMark((3 * i) as QuadrantNumber);
+      let initialMark = mark;
+      for (let j = 3 * i; j < 3 + 3 * i; j++) {
+        let mark = getMark((3 * i) as QuadrantNumber);
+        if (isValidQuadrant(initialMark, mark, j)) {
+          line = [];
+          break;
+        }
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+      if (line.length === 3) {
+        this.drawWinningLine(line);
+      }
+    }
+  }
+
+  private drawVeritcleWinningLines(isValidQuadrant: IsValidQuadrant): void {
+    for (let i = 0; i < 3; i++) {
+      let line: Coordinates[] = [];
+      const getMark = (index: QuadrantNumber): Content =>
+        this.quadrants?.[index]?.getContent() ?? 0;
+      let mark = getMark(i as QuadrantNumber);
+      let initialMark = mark;
+      for (let j = i; j < 9; j += 3) {
+        mark = getMark(i as QuadrantNumber);
+        if (isValidQuadrant(initialMark, mark, j)) {
+          line = [];
+          break;
+        }
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+      if (line.length === 3) {
+        this.drawWinningLine(line);
+      }
+    }
+  }
+
+  private drawBackwardSlashLine(isValidQuadrant: IsValidQuadrant): void {
+    let line: Coordinates[] = [];
+    const getMark = (index: QuadrantNumber): Content =>
+      this.quadrants?.[index]?.getContent() ?? 0;
+    let mark = getMark(0);
+    const initialMark = mark;
+    for (let j = 0; j < 9; j += 4) {
+      mark = getMark(j as QuadrantNumber);
+      if (isValidQuadrant(initialMark, mark, j)) {
+        break;
+      }
+      line.unshift(this.quadrants[j].getCenterCoordinate());
+    }
+    if (line.length === 3) {
+      this.drawWinningLine(line);
+    }
+  }
+
+  private drawFowardSlashLine(
+    isValidQuadrant: (
+      initialMark: Content,
+      mark: Content,
+      index: number
+    ) => boolean
+  ): void {
+    const line: Coordinates[] = [];
+    const getMark = (index: QuadrantNumber): Content =>
+      this.quadrants?.[index]?.getContent() ?? 0;
+    let mark = getMark(2);
+    const initialMark = mark;
+    for (let j = 2; j < 7; j += 2) {
+      mark = getMark(j as QuadrantNumber);
+      if (isValidQuadrant(initialMark, mark, j)) {
+        break;
+      }
+      line.unshift(this.quadrants[j].getCenterCoordinate());
+    }
+    if (line.length === 3) {
+      this.drawWinningLine(line);
+    }
+  }
+
   // create a quadrant factory object
   private drawGameOverState(gameOverState: IGameState): void {
     const quadrants: QuadrantNumber[] = [];
+
     const getQuadrants =
       (quadrants: QuadrantNumber[]) => (x: number, y: number, mark: Mark) => {
         if (mark !== Mark.Empty) {
           quadrants.push(this.calculateQuadrantNumber(x, y));
         }
       };
+
     this.iterateOverState(gameOverState, getQuadrants(quadrants));
 
-    const coordinates: Coordinates[] = [];
-    quadrants.forEach((quadrant) =>
-      coordinates.unshift(this.quadrants[quadrant].getCenterCoordinate())
-    );
+    const isValidQuadrant = (
+      initialMark: Content,
+      mark: Content,
+      index: number
+    ) => {
+      return (
+        !quadrants.includes(index as QuadrantNumber) ||
+        mark !== initialMark ||
+        mark === 0
+      );
+    };
 
-    this.drawWinningLine(coordinates);
+    this.drawBackwardSlashLine(isValidQuadrant);
+    this.drawFowardSlashLine(isValidQuadrant);
+    this.drawHorizontalWinningLines(isValidQuadrant);
+    this.drawVeritcleWinningLines(isValidQuadrant);
+
+    /*
+    for (let i = 0; i < 3; i++) {
+      let line: Coordinates[] = [];
+
+      // winning horizontal line draw
+      let mark = this.quadrants?.[3 * i]?.getContent() ?? 0;
+      let initialMark = mark;
+      for (let j = 3 * i; j < 3 + 3 * i; j++) {
+        mark = this.quadrants?.[3 * i]?.getContent() ?? 0;
+        if (isValidQuadrant(initialMark, mark, j)) {
+          line = [];
+          break;
+        }
+        console.log("here: ", mark);
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+
+      console.log("draw line |", line);
+      if (line.length === 3) {
+        console.log("HERE IN PRINT Hor LINE");
+        this.drawWinningLine(line);
+      }
+
+      line = [];
+      // winning vertical line draw
+      mark = this.quadrants?.[i]?.getContent() ?? 0;
+      initialMark = mark;
+      for (let j = i; j < 9; j += 3) {
+        mark = this.quadrants?.[i]?.getContent() ?? 0;
+        if (
+          !quadrants.includes(j as QuadrantNumber) ||
+          //mark !== (this.quadrants[j]?.getContent() ?? 0) ||
+          mark !== initialMark ||
+          mark === 0
+        ) {
+          console.log("HERE");
+          console.log(line);
+
+          line = [];
+          break;
+        }
+        console.log("here: ", mark);
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+
+      console.log("draw line --", line);
+      if (line.length === 3) {
+        console.log("HERE IN PRINT Hor LINE");
+        this.drawWinningLine(line);
+      }
+
+      line = [];
+      // only need to do one pass by under
+      if (i === 1) {
+        continue;
+      }
+
+      // line \
+      mark = this.quadrants?.[quadrants[0]]?.getContent() ?? 0;
+      initialMark = mark;
+      for (let j = 0; j < 9; j += 4) {
+        mark = this.quadrants?.[j]?.getContent() ?? 0;
+        if (
+          !quadrants.includes(j as QuadrantNumber) ||
+          mark !== initialMark ||
+          mark === 0
+        ) {
+          line = [];
+          break;
+        }
+        console.log("here: ", mark);
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+
+      console.log("draw line", line);
+      if (line.length === 3) {
+        console.log("HERE IN PRINT Hor LINE");
+        this.drawWinningLine(line);
+      }
+      line = [];
+
+      console.log("HERE FOR / line: ");
+      // line /
+      mark = this.quadrants?.[2]?.getContent() ?? 0;
+      initialMark = mark;
+      for (let j = 2; j < 7; j += 2) {
+        mark = this.quadrants?.[2]?.getContent() ?? 0;
+        if (
+          !quadrants.includes(j as QuadrantNumber) ||
+          mark !== initialMark ||
+          mark === 0
+        ) {
+          line = [];
+          console.log("HERE in break FOR / line: ");
+          break;
+        }
+        console.log("here in / cross: ", mark, "Num j: ", j);
+        line.unshift(this.quadrants[j].getCenterCoordinate());
+      }
+
+      console.log("draw line for /", line);
+      if (line.length === 3) {
+        console.log("HERE IN PRINT Hor LINE");
+        this.drawWinningLine(line);
+      }
+      line = [];
+    }
+    */
   }
 
   private calculateQuadrantNumber(x: number, y: number): QuadrantNumber {
@@ -180,7 +394,6 @@ export default class GameBoard {
     };
 
     const quadrant = this.quadrantFactory.createQuadrant(properties);
-
     quadrant.draw();
 
     this.quadrants.push(quadrant);
