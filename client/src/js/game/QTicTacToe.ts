@@ -5,7 +5,7 @@ import {
   GameName,
   QuadrantLocation,
   QuadrantNumber,
-} from "../types";
+} from "../types/game";
 import { Mark } from "../common/enums";
 import IGame from "./IGame";
 import IGameState, { QuantumState, States } from "./bored/state/IGameState";

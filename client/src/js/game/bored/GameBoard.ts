@@ -4,7 +4,7 @@ import {
   Dimensions,
   QuadrantLocation,
   QuadrantNumber,
-} from "../../types";
+} from "../../types/game";
 import { Mark } from "../../common/enums";
 import IGameState, { Content } from "./state/IGameState";
 import TicTacToeState from "./state/TicTacToeState";

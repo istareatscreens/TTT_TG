@@ -1,7 +1,7 @@
 import ISubscriber from "../common/interfaces/ISubscriber";
 import { UniqueId } from "../common/UniqueId";
 import IServer from "../server/IServer";
-import { Dimensions, GameResponse } from "../types";
+import { Dimensions, GameResponse } from "../types/game";
 import { States } from "./bored/state/IGameState";
 import Controller from "./controllers/Controller";
 import IGame from "./IGame";

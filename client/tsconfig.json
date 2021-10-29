@@ -5,6 +5,7 @@
       "module": "es6",
       "target": "es5",
       "allowSyntheticDefaultImports": true,
+      "typeRoots" : ["node_modules/@types", "src/types"],
       "jsx": "react",
       "allowJs": true,
       "moduleResolution": "Node",

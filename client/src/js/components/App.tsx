@@ -1,7 +1,7 @@
-import React, { useState, ReactElement } from "react";
+import React, { ReactElement } from "react";
 import Arcade from "./Arcade";
 import Menu from "./Menu";
-import { RouteComponentProps, Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
 interface Props {
   alt: string;
@@ -14,7 +14,7 @@ export default function App(): ReactElement {
         <Route path="/" exact>
           <Menu />
         </Route>
-        <Route path="/lobby" exact>
+        <Route path="/arcade" exact>
           <Arcade />
         </Route>
         <Route path="/:id" exact>

@@ -3,7 +3,7 @@ import {
   Dimensions,
   QuadrantCoordinate,
   QuadrantNumber,
-} from "../../../types";
+} from "../../../types/game";
 import GameBoard from "../GameBoard";
 import TicTacToeState from "../state/TicTacToeState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";

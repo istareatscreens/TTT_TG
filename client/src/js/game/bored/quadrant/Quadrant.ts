@@ -1,5 +1,5 @@
 import { Mark } from "../../../common/enums";
-import { Coordinates, QuadrantNumber } from "../../../types";
+import { Coordinates, QuadrantNumber } from "../../../types/game";
 import { Content } from "../state/IGameState";
 import IQuadrant, { QuadrantProperties } from "./IQuadrant";
 
@@ -36,14 +36,6 @@ export default class Quadrant implements IQuadrant {
 
   public draw(): void {
     const { X, O, Empty } = Mark;
-    console.log(
-      "Quadrant: ",
-      this.properties.quadrant,
-      "Content: ",
-      this.properties.content,
-      "move Number",
-      this.getMoveNumber()
-    );
 
     if (typeof this.properties.content == "object") {
       return;
@@ -71,7 +63,6 @@ export default class Quadrant implements IQuadrant {
   }
 
   private drawMark(mark: string, number: number): void {
-    console.log("Mark: ", mark, "Number: ", number);
     const [x, y] = this.properties.coordinates;
     const [width, height] = this.properties.dimensions;
 
@@ -101,39 +92,6 @@ export default class Quadrant implements IQuadrant {
     this.context.fillText(
       `${number}`,
       x + width / 2 + fontSize / 1.45,
-      y + height / 1.2
-    );
-  }
-
-  private drawMarkOld(mark: string, number: string): void {
-    console.log("Mark: ", mark, "Number: ", number);
-    const [x, y] = this.properties.coordinates;
-    const [width, height] = this.properties.dimensions;
-
-    const font = "Press Start 2P";
-
-    const fontSize = Math.abs(Math.min(width, height) - this.edgeBuffer * 1.5);
-    const text = `${fontSize}px '${font}'`;
-    this.context.restore();
-    this.context.font = text;
-
-    this.context.textBaseline = "middle";
-    this.context.textAlign = "center";
-    this.context.fillText(mark, x + width / 1.8, y + height / 1.8);
-
-    // Number
-    if (parseInt(number) === -1) {
-      return;
-    }
-
-    const font2 = "Helvetica";
-    const text2 = `${fontSize / 1.5}px '${font2}'`;
-    this.context.font = text2;
-    this.context.textBaseline = "middle";
-    this.context.textAlign = "center";
-    this.context.fillText(
-      number,
-      x + width / 2 + fontSize / 1.8,
       y + height / 1.2
     );
   }

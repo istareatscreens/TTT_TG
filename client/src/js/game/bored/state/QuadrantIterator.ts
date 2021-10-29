@@ -1,4 +1,4 @@
-import { QuadrantNumber } from "../../../types";
+import { QuadrantNumber } from "../../../types/game";
 
 export default class QuadrantIterator {
   private iterator: QuadrantNumber;

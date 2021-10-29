@@ -1,8 +1,7 @@
-FROM node:latest as build-stage
+FROM node:16.13 as build-stage
 
 COPY ./client /home/node/app
 WORKDIR /home/node/app
-
 RUN npm install
 RUN npm run build
 

@@ -1,5 +1,5 @@
 import ISubscriber from "../../common/interfaces/ISubscriber";
-import { Coordinates } from "../../types";
+import { Coordinates } from "../../types/game";
 import Controller from "./Controller";
 
 type ElementData = [element: HTMLElement, isAttached: boolean];

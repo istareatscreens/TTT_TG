@@ -1,4 +1,4 @@
-import { Coordinates, Dimensions } from "../../types";
+import { Coordinates, Dimensions } from "../../types/game";
 export default class Grid {
   private dimensions: Dimensions;
   private lineStroke: number;

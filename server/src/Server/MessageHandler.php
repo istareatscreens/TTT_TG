@@ -52,6 +52,7 @@ class MessageHandler
     public function disconnectClient(ConnectionInterface $client): void
     {
         echo "\n !!!!!!HERE Disconnect ";
+        echo $client->Session->get('id');
         if (!$this->clientHandler->clientExists($client)) {
             echo "\n !!!!!!HERE Client does not exist";
             return;

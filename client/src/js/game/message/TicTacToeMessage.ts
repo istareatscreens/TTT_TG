@@ -5,7 +5,7 @@ import {
   GameResponse,
   QuadrantNumber,
   QuadrantPosition,
-} from "../../types";
+} from "../../types/game";
 import { States } from "../bored/state/IGameState";
 
 export interface IMessageIn {}

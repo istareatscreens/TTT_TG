@@ -1,5 +1,5 @@
 import ISubscriber from "../../common/interfaces/ISubscriber";
-import { Dimensions } from "../../types";
+import { Dimensions } from "../../types/game";
 import Controller from "./Controller";
 
 export default class WindowController implements Controller {

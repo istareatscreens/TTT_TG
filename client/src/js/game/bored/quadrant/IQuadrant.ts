@@ -3,7 +3,7 @@ import {
   Dimensions,
   QuadrantLocation,
   QuadrantNumber,
-} from "../../../types";
+} from "../../../types/game";
 import { Content } from "../state/IGameState";
 
 export default interface IQuadrant {

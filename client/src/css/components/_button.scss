@@ -21,3 +21,21 @@
     font-size: 1rem;
   }
 }
+
+.btn-info {
+  @include button.ink-color(#fff8f0);
+  @include button.container-fill-color(#71a9f7);
+  font-size: 2rem;
+  font-family: "Press Start 2P";
+  white-space: nowrap;
+
+  &--shrink {
+    @include respond(small-size) {
+      font-size: 1rem;
+    }
+
+    @include respond(tiny-size) {
+      font-size: 1rem;
+    }
+  }
+}

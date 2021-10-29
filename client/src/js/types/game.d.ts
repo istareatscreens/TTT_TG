@@ -1,4 +1,4 @@
-import { Mark } from "./common/enums";
+import { Mark } from "../common/enums";
 
 export type Dimensions = [width: number, height: number];
 export type Coordinates = [x: number, y: number];

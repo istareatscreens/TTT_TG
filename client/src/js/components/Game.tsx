@@ -1,21 +1,25 @@
 import React, { ReactElement, useRef, useState, useEffect } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useHistory, Link } from "react-router-dom";
 import { validate as validateUuid } from "uuid";
 import WindowController from "../game/controllers/WindowController";
 import MouseController from "../game/controllers/MouseController";
 import GameClient from "../game/GameClient";
 import TicTacToe from "../game/TicTacToe";
 import SocketServer from "../server/SocketServer";
-import { Dimensions } from "../types";
+import { Dimensions, GameName } from "../types/game";
 import { Mark } from "../common/enums";
 import Loader from "./Loader";
 import { Location } from "history";
 import { UniqueId } from "../common/UniqueId";
 import QTicTacToe from "../game/QTicTacToe";
+import IGame from "../game/IGame";
 
-interface GameProps {}
+interface GameProps {
+  gameSelected: GameName | "";
+  setGameSelected: () => void;
+}
 
-const Game = ({}: GameProps): ReactElement => {
+const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
   const gameContainerRef = useRef(null);
   const canvasRef = useRef(null);
   const canvasContainerRef = useRef(null);
@@ -76,6 +80,21 @@ const Game = ({}: GameProps): ReactElement => {
     history.push(`/${gameId}`);
   };
 
+  const getSelectedGame = (
+    context: CanvasRenderingContext2D,
+    dimensions: Dimensions
+  ): IGame | void => {
+    switch (gameSelected) {
+      case "QTicTacToe":
+        return new QTicTacToe(context, dimensions);
+      case "TicTacToe":
+        return new TicTacToe(context, dimensions);
+      default:
+        handleInvalidGame();
+        setGameSelected();
+    }
+  };
+
   const loadFont = async () => {
     const font = new FontFace(
       "Press Start P",
@@ -124,7 +143,8 @@ const Game = ({}: GameProps): ReactElement => {
 
     // create game
     const server = new SocketServer();
-    const game = new QTicTacToe(context, dimensions);
+
+    const game = getSelectedGame(context, dimensions) as IGame;
     const resizeController = new WindowController(canvasContainer);
     const gameController = new MouseController();
 
@@ -162,10 +182,21 @@ const Game = ({}: GameProps): ReactElement => {
 
   const replayButton = () => {
     return (
-      <button onClick={resetGame} className="btn-text mdc-button">
-        <span className="mdc-button__ripple"></span>
-        <span className="mdc-button__label">Replay</span>
-      </button>
+      <div className="game-header__btn-container">
+        <button onClick={resetGame} className="btn-text mdc-button">
+          <span className="mdc-button__ripple"></span>
+          <span className="mdc-button__label">Replay</span>
+        </button>
+        <Link to="/arcade">
+          <button
+            onClick={() => setGameSelected()}
+            className="btn-text mdc-button"
+          >
+            <span className="mdc-button__ripple"></span>
+            <span className="mdc-button__label">Back</span>
+          </button>
+        </Link>
+      </div>
     );
   };
 

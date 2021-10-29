@@ -5,7 +5,7 @@ import {
   GameName,
   QuadrantLocation,
   QuadrantNumber,
-} from "../types";
+} from "../types/game";
 import { States } from "./bored/state/IGameState";
 
 export default interface IGame {

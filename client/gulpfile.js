@@ -58,7 +58,9 @@ function copyPHP() {
 }
 
 function copyAssets() {
-  return src([imagePath]).pipe(dest(output));
+  return src([imagePath])
+    .pipe(webpack(require("./webpack.prod.js")))
+    .pipe(dest(output));
 }
 
 function watchTask() {
