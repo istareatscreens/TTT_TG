@@ -2,13 +2,11 @@
 
 namespace Game\Server;
 
-use Exception;
 use Game\Db\Database;
 use Game\Db\PlayerState;
 use Game\Library\BiMap;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
-use React\Socket\ConnectorInterface;
 
 class ClientHandler
 {

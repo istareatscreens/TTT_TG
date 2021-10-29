@@ -88,7 +88,6 @@ export default class QTicTacToe implements IGame {
 
   public getQuadrantNumber(coordinates: Coordinates): QuadrantLocation {
     if (this.bored.isValidMove(coordinates)) {
-      console.log(this.bored.getQuadrantNumber(coordinates));
       return this.bored.getQuadrantNumber(coordinates);
     }
     return null;
@@ -118,8 +117,6 @@ export default class QTicTacToe implements IGame {
   }
 
   public draw(): void {
-    //87381 all X
-    //174762 all O
     this.bored = new GameBored(this.context, this.dimensions, {
       lineStroke: this.lineStroke,
       gridStroke: this.lineStroke * 1.5,

@@ -50,20 +50,26 @@ class SocketServer implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         //template code
-        echo sprintf(
-            'Recieved from %d message: "%s"' .
-                "\n",
-            $from->resourceId,
-            $msg,
-        );
-        $msg = json_decode($msg);
-        $playerId = $this->getSessionId($from);
-        if ($playerId === "") {
-            $from->close();
-            return;
+        if ($this->develop) {
+            echo sprintf(
+                'Recieved from %d message: "%s"' .
+                    "\n",
+                $from->resourceId,
+                $msg,
+            );
         }
-        echo "MESSAGE FROM PLAYER ID: " . $playerId;
-        $this->messageHandler->handleMessage($from, $msg, $playerId);
+
+        try {
+            $msg = json_decode($msg);
+            $playerId = $this->getSessionId($from);
+            if ($playerId === "") {
+                $from->close();
+                return;
+            }
+            $this->messageHandler->handleMessage($from, $msg, $playerId);
+        } catch (Exception $e) {
+            $this->onClose($from);
+        }
     }
 
     public function onClose(ConnectionInterface $conn)

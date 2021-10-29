@@ -41,8 +41,6 @@ abstract class AbstractTicTacToe implements GameInterface
         $newGame = clone $this;
         $newGame->players = clone $this->players;
         $newGame->id = $id;
-        //$newGame->players = array();
-        //if (!$newGame->registerPlayers(...$playerIds)) {
         if (!$newGame->players->setPlayers([...$playerIds])) {
             throw new \Exception("Cannot register identical players to a game in TicTacToe");
         }
@@ -81,34 +79,16 @@ abstract class AbstractTicTacToe implements GameInterface
     public function isPlayer($playerId): bool
     {
         return $this->players->isPlayer($playerId);
-        //return key_exists($playerId, $this->players);
     }
 
     public function getPlayers(): array
     {
         return $this->players->getPlayers();
-        //return array_keys($this->players);
     }
-
-    /*
-    protected function registerPlayers(string $playerId1, string $playerId2): bool
-    {
-
-        $this->players[$playerId1] = random_int(1, 2);
-        $this->players[$playerId2] = ($this->players[$playerId1] == 1) ? 2 : 1;
-
-        return $playerId1 !== $playerId2;
-    }
-    */
 
     public function getPlayerNumber(string $playerId): int
     {
         return $this->players->getPlayerNumber($playerId);
-        /*
-        echo "\nin get player number: " . $playerId . "\n";
-        print_r($this->players);
-        return $this->players[$playerId];
-        */
     }
 
     public function validPosition($quadrant): bool
@@ -136,38 +116,6 @@ abstract class AbstractTicTacToe implements GameInterface
         return ($playerNumber === $this->playersMove);
     }
 
-    /*
-    public function makeMove(string $playerId, int $quadrant): bool
-    {
-        $moveComplete = false;
-        if (
-            $this->outOfMoves()
-            || !$this->validPosition($quadrant)
-        ) {
-            return false;
-        }
-
-        $playerNumber = $this->getPlayerNumber($playerId);
-        if ($playerNumber !== $this->playersMove) {
-            return false;
-        }
-
-        $gameWon = false;
-        if ($this->quadrantIsEmpty($quadrant, $this->state)) {
-            $this->changeState($quadrant, $playerNumber);
-            $gameWon = $this->wonGame($playerNumber);
-            $moveComplete = true;
-            if ($moveComplete && $gameWon) {
-                $this->setWinner($playerNumber);
-                $this->setMovesLeft(0);
-            }
-            $this->endTurn();
-        };
-
-        return $moveComplete;
-    }
-    */
-
     protected function getMovesLeft(): int
     {
         return $this->movesLeft;
@@ -193,44 +141,12 @@ abstract class AbstractTicTacToe implements GameInterface
         $this->state = $state;
     }
 
-    /*
-    protected function endTurn(): void
-    {;
-        $this->movesLeft--;
-        $this->playersMove = ($this->playersMove === 1) ? 2 : 1;
-    }
-    */
-
     protected function changeState(int $quadrant, int $playerNumber): void
     {
         $mask = 1 << $quadrant * 2;
         $this->state = (($this->state & ~$mask) | ($playerNumber << $quadrant * 2));
     }
 
-    /*
-    private function wonGame(int $playerNumber): bool
-    {
-        $winningMasks = array(
-            0b110000110000110000,
-            0b001100001100001100,
-            0b000011000011000011,
-            0b110000001100000011,
-            0b000011001100110000,
-            0b111111000000000000,
-            0b000000111111000000,
-            0b000000000000111111
-        );
-        foreach ($winningMasks as &$mask) {
-            $result = $this->state & $mask;
-            if ($this->containsThreeOfTheSameMarks($result, $playerNumber)) {
-                $this->winningState = $result;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    */
     protected function containsThreeOfTheSameMarks(int $result, int $playerNumber): bool
     {
         $counter = 0;

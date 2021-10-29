@@ -65,14 +65,11 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
 
   const getGameIdFromUrl = (location: Location<unknown>): string => {
     const gameId: string = location.pathname.substring(1);
-    console.log(gameId);
-    console.log(validateUuid(gameId));
     return validateUuid(gameId) ? gameId : "";
   };
 
   const handleInvalidGame = () => {
     history.push("/");
-    console.log("Invalid route", "/");
   };
   const updateGameId = (gameId: string) => {
     // url hack
@@ -267,16 +264,12 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
           )}
           <canvas
             className="game-canvas"
-            style={
-              {} //{ display: connected ? "unset" : "none" }
-            }
+            style={{ display: connected ? "unset" : "none" }}
             ref={canvasRef}
           ></canvas>
         </div>
       </div>
-      {
-        //!connected && <Loader message="Connecting" />
-      }
+      {!connected && <Loader message="Connecting" />}
     </>
   );
 };

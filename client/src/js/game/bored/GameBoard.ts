@@ -108,7 +108,6 @@ export default class GameBoard {
   }
 
   public drawWinningLine(coordinates: Coordinates[]) {
-    console.log("HERE in draw function is being called", coordinates);
     let [x1, y1] = coordinates[0];
     let [x3, y3] = coordinates[2];
     const [width, height] = this.dimensions;

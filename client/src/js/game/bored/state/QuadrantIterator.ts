@@ -12,6 +12,6 @@ export default class QuadrantIterator {
   }
 
   public getIterator(): QuadrantNumber {
-    return this.iterator; //this is undefined here
+    return this.iterator;
   }
 }

@@ -89,7 +89,6 @@ export default class QauntumQuadrant implements IQuadrant {
   }
 
   public getNumber(coordinates: Coordinates): QuadrantCoordinate {
-    console.log("in get number", coordinates);
     return [
       this.markedQuadrant.getNumber(),
       this.gameBoard.getQuadrantNumber(coordinates) as QuadrantNumber,

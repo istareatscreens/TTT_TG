@@ -29,9 +29,6 @@ export type GameProperties = [
   canvas: HTMLCanvasElement
 ];
 
-// not used
-export type QuadrantType = "TicTacToe" | "Mark";
-
 export type QuadrantPosition =
   | [board: QuadrantNumber, quadrant: QuadrantNumber]
   | null;

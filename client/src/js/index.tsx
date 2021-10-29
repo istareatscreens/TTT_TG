@@ -5,7 +5,6 @@ import { BrowserRouter, HashRouter } from "react-router-dom";
 
 function hideLoader() {
   const elements = document.getElementById("loader");
-  console.log(elements);
   hideAllElements(elements);
 }
 

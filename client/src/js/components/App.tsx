@@ -21,18 +21,6 @@ export default function App(): ReactElement {
           <Arcade />
         </Route>
       </Switch>
-      {/*
-      {inGame ? (
-        <Arcade></Arcade>
-      ) : (
-        <Route
-          path="/"
-          render={(_: RouteComponentProps) => (
-            <Menu handleStartButton={handleStartButton}></Menu>
-          )}
-        />
-      )}
-      */}
     </div>
   );
 }

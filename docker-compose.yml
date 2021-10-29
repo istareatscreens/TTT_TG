@@ -23,6 +23,7 @@ services:
     env_file:
       - .env
   memcached: # port 11211
+    restart: always
     container_name: memcached
     image: memcached:latest
     ports:

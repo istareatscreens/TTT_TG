@@ -114,7 +114,6 @@ class MessageHandlerTest extends TestCase
         $msgIn = $this->makeMessageIn("joinLobby", $this->gameName);
         $this->messageHandler->handleMessage($client1, $msgIn, $playerId1);
         $playerId1 = $this->clientHandler->getPlayerIdByClient($client1);
-        //$msg1 = new MessageOut();
 
         $msgOut1 = (new StatusMessage("inLobby"))->getMessage();
         $this->assertEquals($msgOut1, $client1->getMessage());

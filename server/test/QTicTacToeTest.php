@@ -549,7 +549,6 @@ class QTicTacToeTest extends TestCase
         $this->assertTrue($game->makeMove($this->playerId2, [3, 1]));
         $state = $game->getState();
         $quadrant = bindec("000000000000001010") . ",5,7,-1,-1,-1,-1,-1,-1,-1";
-        print_r($state);
         $this->assertTrue(
             0b100101011010010010 == $state ||
                 0b10110011010010010 == $state ||
@@ -667,7 +666,6 @@ class QTicTacToeTest extends TestCase
         );
 
         $this->assertTrue($game->makeMove($this->playerId2, [8, 7]));
-        print_r($game->getState());
         $this->assertTrue(
             [
                 "1",

@@ -79,7 +79,6 @@ export default class Quadrant implements IQuadrant {
     this.context.textAlign = "center";
     this.context.fillText(mark, x + width / 1.8, y + height / 1.8);
 
-    // Number
     if (number === -1) {
       return;
     }

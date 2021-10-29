@@ -56,7 +56,6 @@ export default class Grid {
     height: number
   ): void {
     this.context.fillStyle = this.color;
-    //this.context.fill();
     this.context.fillRect(x, y, width, height);
   }
 

@@ -36,7 +36,6 @@ export default class SocketServer implements IServer {
   }
 
   private socketOnMessage(msg: MessageEvent): void {
-    console.log("received " + msg.data);
     this.setMessage(JSON.parse(msg.data) as TTTMessageIn);
     this.notify();
   }
@@ -62,7 +61,6 @@ export default class SocketServer implements IServer {
   }
 
   public send(message: TTTMessageOut): void {
-    console.log(message);
     this.socket.send(JSON.stringify(message));
   }
 

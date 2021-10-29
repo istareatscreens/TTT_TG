@@ -107,10 +107,8 @@ export default class GameClient implements ISubscriber {
     } else if (this.server.hasMessageIn()) {
       this.handleMessage();
     } else if (this.server.isConnected() && !this.gameId) {
-      console.log("in update GAME ID:", this.gameId, !this.gameId);
       this.joinLobby();
     } else if (this.server.isConnected()) {
-      console.log("in reconnect update GAME ID:", this.gameId, !this.gameId);
       this.reconnectToGame();
     } else if (!this.server.isConnected()) {
       this.handleDisconnection();
@@ -156,10 +154,8 @@ export default class GameClient implements ISubscriber {
   }
 
   private setGameId(gameId: string) {
-    console.log("set game id", gameId, this.gameId);
     if (this.gameId === "" && gameId !== "" && gameId !== this.gameId) {
       this.gameId = gameId;
-      console.log("set game id in conditional", gameId, gameId);
       this.frontEndCallbacks.updateGameId(this.gameId);
     }
   }
@@ -177,19 +173,16 @@ export default class GameClient implements ISubscriber {
 
     switch (this.gameStatus) {
       case "inLobby":
-        console.log(this.gameStatus);
         this.frontEndCallbacks.setInLobby(true);
         break;
       case "inGame":
         this.handleGameMessage(message);
-        console.log(this.gameStatus);
         this.frontEndCallbacks.setInLobby(false);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
         break;
       case "gameOver":
         this.handleGameMessage(message);
-        console.log(this.gameStatus);
         this.updateState(message.state);
         this.game.setWinner(message.winner);
         this.resetGameId();
@@ -207,7 +200,6 @@ export default class GameClient implements ISubscriber {
         this.frontEndCallbacks.setPlayerDisconnected(true);
         break;
       case "invalidGame":
-        console.log("IN invalid game");
         this.frontEndCallbacks.handleInvalidGame();
         break;
       default:
@@ -238,7 +230,6 @@ export default class GameClient implements ISubscriber {
   private makeMove(): void {
     const coordinates = this.controllers.gameController.getCoordinates(this);
     const quadrant = this.game.getQuadrantNumber(coordinates);
-    console.log("quadrant: " + quadrant);
     if (
       !this.connected ||
       quadrant == null ||

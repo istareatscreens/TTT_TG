@@ -8,7 +8,7 @@ use Game\Game\PlayerAssignment\RandomAssign;
 use Game\Game\PlayerAssignment\SetAssign;
 use Game\Game\TicTacToe;
 use Game\Game\QTicTacToe\QQuadrant;
-use function Game\Game\QTicTacToe\dFSCycleCheck;
+use Game\Game\QTicTacToe\GraphMethods;
 
 class QTicTacToe extends AbstractTicTacToe
 {
@@ -103,8 +103,6 @@ class QTicTacToe extends AbstractTicTacToe
         // handle initial quadrant
         $moveList = $this->quadrants[$quadrant]->getMoveList();
         [$move, $playerNumber] = array_pop($moveList);
-        //$this->quadrants[$quadrant]->mark($mark);
-        //$this->markQuadrant($quadrant, $mark, $move);
         $this->markQuadrant($quadrant, $playerNumber);
         $playerNumbers[$quadrant] = $playerNumber;
         $visited[$move] = true;
@@ -114,13 +112,10 @@ class QTicTacToe extends AbstractTicTacToe
             [$move, $playerNumber] = array_pop($moveList);
             $quadrant = $getConnectedQuadrant($move);
             if ($visited[$move] || $this->quadrants[$quadrant]->isMarked()) {
-                echo "exit \n";
                 continue;
             }
             $visited[$move] = true;
             $playerNumbers[$quadrant] = $playerNumber;
-            // $this->markQuadrant($quadrant, $mark, $move);
-            //$this->quadrants[$quadrant]->mark($mark);
             $this->markQuadrant($quadrant, $playerNumber);
             $moveList = [...$this->quadrants[$quadrant]->getMoveList(), ...$moveList];
         }
@@ -177,15 +172,6 @@ class QTicTacToe extends AbstractTicTacToe
         $player1WinningStates = $this->findWinningStates(1);
         $player2WinningStates = $this->findWinningStates(2);
         $states = [...$player1WinningStates, ...$player2WinningStates];
-        echo "\nPlayer1 States";
-        print_r($player1WinningStates);
-        echo "\nPlayer 2 States";
-        print_r($player2WinningStates);
-        echo "\nP1 Count";
-        echo count($player1WinningStates);
-        echo "\nP2 Count";
-        echo count($player2WinningStates);
-        echo "\n";
         if (!count($player1WinningStates) && !count($player2WinningStates)) {
             return;
         } else if (count($player1WinningStates) > count($player2WinningStates)) {
@@ -238,7 +224,6 @@ class QTicTacToe extends AbstractTicTacToe
 
         $playerNumber = $this->getPlayersMove() === 1 ? 2 : 1;
         $quadrant = $this->findLastQuadrant();
-        //$this->markQuadrant($quadrant, $playerNumber);
         $this->quadrants[$quadrant]->mark($playerNumber);
         $this->decrementMoves();
     }
