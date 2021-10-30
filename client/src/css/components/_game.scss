@@ -16,6 +16,12 @@
       font-size: 0.6rem;
     }
 
+    &__btn-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
     &__player {
       display: block;
       padding: 0.1rem;

@@ -18,7 +18,7 @@ export default function Menu(): ReactElement {
           <div className="menu__buttons">
             <Link to="/arcade">
               <button className="btn mdc-button mdc-button--raised">
-                <span className="mdc-button__label">Start Game</span>
+                <span className="mdc-button__label">Play Game</span>
               </button>
             </Link>
           </div>

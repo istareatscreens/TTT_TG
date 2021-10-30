@@ -28,6 +28,7 @@ module.exports = {
         test: /\.(sass|less|css|scss)$/,
         test: /\.scss$/,
         use: [
+          { loader: "style-loader" },
           {
             loader: "file-loader",
             options: {
@@ -38,11 +39,6 @@ module.exports = {
           { loader: "css-loader" },
           {
             loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [autoprefixer()],
-              },
-            },
           },
           {
             loader: "sass-loader",
@@ -64,5 +60,4 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js", "jsx"],
   },
-  plugins: [require("autoprefixer"), require("cssnano")],
 };

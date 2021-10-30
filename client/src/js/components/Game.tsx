@@ -1,25 +1,29 @@
 import React, { ReactElement, useRef, useState, useEffect } from "react";
-import { useLocation, useHistory, Link } from "react-router-dom";
-import { validate as validateUuid } from "uuid";
+import { Link } from "react-router-dom";
 import WindowController from "../game/controllers/WindowController";
 import MouseController from "../game/controllers/MouseController";
 import GameClient from "../game/GameClient";
-import TicTacToe from "../game/TicTacToe";
 import SocketServer from "../server/SocketServer";
-import { Dimensions, GameName } from "../types/game";
+import { Dimensions } from "../types/game";
 import { Mark } from "../common/enums";
-import Loader from "./Loader";
-import { Location } from "history";
-import { UniqueId } from "../common/UniqueId";
-import QTicTacToe from "../game/QTicTacToe";
 import IGame from "../game/IGame";
+import Loader from "./Loader";
+import { GameInfo } from "../GameData";
 
 interface GameProps {
-  gameSelected: GameName | "";
   setGameSelected: () => void;
+  handleInvalidGame: () => void;
+  gameId: string;
+  updateGameId: (gameId: string) => void;
+  gameInfo: GameInfo;
 }
 
-const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
+const Game = ({
+  handleInvalidGame,
+  gameId,
+  gameInfo,
+  updateGameId,
+}: GameProps): ReactElement => {
   const gameContainerRef = useRef(null);
   const canvasRef = useRef(null);
   const canvasContainerRef = useRef(null);
@@ -34,19 +38,11 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
   const [playerDisconnected, setPlayerDisconnected] = useState<boolean>(false);
   const [inLobby, setInLobby] = useState<boolean>(true);
   const [connected, setConnected] = useState<boolean>(false);
-  const [gameId, setGameId] = useState<string>("");
-  const history = useHistory();
+  const [gameLoaded, setGameLoaded] = useState<boolean>(false);
 
-  const location = useLocation();
-
-  const setCanvasDimensions = (
-    canvas: HTMLCanvasElement,
-    width: number,
-    height: number
-  ) => {
-    canvas.height = height;
-    canvas.width = width;
-  };
+  useEffect(() => {
+    (async () => createGame())();
+  }, []);
 
   useEffect(() => {
     const resetHeaderWidth = () => {
@@ -58,38 +54,18 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
     };
   });
 
+  const setCanvasDimensions = (
+    canvas: HTMLCanvasElement,
+    width: number,
+    height: number
+  ) => {
+    canvas.height = height;
+    canvas.width = width;
+  };
+
   const getDimension = (): number => {
     const canvasContainer: HTMLDivElement = canvasContainerRef.current;
     return Math.min(canvasContainer.clientWidth, canvasContainer.clientHeight);
-  };
-
-  const getGameIdFromUrl = (location: Location<unknown>): string => {
-    const gameId: string = location.pathname.substring(1);
-    return validateUuid(gameId) ? gameId : "";
-  };
-
-  const handleInvalidGame = () => {
-    history.push("/");
-  };
-  const updateGameId = (gameId: string) => {
-    // url hack
-    window.history.replaceState(null, "Tic Tac Toe", `/#/${gameId}`);
-    history.push(`/${gameId}`);
-  };
-
-  const getSelectedGame = (
-    context: CanvasRenderingContext2D,
-    dimensions: Dimensions
-  ): IGame | void => {
-    switch (gameSelected) {
-      case "QTicTacToe":
-        return new QTicTacToe(context, dimensions);
-      case "TicTacToe":
-        return new TicTacToe(context, dimensions);
-      default:
-        handleInvalidGame();
-        setGameSelected();
-    }
   };
 
   const loadFont = async () => {
@@ -101,14 +77,9 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
     document.fonts.add(font);
   };
 
-  useEffect(() => {
-    (async () => createGame())();
-  }, []);
-
   const createGame = async () => {
-    const gameId = getGameIdFromUrl(location);
-    setGameId(gameId);
-
+    //const gameId = getGameIdFromUrl(location);
+    //const gameSelected = getGameSelectedFromUrl(location);
     await loadFont();
     await document.fonts.ready;
 
@@ -141,18 +112,25 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
     // create game
     const server = new SocketServer();
 
-    const game = getSelectedGame(context, dimensions) as IGame;
+    const game = (gameInfo?.createGame?.(context, dimensions) as IGame) ?? "";
+
+    // if invalid game name bail
+    if (!game) {
+      handleInvalidGame();
+    }
+
     const resizeController = new WindowController(canvasContainer);
     const gameController = new MouseController();
 
     gameClient.current = new GameClient(
       server,
-      game,
+      game as IGame,
       { gameController: gameController, resizeController: resizeController },
       stateCallbacks,
       { canvas: canvas, gameId: gameId }
     );
     gameClient.current.start();
+    setGameLoaded(true);
   };
 
   const getPlayerSymbol = (number: Mark): string => {
@@ -177,18 +155,18 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
     gameClient.current.reset();
   };
 
-  const replayButton = () => {
+  const headerControls = () => {
     return (
       <div className="game-header__btn-container">
-        <button onClick={resetGame} className="btn-text mdc-button">
-          <span className="mdc-button__ripple"></span>
-          <span className="mdc-button__label">Replay</span>
-        </button>
+        <Link to={`/${gameInfo?.gameName ?? "arcade"}`}>
+          <button onClick={resetGame} className="btn-text mdc-button">
+            <span className="mdc-button__ripple"></span>
+            <span className="mdc-button__label">Replay</span>
+          </button>
+        </Link>
+        <p className="btn--seperator">/</p>
         <Link to="/arcade">
-          <button
-            onClick={() => setGameSelected()}
-            className="btn-text mdc-button"
-          >
+          <button className="btn-text mdc-button">
             <span className="mdc-button__ripple"></span>
             <span className="mdc-button__label">Back</span>
           </button>
@@ -207,7 +185,7 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
       return (
         <>
           <h1 className="game-header__you-win">You Win!</h1>
-          {replayButton()}
+          {headerControls()}
         </>
       );
     } else if (gameOver) {
@@ -216,7 +194,7 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
           <h1 className="game-header__winner">
             {winner ? `${getPlayerSymbol(winner)} Wins!` : "Tie Game"}
           </h1>
-          {replayButton()}
+          {headerControls()}
         </>
       );
     } else if (playerDisconnected) {
@@ -225,7 +203,7 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
           <h1 className="game-header__player-disconnect">
             {`${getOppositePlayer()} Left!`}
           </h1>
-          {replayButton()}
+          {headerControls()}
         </>
       );
     } else if (inLobby) {
@@ -250,11 +228,21 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
     }
   };
 
+  const getLoadingMessage = (): string => {
+    if (!connected && !gameLoaded) {
+      return "Loading";
+    } else if (!connected) {
+      return "Connecting";
+    } else if (!gameLoaded) {
+      return "Loading Game";
+    }
+  };
+
   return (
     <>
       <div className="game-container" ref={gameContainerRef}>
         <div className="game" ref={canvasContainerRef}>
-          {connected && (
+          {connected && gameLoaded && (
             <header
               style={{ width: headerWidth }}
               className="game-header fade-in-long"
@@ -263,13 +251,13 @@ const Game = ({ gameSelected, setGameSelected }: GameProps): ReactElement => {
             </header>
           )}
           <canvas
-            className="game-canvas"
-            style={{ display: connected ? "unset" : "none" }}
+            className="game-canvas fade-in-long"
+            style={{ display: connected && gameLoaded ? "unset" : "none" }}
             ref={canvasRef}
           ></canvas>
         </div>
       </div>
-      {!connected && <Loader message="Connecting" />}
+      {!(connected && gameLoaded) && <Loader message={getLoadingMessage()} />}
     </>
   );
 };

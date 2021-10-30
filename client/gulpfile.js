@@ -13,6 +13,7 @@ const cssPath = "./src/css/**/*";
 const htmlPath = "./src/php/home.php";
 const phpPath = "./src/php/**/*";
 const imagePath = "./src/images/**/*";
+const icoPath = "./src/images/*.ico";
 
 function jsTask() {
   return src([jsPath, "!node_modules"])
@@ -63,6 +64,10 @@ function copyAssets() {
     .pipe(dest(output));
 }
 
+function copyIco() {
+  return src([icoPath]).pipe(dest(output));
+}
+
 function watchTask() {
   browserSync.init({
     server: {
@@ -82,11 +87,11 @@ function watchTask() {
 
 //BUILD Web Production
 exports.default = series(
-  parallel(cleanTask, jsTask, cssTask, copyPHP, copyAssets)
+  parallel(cleanTask, jsTask, cssTask, copyPHP, copyIco, copyAssets)
 );
 
 //Develop Web
 exports.watch = series(
-  parallel(jsDevTask, cssDevTask, copyDevHtml, copyAssets),
+  parallel(jsDevTask, cssDevTask, copyDevHtml, copyIco, copyAssets),
   watchTask
 );

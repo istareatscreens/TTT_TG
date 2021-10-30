@@ -43,6 +43,24 @@
     text-align: center;
     display: inline-block;
     line-height: 4rem;
+
+    @include respond(medium-size) {
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.8rem;
+    }
+
+    @include respond(small-size) {
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.6rem;
+    }
+
+    @include respond(tiny-size) {
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.4rem;
+    }
   }
 
   &__buttons {
@@ -77,6 +95,19 @@
     &__info {
       padding: 1rem;
       margin-bottom: 4rem;
+      width: 40vw;
+
+      @include respond(medium-size) {
+        width: 50vw;
+      }
+
+      @include respond(small-size) {
+        width: 60vw;
+      }
+
+      @include respond(tiny-size) {
+        width: 80vw;
+      }
     }
 
     &__btn-container {

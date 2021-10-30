@@ -1,56 +1,88 @@
 import React, { ReactElement, useRef, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { validate as validateUuid } from "uuid";
+import { useHistory, useLocation, useParams } from "react-router-dom";
+import { Location } from "history";
+
 import Game from "./Game";
-import GameSelector, { GameInfo } from "./GameSelector";
-import { GameName } from "../types/game";
-import ttt from "../../images/ttt.png";
-import qttt from "../../images/qttt.png";
+import GameSelector from "./selector/GameSelector";
+import { Dimensions, GameName } from "../types/game";
+import IGame from "../game/IGame";
+import QTicTacToe from "../game/QTicTacToe";
+import TicTacToe from "../game/TicTacToe";
+import { gamesInfo, GameInfo } from "../GameData";
 
 interface Props {}
 
 export default function Arcade({}: Props): ReactElement {
-  const [gameSelected, setGameSelected] = useState<GameName | "">("");
+  const [gameSelected, setGameSelected] = useState<GameInfo | "">("");
+  const [gameId, setGameId] = useState<string>("");
+  const history = useHistory();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
-  const [gamesInfo, setGamesInfo] = useState<GameInfo[]>([
-    {
-      id: 0,
-      name: "Classic",
-      gameName: "TicTacToe",
-      image: ttt,
-      info: [
-        "Each player alternates between placing a mark on the board.",
-        "The first player to place a horizontal, veritcle, or diagonal line of marks wins",
-      ],
-      link: "https://en.wikipedia.org/wiki/Tic-tac-toe",
-    },
-    {
-      id: 1,
-      name: "Quantum",
-      gameName: "QTicTacToe",
-      image: qttt,
-      info: [
-        "Each player places two spooky marks in two different outer quadrants.",
-        "Each set of moves creates a link between outer quadrants.",
-        "On formation of a cycle on the board through linked quadrants the system will collapse to classical marks (two states possible).",
-        "First player to form a line of classical marks wins",
-      ],
-      link: "https://en.wikipedia.org/wiki/Quantum_tic-tac-toe",
-    },
-  ]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    handleLoad();
+  }, [location]);
+
+  const getGameFromUrl = () => {
+    const gameSelected = getGameInfoFromUrl();
+    setGameSelected(gameSelected ? gameSelected : "");
+  };
+
+  const parseUrlArguments = () => {
+    return location.pathname.split("/");
+  };
+
+  const getGameInfoFromUrl = (): GameInfo | "" => {
+    const urlGameName = parseUrlArguments();
+    return gamesInfo.find(
+      (gameInfo) => gameInfo.gameName === urlGameName?.[1] ?? ""
+    );
+  };
+
+  const getGameIdFromUrl = (): void => {
+    const gameId: string = parseUrlArguments()?.[2] ?? "";
+    setGameId(validateUuid(gameId) ? gameId : "");
+  };
+
+  const updateGameId = (gameId: string) => {
+    // url hack
+    if (!gameSelected) {
+      return;
+    }
+
+    const { gameName, fullName } = gameSelected;
+    window.history.replaceState(
+      null,
+      `${fullName}`,
+      `/#/${gameName}/${gameId}`
+    );
+    history.push(`/${gameName}/${gameId}`);
+  };
+
+  const handleInvalidGame = () => {
+    history.push("/arcade");
+  };
+
+  const handleLoad = () => {
+    getGameIdFromUrl();
+    getGameFromUrl();
+  };
 
   return (
     <div className="games-container">
       {gameSelected ? (
         <Game
+          updateGameId={updateGameId}
+          handleInvalidGame={handleInvalidGame}
+          gameId={gameId}
+          gameInfo={gameSelected}
           setGameSelected={() => {
             setGameSelected("");
           }}
-          gameSelected={gameSelected}
         />
       ) : (
-        <GameSelector setGame={setGameSelected} gamesInfo={gamesInfo} />
+        <GameSelector gamesInfo={gamesInfo} />
       )}
     </div>
   );

@@ -17,7 +17,16 @@ export default function App(): ReactElement {
         <Route path="/arcade" exact>
           <Arcade />
         </Route>
-        <Route path="/:id" exact>
+        <Route path="/QTicTacToe" exact>
+          <Arcade />
+        </Route>
+        <Route path="/TicTacToe" exact>
+          <Arcade />
+        </Route>
+        <Route path="/QTicTacToe/:id" exact>
+          <Arcade />
+        </Route>
+        <Route path="/TicTacToe/:id" exact>
           <Arcade />
         </Route>
       </Switch>

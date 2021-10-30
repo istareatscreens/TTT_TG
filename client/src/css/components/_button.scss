@@ -6,6 +6,18 @@
   @include button.ink-color(#fff8f0);
   font-size: 1rem;
   font-family: "Press Start 2P";
+  &--seperator {
+    font-size: 1.5rem;
+    color: #92140c;
+    font-weight: bold;
+    @include respond(small-size) {
+      font-size: 1.4rem;
+    }
+
+    @include respond(tiny-size) {
+      font-size: 1rem;
+    }
+  }
 }
 
 .btn-text {
@@ -30,12 +42,16 @@
   white-space: nowrap;
 
   &--shrink {
-    @include respond(small-size) {
+    @include respond(medium-size) {
       font-size: 1rem;
     }
 
+    @include respond(small-size) {
+      font-size: 0.8rem;
+    }
+
     @include respond(tiny-size) {
-      font-size: 1rem;
+      font-size: 0.5rem;
     }
   }
 }
