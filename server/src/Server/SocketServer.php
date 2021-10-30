@@ -25,7 +25,7 @@ class SocketServer implements MessageComponentInterface
             $id = $this->develop ?  Uuid::v4() : $conn->Session->get('id');
             return (is_null($id)) ? "" : $id;
         } catch (Exception $e) {
-            echo $e;
+            echo "Error in getSessionId: " .  $e;
             return "";
         }
     }
@@ -38,6 +38,7 @@ class SocketServer implements MessageComponentInterface
         }
 
         $playerId = $this->getSessionId($conn);
+
         if ($playerId === "") {
             $conn->close();
             return;

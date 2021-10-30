@@ -51,21 +51,13 @@ class MessageHandler
 
     public function disconnectClient(ConnectionInterface $client): void
     {
-        if (!$this->clientHandler->clientExists($client)) {
-            return;
-        }
-
-        // Handle case where player just joined and quit
-        if (!$this->clientHandler->clientHasPlayerId($client)) {
-            $this->clientHandler->removeClient($client);
-        }
-
         // Handle case where player messaged the server
         $this->removeFromLobbies($client);
-        $playerId = $this->clientHandler->getPlayerIdByClient($client);
-
+        if ($this->clientHandler->clientHasPlayerId($client)) {
+            $playerId = $this->clientHandler->getPlayerIdByClient($client);
+            $this->handleGamesAfterDisconnect($playerId);
+        }
         $this->clientHandler->removeClient($client);
-        $this->handleGamesAfterDisconnect($playerId);
     }
 
     private function removeFromLobbies(ConnectionInterface $client): void
@@ -110,7 +102,6 @@ class MessageHandler
                 if (is_null($clientHash)) {
                     $this->deleteGame($gameId);
                 } else {
-
                     //notify other user of player leaving 
                     $game = $this->games[$gameId];
                     $this->sendMessage(
@@ -129,7 +120,7 @@ class MessageHandler
 
     private function sendMessage(ConnectionInterface $client, string $message): void
     {
-        echo "\n Client: " . $client->resourceId .  " Message Sent: " . $message . " \n";
+        //echo "\n Client: " . $client->resourceId .  " Message Sent: " . $message . " \n";
         $client->send($message);
     }
 
@@ -151,8 +142,6 @@ class MessageHandler
 
     public function handleMessage(ConnectionInterface $client, $msg, string $playerId): void
     {
-        var_dump($msg);
-
         if (!$this->validMessage($msg)) {
             return;
         }

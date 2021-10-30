@@ -25,9 +25,13 @@ class GameFactory
         return $this->games[$gameName]->validPosition($position);
     }
 
-    public function isValidGame(string $gameName)
+    public function isValidGame(string $gameName): bool
     {
-        return key_exists($gameName, $this->games);
+        try {
+            return key_exists($gameName, $this->games);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     private function removeNamespaceFromType($game)

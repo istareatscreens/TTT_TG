@@ -31,6 +31,7 @@ class ClientHandler
         // one connection per client disconnect old instance
         if ($this->playerIdExists($playerId) && $this->playerIsConnected($playerId)) {
             $oldClient = $this->getClientByPlayerId($playerId);
+            $this->removeClient($oldClient);
             $socketServer->onClose($oldClient);
         }
 
@@ -97,7 +98,7 @@ class ClientHandler
                 $this->db->updateClientHash($playerId);
             }
         } catch (\Exception $e) {
-            echo $e;
+            echo "Error in removeClient" . $e;
             return;
         }
     }
@@ -136,8 +137,6 @@ class ClientHandler
     {
         $oldHash = $this->clientBiMap->getValue($playerId);
         if (key_exists($oldHash, $this->clients)) {
-            $oldClient = $this->clients[$oldHash];
-            $oldClient->close();
             unset($this->clients[$oldHash]);
         }
         $this->clients[$hash] = $client;
