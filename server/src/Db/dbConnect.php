@@ -17,6 +17,10 @@ function connectToDatabase(bool $develop)
         $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
         return $db;
     } catch (\PDOException $e) {
-        echo "\n" . 'Database Error: ' . $e->getMessage() . "\n";
+        //echo "\n" . 'Database Error: ' . $e->getMessage() . "\n";
+        sleep(4);
+        return connectToDatabase($develop);
+    } catch (\Exception $e) {
+        exit("server failed to connect to db");
     }
 }

@@ -78,8 +78,6 @@ const Game = ({
   };
 
   const createGame = async () => {
-    //const gameId = getGameIdFromUrl(location);
-    //const gameSelected = getGameSelectedFromUrl(location);
     await loadFont();
     await document.fonts.ready;
 

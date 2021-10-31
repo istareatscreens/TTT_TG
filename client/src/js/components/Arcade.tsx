@@ -52,11 +52,7 @@ export default function Arcade({}: Props): ReactElement {
     }
 
     const { gameName, fullName } = gameSelected;
-    window.history.replaceState(
-      null,
-      `${fullName}`,
-      `/#/${gameName}/${gameId}`
-    );
+    window.history.replaceState(null, `${fullName}`, `/${gameName}/${gameId}`);
     history.push(`/${gameName}/${gameId}`);
   };
 

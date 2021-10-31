@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import Arcade from "./Arcade";
 import Menu from "./Menu";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 
 interface Props {
   alt: string;
@@ -29,6 +29,7 @@ export default function App(): ReactElement {
         <Route path="/TicTacToe/:id" exact>
           <Arcade />
         </Route>
+        <Route render={() => <Redirect to={{ pathname: "/" }} />} />
       </Switch>
     </div>
   );

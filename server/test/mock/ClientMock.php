@@ -5,15 +5,32 @@ namespace Test\Mock;
 use Game\Library\Uuid;
 use Ratchet\ConnectionInterface;
 
+class SessionMock
+{
+    private string $playerId;
+
+    public function __construct($playerId)
+    {
+        $this->playerId = $playerId;
+    }
+
+    public function get(string $id)
+    {
+        return $this->playerId;
+    }
+}
+
 class ClientMock implements ConnectionInterface
 {
     public $resourceId;
     public array $messages;
+    public $Session;
 
-    public function __construct()
+    public function __construct(string $playerId = "")
     {
         $this->resourceId = Uuid::v4();
         $this->messages = array();
+        $this->Session = new SessionMock($playerId);
     }
 
     public function send($msg)

@@ -25,7 +25,7 @@ services:
   memcached: # port 11211
     restart: always
     container_name: memcached
-    image: memcached:latest
+    image: memcached:1.6.12
     ports:
       - "11211:11211"
   php-composer:
@@ -47,7 +47,9 @@ services:
     command: install
   db: # port 3306
     container_name: db
-    image: mysql:latest
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
     restart: always
     volumes:
       - ./server/src/Db/script/db.sql:/docker-entrypoint-initdb.d/db.sql
