@@ -38,11 +38,26 @@ A full stack extensible web application for running multiplayer turn based games
 
 ## Running
 
-To run simply run from the project directory:
+Create a .env file at the root of the project and paste in the following. Remember to fill in the empty fields:
+
+```
+MYSQL_HOST=db
+MYSQL_PORT=3306
+
+MYSQL_ROOT_PASSWORD=
+
+MYSQL_DATABASE=tttdb
+MYSQL_USER=game
+MYSQL_PASSWORD=
+MYSQL_ONETIME_PASSWORD=yes
+MYSQL_ALLOW_EMPTY_PASSWORD=no
+```
+
+Then to run the following command from the project directory:
 
 `docker-compose up`
 
-Navigate to localhost <b>in two different browsers (e.g. Firefox and Chrome as it only supports one client connection per browser application)</b> to test gameplay of Tic Tac Toe/Quantum Tic Tac Toe.
+Navigate to localhost:80 <b>in two different browsers (e.g. Firefox and Chrome as it only supports one client connection per browser application)</b> to test gameplay of Tic Tac Toe/Quantum Tic Tac Toe.
 
 ## Development
 
