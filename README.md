@@ -1,6 +1,6 @@
 # TTT_TG
 
-A full stack extensible web application for running multiplayer turn based games in canvas. Comes pre-loaded both Tic Tac Toe and Quantum Tic Tac Toe.
+A full stack extensible web application for running multiplayer turn based games in canvas. Comes pre-loaded with both Tic Tac Toe and Quantum Tic Tac Toe.
 
 ## Tech Stack
 
@@ -15,6 +15,7 @@ A full stack extensible web application for running multiplayer turn based games
     - PHP 8.0 and Symfony2 for session handling
     - Webpack/Gulp for tooling
     - SCSS Preprocessor
+    - Material Design component library
 
 ### Server
 
@@ -132,11 +133,15 @@ Addition of games to this application is relatively easy.
 ## Preview
 
 <figure><img src="https://i.imgur.com/HKvHlTq.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Fig.1 - Main Menu</b></figcaption></figure>
+&nbsp;
 
 <figure><img src="https://i.imgur.com/bjIoTNh.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Fig.2 - Game Menu</b></figcaption></figure>
+&nbsp;
 
 <figure><img src="https://i.imgur.com/XhHqOLM.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Fig.3 - Game Info</b></figcaption></figure>
+&nbsp;
 
 <figure><img src="https://i.imgur.com/k2aCBaM.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Fig.4 - Quantum Tic Tac Toe Preview</b></figcaption></figure>
+&nbsp;
 
 <figure><img src="https://i.imgur.com/8et3rTU.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Fig.5 -  Tic Tac Toe Priview</b></figcaption></figure>
