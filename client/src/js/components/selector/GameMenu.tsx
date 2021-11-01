@@ -12,7 +12,7 @@ const GameMenu = ({
   gameInfo,
   handleInfoClick,
 }: GameMenuProps): ReactElement => {
-  const { name, image, id, imageAlt, gameName } = gameInfo;
+  const { alias, image, id, imageAlt, gameName } = gameInfo;
   return (
     <div key={id} className="menu__selector">
       <SuspenseImage
@@ -24,7 +24,7 @@ const GameMenu = ({
       <div className="menu__selector__btn-container">
         <Link to={`/${gameName}`}>
           <button className="btn mdc-button mdc-button--raised">
-            <span className="mdc-button__label">{name}</span>
+            <span className="mdc-button__label">{alias}</span>
           </button>
         </Link>
         <button

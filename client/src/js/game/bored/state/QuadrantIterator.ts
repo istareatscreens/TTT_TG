@@ -1,5 +1,6 @@
 import { QuadrantNumber } from "../../../types/game";
 
+// I know this could be better done with generators
 export default class QuadrantIterator {
   private iterator: QuadrantNumber;
 

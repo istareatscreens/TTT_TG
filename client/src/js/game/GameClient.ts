@@ -5,7 +5,7 @@ import { Dimensions, GameResponse } from "../types/game";
 import { States } from "./bored/state/IGameState";
 import Controller from "./controllers/Controller";
 import IGame from "./IGame";
-import { TTTMessageIn } from "./message/TicTacToeMessage";
+import { TTTMessageIn } from "./message/Message";
 import TicTacToe from "./TicTacToe";
 
 interface Controllers {

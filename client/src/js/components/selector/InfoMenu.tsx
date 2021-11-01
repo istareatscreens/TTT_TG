@@ -7,8 +7,6 @@ interface GameInfoProps {
 }
 
 const InfoMenu = ({ gameInfo, setGameInfo }: GameInfoProps) => {
-  const [click, setClick] = useState<number>(0);
-
   return (
     <div className="menu--info-padding fade-in">
       <p className="menu__selector__info">

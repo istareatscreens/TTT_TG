@@ -7,7 +7,7 @@ import qttt from "../images/qttt.png";
 
 export interface GameInfo {
   id: number;
-  name: string;
+  alias: string;
   gameName: GameName;
   fullName: string;
   image: any;
@@ -23,7 +23,7 @@ export interface GameInfo {
 export const gamesInfo: GameInfo[] = [
   {
     id: 0,
-    name: "Classic",
+    alias: "Classic",
     gameName: "TicTacToe",
     fullName: "Tic Tac Toe",
     image: ttt,
@@ -40,7 +40,7 @@ export const gamesInfo: GameInfo[] = [
   },
   {
     id: 1,
-    name: "Quantum",
+    alias: "Quantum",
     gameName: "QTicTacToe",
     fullName: "Quantum Tic Tac Toe",
     image: qttt,

@@ -14,7 +14,11 @@ export default function Menu(): ReactElement {
     <>
       <div className="menu fade-in">
         <div className="mdc-card">
-          <h1 className="menu__title title menu--title-padding">Tic Tac Toe</h1>
+          <h1 className="menu__title title menu--title-padding">
+            TTT Turn-based
+            <br />
+            Games
+          </h1>
           <div className="menu__buttons">
             <Link to="/arcade">
               <button className="btn mdc-button mdc-button--raised">

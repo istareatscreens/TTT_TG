@@ -1,5 +1,5 @@
 import ISubscriber from "../common/interfaces/ISubscriber";
-import { TTTMessageIn, TTTMessageOut } from "../game/message/TicTacToeMessage";
+import { TTTMessageIn, TTTMessageOut } from "../game/message/Message";
 import IServer from "./IServer";
 const url = "ws://localhost:80/ws/";
 

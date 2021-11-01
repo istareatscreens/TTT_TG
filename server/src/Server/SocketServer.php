@@ -78,12 +78,12 @@ class SocketServer implements MessageComponentInterface
         // The connection is closed, remove it, as we can no longer send it messages
         $this->messageHandler->disconnectClient($conn);
         $conn->close();
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        //echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        echo "An error has occurred: {$e->getMessage()}\n";
+        //echo "An error has occurred: {$e->getMessage()}\n";
         $this->messageHandler->disconnectClient($conn);
         $conn->close();
     }
