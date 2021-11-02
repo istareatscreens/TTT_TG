@@ -73,7 +73,7 @@ After the container is launched run the following command to execute tests:
 
 ### Info
 
-Server structure is fairly simple. SocketServer.php opens the websocket connection, handles disconnects and recieves requests. MessageHandler class handles/validates requests directed from connected clients, ClientHandler class keeps track of each session and its connection. Handling of client disconnecting from multiple game is handled by the MySQL database.
+Server structure is fairly simple. SocketServer.php opens the websocket connection, handles disconnects and recieves requests. MessageHandler.php handles/validates requests directed from connected clients, ClientHandler.php keeps track of each session and its connection. Handling of client disconnection from multiple games is handled by the MySQL database.
 
 ### Client
 
@@ -91,7 +91,7 @@ Production build of the client can be tested by running:
 
 ### Info
 
-The client is split into two parts. The GameClient which interacts with the ReactJS front end through callbacks and recieves requests the server and sends requests from the player. The front-end is done in ReactJS with TypeScript and has routes specified in App.js using react-router-dom. Arcade.tsx handles url parsing as well as loading the GameClient through Game.tsx and providing a game menu (GameMenu.tsx) and info screen (GameInfo.tsx) through GameSelector.tsx.
+The client is split into two parts. The GameClient.ts which interacts with the ReactJS front end through callbacks and recieves requests from the server and sends requests from the player. The front-end is done in ReactJS with TypeScript and has routes specified in App.js using react-router-dom. Arcade.tsx handles url parsing as well as loading the GameClient through Game.tsx and providing a game menu (GameMenu.tsx) and info screen (GameInfo.tsx) through GameSelector.tsx.
 
 Styling is done roughly following BEM convention.
 
@@ -117,10 +117,10 @@ Addition of games to this application is relatively easy.
 
 1. Implement IGame.ts interface for your front-end game rendering logic using canvas. Make sure your constructor takes in a context and Dimensions of the canvas
 2. Add your new game and information about your game to the gamesInfo array in GameData.tsx
-3. In App.js add the Route to your Game as a child element in the Switch route e.g:
+3. In App.js add the Route to your Game as a child element in the Switch route, making sure the route matches the gameName in GameData.tsx e.g:
 
 ```
-<Route path="/QTicTacToe/:id" exact>
+<Route path="/TicTacToe" exact>
     <Arcade />
 </Route>
 <Route path="/TicTacToe/:id" exact>
@@ -131,7 +131,7 @@ Addition of games to this application is relatively easy.
 ### Server
 
 1. Implement GameInterface.php for your game logic. See AbstractTicTacToe.php as an example of how to setup createGame function
-2. In server.php create a new instance of your game and pass it to the GameFactory instance via addGame
+2. In server.php create a new instance of your game and pass it to the GameFactory instance via addGame method
 
 ### Notes
 
